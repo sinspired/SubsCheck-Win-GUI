@@ -1422,7 +1422,7 @@
             // 
             // timer4
             // 
-            this.timer4.Interval = 1000;
+            this.timer4.Interval = 100;
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
             // 
             // Form1

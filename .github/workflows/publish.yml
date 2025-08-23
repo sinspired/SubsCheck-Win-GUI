@@ -1,0 +1,118 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # 推送 tag 时触发，如 v1.0.0
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore subs-check.win.gui.sln
+
+    - name: Build project
+      run: msbuild subs-check.win.gui.csproj /p:Configuration=Release
+
+    - name: Package artifact
+      run: |
+        mkdir release
+        cp -r bin/Release/*.exe bin/Release/*.dll release/
+      shell: bash
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: subs-check-win
+        path: release/
+        if-no-files-found: error # 如果没有文件，报错
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: subs-check-win
+        path: release
+
+    - name: Prepare tags (delete local tags then fetch remote tags cleanly)
+      id: tags
+      run: |
+        # current tag 从触发环境取
+        CURRENT_TAG="${GITHUB_REF#refs/tags/}"
+        echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
+
+        # 找到上一个 tag（按创建时间倒序，排除当前）
+        PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${CURRENT_TAG}$" | head -n1 || true)
+        echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Generate changelog (no file, put into step output)
+      id: changelog
+      run: |
+        CURRENT="${{ steps.tags.outputs.current_tag }}"
+        PREV="${{ steps.tags.outputs.prev_tag }}"
+
+        if [ -z "$CURRENT" ]; then
+          echo "No current tag detected from GITHUB_REF; aborting changelog generation." >&2
+          printf '%s\n' "body<<EOF" >> $GITHUB_OUTPUT
+          printf '%s\n' "## Changelog" >> $GITHUB_OUTPUT
+          printf '%s\n' "- Unable to determine current tag from environment." >> $GITHUB_OUTPUT
+          printf '%s\n' "EOF" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        # 尝试获取 tag 的日期（短格式），失败则忽略
+        TAG_DATE=$(git log -1 --format=%ad --date=short "$CURRENT" 2>/dev/null || true)
+
+        if [ -z "$PREV" ]; then
+          # 首次发布或没有上一个 tag：取最近 20 条提交（短哈希 + 标题 + 作者）
+          LOG=$(git log --pretty=format:'- %h %s (%an)' --no-merges -n 20)
+        else
+          LOG=$(git log --pretty=format:'- %h %s (%an)' --no-merges "$PREV".."$CURRENT")
+        fi
+
+        if [ -z "$LOG" ]; then
+          LOG="- No notable changes found (commits may be merge/empty or follow a different convention)."
+        fi
+
+        HEADER="## Changelog"
+        printf '%s\n' "body<<EOF" >> $GITHUB_OUTPUT
+        printf '%s\n' "$HEADER" >> $GITHUB_OUTPUT
+        printf '%s\n' "$LOG" >> $GITHUB_OUTPUT
+        printf '%s\n' "EOF" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Create ZIP archive
+      run: |
+        cd release
+        zip -r subs-check-win.zip .
+      shell: bash # Zip the contents of the release directory
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        body: ${{ steps.changelog.outputs.body }}
+        files: release/subs-check-win.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
