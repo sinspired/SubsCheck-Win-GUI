@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+	<assemblyIdentity version="1.0.0.0" name="subs-check.win.gui" />
+	<description>subs-check.win.gui</description>
+
+	<!-- Windows visual & DPI settings -->
+	<application xmlns="urn:schemas-microsoft-com:asm.v3">
+		<windowsSettings>
+			<!-- 向下兼容的简单声明（老 Windows） -->
+			<dpiAware>true</dpiAware>
+			<!-- 在支持的 Windows 上启用 Per-Monitor V2（更好） -->
+			<dpiAwareness>PerMonitorV2</dpiAwareness>
+		</windowsSettings>
+	</application>
+</assembly>
