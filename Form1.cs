@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace subs_check.win.gui
 {
-    public partial class Form1: Form
+    public partial class Form1 : Form
     {
         //string 版本号;
         string 标题;
@@ -33,6 +33,13 @@ namespace subs_check.win.gui
         private string nextCheckTime = null;// 用于存储下次检查时间
         string WebUIapiKey = "CMLiussss";
         int downloading = 0;
+
+        // ——用于避免无意义的重复 UI 重绘——
+        private string _lastStateType = null;     // checking / idle / error
+        private string _lastLogLabelNodeInfoText = string.Empty;
+        private string _lastNotifyText = string.Empty;
+        private int _lastProgressBarValue = -1;
+
         public Form1()
         {
             InitializeComponent();
@@ -57,7 +64,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(comboBox1, "测速结果的保存方法。");
             toolTip1.SetToolTip(textBox2, "Gist ID：注意！非Github用户名！");
             toolTip1.SetToolTip(textBox3, "Github TOKEN");
-            
+
             toolTip1.SetToolTip(comboBox4, "通用订阅：内置了Sub-Store程序，自适应订阅格式。\nClash订阅：带规则的 Mihomo、Clash 订阅格式。");
             toolTip1.SetToolTip(comboBox5, "生成带规则的 Clash 订阅所需的覆写规则文件");
 
@@ -69,6 +76,26 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBox5, "开机启动：勾选后，程序将在Windows启动时自动运行");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
+        }
+
+        //临时禁用/恢复控件重绘
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        private const int WM_SETREDRAW = 0x000B;
+
+        private void SuspendRedraw(Control c)
+        {
+            if (c != null && c.IsHandleCreated)
+                SendMessage(c.Handle, WM_SETREDRAW, (IntPtr)0, IntPtr.Zero);
+        }
+
+        private void ResumeRedraw(Control c)
+        {
+            if (c != null && c.IsHandleCreated)
+            {
+                SendMessage(c.Handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero);
+                c.Invalidate();
+            }
         }
 
         private void SetupNotifyIconContextMenu()
@@ -189,7 +216,8 @@ namespace subs_check.win.gui
                 button1_Click(this, EventArgs.Empty);
                 this.Hide();
                 notifyIcon1.Visible = true;
-            } else await CheckGitHubVersionAsync();
+            }
+            else await CheckGitHubVersionAsync();
         }
 
         private async Task CheckGitHubVersionAsync()
@@ -203,7 +231,7 @@ namespace subs_check.win.gui
                 }
 
                 var result = await 获取版本号("https://api.github.com/repos/cmliu/SubsCheck-Win-GUI/releases/latest");
-                if (result.Item1 != "未知版本") 
+                if (result.Item1 != "未知版本")
                 {
                     string latestVersion = result.Item1;
                     if (latestVersion != 当前GUI版本号)
@@ -554,7 +582,7 @@ namespace subs_check.win.gui
                 config["enable-web-ui"] = true;
 
                 // 保存listen-port
-                if (checkBox4.Checked) 
+                if (checkBox4.Checked)
                 {
                     WebUIapiKey = textBox10.Text;
                     config["listen-port"] = $@":{numericUpDown6.Value}";
@@ -672,7 +700,7 @@ namespace subs_check.win.gui
                 }
                 else if (comboBox5.Text.StartsWith(githubRawPrefix)) config["mihomo-overwrite-url"] = githubProxyURL + comboBox5.Text;
                 else config["mihomo-overwrite-url"] = comboBox5.Text != "" ? comboBox5.Text : $"http://127.0.0.1:{numericUpDown6.Value}/ACL4SSR_Online_Full.yaml";
-                
+
                 config["rename-node"] = checkBox1.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBox2.Checked;//是否开启流媒体检测
                 config["keep-success-proxies"] = false;
@@ -743,7 +771,7 @@ namespace subs_check.win.gui
         private async void button1_Click(object sender, EventArgs e)
         {
             button1.Enabled = false;
-            if (button1.Text == "▶️ 启动") 
+            if (button1.Text == "▶️ 启动")
             {
                 if (checkBox4.Checked && textBox10.Text == "请输入密钥")
                 {
@@ -751,7 +779,7 @@ namespace subs_check.win.gui
                     return;
                 }
                 run = 1;
-                if (button3.Enabled==false)
+                if (button3.Enabled == false)
                 {
                     string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
                     string allyamlFilePath = Path.Combine(executablePath, "output", "all.yaml");
@@ -780,7 +808,7 @@ namespace subs_check.win.gui
                 await KillNodeProcessAsync();
                 await SaveConfig();
 
-                if (run == 1) 
+                if (run == 1)
                 {
                     // 更新菜单项的启用状态
                     startMenuItem.Enabled = false;
@@ -850,7 +878,7 @@ namespace subs_check.win.gui
                 }
 
                 var result = await 获取版本号("https://api.github.com/repos/beck-8/subs-check/releases/latest", true);
-                if (result.Item1 != "未知版本") 
+                if (result.Item1 != "未知版本")
                 {
                     // 创建不使用系统代理的 HttpClientHandler
                     HttpClientHandler handler = new HttpClientHandler
@@ -860,7 +888,7 @@ namespace subs_check.win.gui
                     };
 
                     // 使用自定义 handler 创建 HttpClient
-                    using (HttpClient client = new HttpClient(handler)) 
+                    using (HttpClient client = new HttpClient(handler))
                     {
                         try
                         {
@@ -1076,7 +1104,7 @@ namespace subs_check.win.gui
                                 "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -1351,107 +1379,180 @@ namespace subs_check.win.gui
                 }
             }
         }
-        
+
         private void SubsCheckProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Data))
+            if (string.IsNullOrEmpty(e.Data)) return;
+
+            var state = this.Tag as Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer>;
+            if (state == null)
             {
-                // 由于此事件在另一个线程中触发，需要使用 Invoke 在 UI 线程上更新控件
+                // 首次初始化在 UI 线程完成
                 BeginInvoke(new Action(() =>
                 {
-                    // 过滤ANSI转义序列
-                    string cleanText = RemoveAnsiEscapeCodes(e.Data);
-
-                    // 检查是否包含"下次检查时间"信息
-                    if (cleanText.Contains("下次检查时间:"))
+                    var st2 = this.Tag as Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer>;
+                    if (st2 != null)
                     {
-                        if (button3.Enabled == false)
-                        {
-                            string executablePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                            string outputFolderPath = System.IO.Path.Combine(executablePath, "output");
-                            if (System.IO.Directory.Exists(outputFolderPath))
-                            {
-                                string allyamlFilePath = System.IO.Path.Combine(outputFolderPath, "all.yaml");
-                                if (System.IO.File.Exists(allyamlFilePath)) button3.Enabled = true;
-                            }
-                        }
-                        // 提取完整的下次检查时间信息
-                        int startIndex = cleanText.IndexOf("下次检查时间:");
-                        nextCheckTime = cleanText.Substring(startIndex);
+                        st2.Item1.Enqueue(e.Data);
+                        // 启动定时器（如果尚未运行）
+                        if (!st2.Item2.Enabled) st2.Item2.Start();
+                        return;
                     }
 
-                    if (!cleanText.StartsWith("[GIN]"))
+                    var q = new System.Collections.Concurrent.ConcurrentQueue<string>();
+                    var t = new System.Windows.Forms.Timer { Interval = 200 }; // 可调：80-200ms
+                    t.Tick += (s, ev) =>
                     {
-                        // 如果不是进度行，则添加到日志中
-                        richTextBox1.AppendText(cleanText + "\r\n");
-                        // 滚动到最底部
-                        richTextBox1.SelectionStart = richTextBox1.Text.Length;
-                        richTextBox1.ScrollToCaret();
-                    }
-
-                    /*
-                    // 检查是否是进度信息行
-                    if (cleanText.StartsWith("进度: ["))
-                    {
-                        // 解析百分比
-                        int percentIndex = cleanText.IndexOf('%');
-                        if (percentIndex > 0)
+                        // 若无新日志，立即停表避免空转重绘
+                        if (q.IsEmpty)
                         {
-                            // 查找百分比前面的数字部分
-                            int startIndex = cleanText.LastIndexOfAny(new char[] { ' ', '>' }, percentIndex) + 1;
-                            string percentText = cleanText.Substring(startIndex, percentIndex - startIndex);
-
-                            if (double.TryParse(percentText, out double percentValue))
-                            {
-                                // 更新进度条，将百分比值（0-100）设置给进度条
-                                progressBar1.Value = (int)Math.Round(percentValue);
-                            }
+                            try { if (t.Enabled) t.Stop(); } catch { }
+                            return;
                         }
 
-                        // 解析节点信息部分（例如：(12/6167) 可用: 0）
-                        int infoStartIndex = cleanText.IndexOf('(');
-                        if (infoStartIndex > 0)
+                        var sb = new System.Text.StringBuilder();
+
+                        while (q.TryDequeue(out var rawLine))
                         {
-                            string fullNodeInfo = cleanText.Substring(infoStartIndex);
+                            string clean = RemoveAnsiEscapeCodes(rawLine);
 
-                            // 提取最重要的信息：节点数量和可用数量
-                            int endIndex = fullNodeInfo.IndexOf("2025-"); // 查找日期部分开始位置
-                            if (endIndex > 0)
+                            // 过滤掉空白行与 [GIN] 行，避免无意义刷新
+                            if (string.IsNullOrWhiteSpace(clean)) continue;
+                            if (clean.StartsWith("[GIN]")) continue;
+
+                            // 一次性“下次检查时间”
+                            if (clean.Contains("下次检查时间:"))
                             {
-                                nodeInfo = fullNodeInfo.Substring(0, endIndex).Trim();
-                            }
-                            else
-                            {
-                                // 如果找不到日期部分，则取前30个字符
-                                nodeInfo = fullNodeInfo.Length > 30 ? fullNodeInfo.Substring(0, 30) + "..." : fullNodeInfo;
+                                if (!button3.Enabled)
+                                {
+                                    string executablePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                                    string outputFolderPath = System.IO.Path.Combine(executablePath, "output");
+                                    if (System.IO.Directory.Exists(outputFolderPath))
+                                    {
+                                        string allyamlFilePath = System.IO.Path.Combine(outputFolderPath, "all.yaml");
+                                        if (System.IO.File.Exists(allyamlFilePath)) button3.Enabled = true;
+                                    }
+                                }
+                                int startIndex = clean.IndexOf("下次检查时间:");
+                                var lineOnly = clean.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)[0];
+                                nextCheckTime = lineOnly.Substring(startIndex);
                             }
 
-                            groupBox2.Text = "实时日志 " + nodeInfo;
-
-                            // 确保通知图标文本不超过63个字符
-                            string notifyText = "SubsCheck: " + nodeInfo;
-                            if (notifyText.Length > 63)
-                            {
-                                notifyText = notifyText.Substring(0, 60) + "...";
-                            }
-                            notifyIcon1.Text = notifyText;
+                            sb.AppendLine(clean);
                         }
 
-                        // 更新lastProgressLine，但不向richTextBox添加文本
-                        lastProgressLine = cleanText;
-                    }
-                    else
-                    {
-                        // 如果不是进度行，则添加到日志中
-                        richTextBox1.AppendText(cleanText + "\r\n");
-                        // 滚动到最底部
-                        richTextBox1.SelectionStart = richTextBox1.Text.Length;
-                        richTextBox1.ScrollToCaret();
-                    }
-                    */
+                        // 若本轮没有有效输出，停止计时器并退出
+                        if (sb.Length == 0)
+                        {
+                            try { if (q.IsEmpty && t.Enabled) t.Stop(); } catch { }
+                            return;
+                        }
+
+                        // 批量追加时暂时禁用重绘，减少闪烁
+                        SuspendRedraw(richTextBox1);
+                        try
+                        {
+                            richTextBox1.AppendText(sb.ToString());
+                            richTextBox1.SelectionStart = richTextBox1.TextLength;
+                            richTextBox1.ScrollToCaret();
+                        }
+                        finally
+                        {
+                            ResumeRedraw(richTextBox1);
+                        }
+
+                        // 若已消费完，停止定时器
+                        if (q.IsEmpty)
+                        {
+                            try { if (t.Enabled) t.Stop(); } catch { }
+                        }
+                    };
+
+                    t.Start();
+                    this.Tag = Tuple.Create(q, t);
+
+                    // 入队并确保定时器在 UI 线程已启动
+                    q.Enqueue(e.Data);
                 }));
+
+                return;
             }
+
+            // 已初始化：直接入队（非 UI 线程安全）
+            state.Item1.Enqueue(e.Data);
+
+            // 确保定时器正在运行（使用 BeginInvoke 在 UI 线程安全地检查/启动）
+            BeginInvoke(new Action(() =>
+            {
+                Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, Timer> st = this.Tag as Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer>;
+                if (st != null && !st.Item2.Enabled)
+                {
+                    st.Item2.Start();
+                }
+            }));
         }
+
+
+        /*
+        // 检查是否是进度信息行
+        if (cleanText.StartsWith("进度: ["))
+        {
+            // 解析百分比
+            int percentIndex = cleanText.IndexOf('%');
+            if (percentIndex > 0)
+            {
+                // 查找百分比前面的数字部分
+                int startIndex = cleanText.LastIndexOfAny(new char[] { ' ', '>' }, percentIndex) + 1;
+                string percentText = cleanText.Substring(startIndex, percentIndex - startIndex);
+
+                if (double.TryParse(percentText, out double percentValue))
+                {
+                    // 更新进度条，将百分比值（0-100）设置给进度条
+                    progressBar1.Value = (int)Math.Round(percentValue);
+                }
+            }
+
+            // 解析节点信息部分（例如：(12/6167) 可用: 0）
+            int infoStartIndex = cleanText.IndexOf('(');
+            if (infoStartIndex > 0)
+            {
+                string fullNodeInfo = cleanText.Substring(infoStartIndex);
+
+                // 提取最重要的信息：节点数量和可用数量
+                int endIndex = fullNodeInfo.IndexOf("2025-"); // 查找日期部分开始位置
+                if (endIndex > 0)
+                {
+                    nodeInfo = fullNodeInfo.Substring(0, endIndex).Trim();
+                }
+                else
+                {
+                    // 如果找不到日期部分，则取前30个字符
+                    nodeInfo = fullNodeInfo.Length > 30 ? fullNodeInfo.Substring(0, 30) + "..." : fullNodeInfo;
+                }
+
+                groupBox2.Text = "实时日志 " + nodeInfo;
+
+                // 确保通知图标文本不超过63个字符
+                string notifyText = "SubsCheck: " + nodeInfo;
+                if (notifyText.Length > 63)
+                {
+                    notifyText = notifyText.Substring(0, 60) + "...";
+                }
+                notifyIcon1.Text = notifyText;
+            }
+
+            // 更新lastProgressLine，但不向richTextBox添加文本
+            lastProgressLine = cleanText;
+        }
+        else
+        {
+            // 如果不是进度行，则添加到日志中
+            richTextBox1.AppendText(cleanText + "\r\n");
+            // 滚动到最底部
+            richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            richTextBox1.ScrollToCaret();
+        }
+        */
 
 
         // 添加一个方法来过滤ANSI转义序列
@@ -1664,7 +1765,7 @@ namespace subs_check.win.gui
         private void comboBox3_Leave(object sender, EventArgs e)
         {
             // 检查是否有内容
-            if (string.IsNullOrWhiteSpace(comboBox3.Text)) 
+            if (string.IsNullOrWhiteSpace(comboBox3.Text))
             {
                 comboBox3.Text = "自动选择";
                 return;
@@ -1728,7 +1829,7 @@ namespace subs_check.win.gui
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
             判断保存类型();
-            if(!(comboBox1.Text == "本地" || comboBox1.Text == "") && button2.Text == "高级设置∨") button2_Click(sender, e);
+            if (!(comboBox1.Text == "本地" || comboBox1.Text == "") && button2.Text == "高级设置∨") button2_Click(sender, e);
         }
 
         private void textBox3_Enter(object sender, EventArgs e)
@@ -1757,7 +1858,7 @@ namespace subs_check.win.gui
 
         private void textBox10_Leave(object sender, EventArgs e)
         {
-            
+
             if (textBox10.Text == "")
             {
                 textBox10.PasswordChar = '\0';
@@ -2101,7 +2202,8 @@ namespace subs_check.win.gui
                     try
                     {
                         // 使用Task.Run将可能耗时的操作放在后台线程执行
-                        string processPath = await Task.Run(() => {
+                        string processPath = await Task.Run(() =>
+                        {
                             try
                             {
                                 return process.MainModule?.FileName;
@@ -2119,7 +2221,8 @@ namespace subs_check.win.gui
                             // 找到匹配的进程，终止它
                             Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...");
 
-                            await Task.Run(() => {
+                            await Task.Run(() =>
+                            {
                                 process.Kill();
                                 process.WaitForExit();
                             });
@@ -2202,7 +2305,7 @@ namespace subs_check.win.gui
 
         private async void timer3_Tick(object sender, EventArgs e)
         {
-            if (button1.Text == "⏹️ 停止") 
+            if (button1.Text == "⏹️ 停止")
             {
                 Log("subs-check.exe 运行时满24小时，自动重启清理内存占用。");
                 // 停止 subs-check.exe 程序
@@ -2242,7 +2345,8 @@ namespace subs_check.win.gui
             checkUpdatesForm.最新GUI版本号 = 最新GUI版本号;
 
             // 为 CheckUpdates 的 button2 添加点击事件处理程序
-            checkUpdatesForm.FormClosed += (s, args) => {
+            checkUpdatesForm.FormClosed += (s, args) =>
+            {
                 // 移除事件处理，避免内存泄漏
                 if (checkUpdatesForm.DialogResult == DialogResult.OK)
                 {
@@ -2404,7 +2508,7 @@ namespace subs_check.win.gui
 
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
-            if(checkBox4.Checked) textBox10.Enabled = true;
+            if (checkBox4.Checked) textBox10.Enabled = true;
             else textBox10.Enabled = false;
         }
 
@@ -2538,38 +2642,71 @@ namespace subs_check.win.gui
 
             if (状态类型 == "checking")
             {
-                button7.Text = "⏸️ 暂停";
+                button7.Text = button7.Text == "⏸️ 暂停" ? button7.Text : "⏸️ 暂停";
                 nodeInfo = $"({进度百分比}/{节点总数}) 可用: {可用节点数量}";
-                int nodeTotal = int.Parse(节点总数);
-                if (nodeTotal > 0) {
-                    int 进度条百分比 = int.Parse(进度百分比) * 100 / nodeTotal;
-                    progressBar1.Value = 进度条百分比;
+
+                int.TryParse(节点总数, out int nodeTotal);
+                int.TryParse(进度百分比, out int curr);
+
+                if (nodeTotal > 0)
+                {
+                    int 进度条百分比 = curr * 100 / nodeTotal;
+                    if (进度条百分比 < 0) 进度条百分比 = 0;
+                    if (进度条百分比 > 100) 进度条百分比 = 100;
+
+                    if (_lastProgressBarValue != 进度条百分比)
+                    {
+                        _lastProgressBarValue = 进度条百分比;
+                        progressBar1.Value = 进度条百分比;
+                    }
+
                     if (!button7.Enabled) button7.Enabled = true;
                 }
-                
-                // 确保通知图标文本不超过63个字符
+
+                // 仅在文本变化时更新 NotifyIcon，避免频繁重绘
                 string notifyText = "SubsCheck: " + nodeInfo;
-                if (notifyText.Length > 63)
+                if (notifyText.Length > 63) notifyText = notifyText.Substring(0, 60) + "...";
+                if (_lastNotifyText != notifyText)
                 {
-                    notifyText = notifyText.Substring(0, 60) + "...";
+                    _lastNotifyText = notifyText;
+                    notifyIcon1.Text = notifyText;
                 }
-                notifyIcon1.Text = notifyText;
-                textBox1.Enabled = false;
+
+                if (textBox1.Enabled) textBox1.Enabled = false; // 仅在需要时改变
             }
             else if (状态类型 == "idle")
             {
-                button7.Text = "⏯️ 开始";
-                progressBar1.Value = 100;
+                if (button7.Text != "⏯️ 开始") button7.Text = "⏯️ 开始";
+
+                if (_lastProgressBarValue != 100)
+                {
+                    _lastProgressBarValue = 100;
+                    progressBar1.Value = 100;
+                }
+
                 nodeInfo = $"等待{nextCheckTime}";
-                notifyIcon1.Text = "SubsCheck: 已就绪\n" + nextCheckTime; ;
-                textBox1.Enabled = true;
+                string idleNotify = "SubsCheck: 已就绪\n" + nextCheckTime;
+                if (_lastNotifyText != idleNotify)
+                {
+                    _lastNotifyText = idleNotify;
+                    notifyIcon1.Text = idleNotify;
+                }
+
+                if (!textBox1.Enabled) textBox1.Enabled = true;
             }
             else if (状态类型 == "error")
             {
-                button7.Text = "🔀 未知";
+                if (button7.Text != "🔀 未知") button7.Text = "🔀 未知";
                 nodeInfo = 状态文本;
             }
-            groupBox2.Text = $"实时日志 {nodeInfo}";
+
+            // 仅在标题文字确实变化时更新，避免父容器反复重绘引起的闪烁
+            string groupTitle = $"实时日志 {nodeInfo}";
+            if (_lastLogLabelNodeInfoText != groupTitle)
+            {
+                _lastLogLabelNodeInfoText = groupTitle;
+                LogLabelNodeInfo.Text = groupTitle;
+            }
         }
 
         private async void button7_Click(object sender, EventArgs e)
