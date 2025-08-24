@@ -63,7 +63,13 @@
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.button5 = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.LogLabelNodeInfo = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
+            this.checkBox6 = new System.Windows.Forms.CheckBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.numericUpDown9 = new System.Windows.Forms.NumericUpDown();
             this.button8 = new System.Windows.Forms.Button();
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
@@ -112,6 +118,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -475,7 +483,7 @@
             // 
             // numericUpDown5
             // 
-            this.numericUpDown5.Location = new System.Drawing.Point(515, 79);
+            this.numericUpDown5.Location = new System.Drawing.Point(515, 78);
             this.numericUpDown5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             10,
@@ -509,7 +517,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(350, 84);
+            this.label5.Location = new System.Drawing.Point(350, 83);
             this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(158, 21);
@@ -550,21 +558,13 @@
             this.label20.TabIndex = 20;
             this.label20.Text = "Sub-Store端口：";
             // 
-            // 进度显示标签，需在groupBox2 上方，避免groupBox2标题刷新导致日志界面无意义重绘
-            // 
-            this.LogLabelNodeInfo = new System.Windows.Forms.Label();
-            this.LogLabelNodeInfo.AutoSize = true;
-            this.LogLabelNodeInfo.Location = new System.Drawing.Point(0, 0); // 放在标题右边
-            this.LogLabelNodeInfo.Name = "LogLabelNodeInfo";
-            this.LogLabelNodeInfo.Size = new System.Drawing.Size(0, 21);
-            this.LogLabelNodeInfo.TabIndex = 22;
-            this.LogLabelNodeInfo.Text = "实时日志";
-            // 
             // groupBox2
             // 
+            this.groupBox2.CausesValidation = false;
             this.groupBox2.Controls.Add(this.linkLabel1);
             this.groupBox2.Controls.Add(this.button5);
             this.groupBox2.Controls.Add(this.richTextBox1);
+            this.groupBox2.Controls.Add(this.LogLabelNodeInfo);
             this.groupBox2.Location = new System.Drawing.Point(354, 23);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox2.Name = "groupBox2";
@@ -572,8 +572,6 @@
             this.groupBox2.Size = new System.Drawing.Size(1100, 847);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "";
-            this.groupBox2.Controls.Add(this.LogLabelNodeInfo);
             // 
             // linkLabel1
             // 
@@ -601,7 +599,10 @@
             // 
             // richTextBox1
             // 
+            this.richTextBox1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBox1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.richTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.richTextBox1.Location = new System.Drawing.Point(6, 29);
             this.richTextBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.richTextBox1.Name = "richTextBox1";
@@ -611,8 +612,22 @@
             this.richTextBox1.Text = "";
             this.richTextBox1.DoubleClick += new System.EventHandler(this.richTextBox1_DoubleClick);
             // 
+            // LogLabelNodeInfo
+            // 
+            this.LogLabelNodeInfo.AutoSize = true;
+            this.LogLabelNodeInfo.Location = new System.Drawing.Point(0, 0);
+            this.LogLabelNodeInfo.Name = "LogLabelNodeInfo";
+            this.LogLabelNodeInfo.Size = new System.Drawing.Size(94, 21);
+            this.LogLabelNodeInfo.TabIndex = 22;
+            this.LogLabelNodeInfo.Text = "实时日志";
+            // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.numericUpDown10);
+            this.groupBox3.Controls.Add(this.checkBox6);
+            this.groupBox3.Controls.Add(this.label22);
+            this.groupBox3.Controls.Add(this.label21);
+            this.groupBox3.Controls.Add(this.numericUpDown9);
             this.groupBox3.Controls.Add(this.button8);
             this.groupBox3.Controls.Add(this.textBox10);
             this.groupBox3.Controls.Add(this.checkBox4);
@@ -637,15 +652,84 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.groupBox3.Size = new System.Drawing.Size(1430, 180);
+            this.groupBox3.Size = new System.Drawing.Size(1430, 216);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "高级设置";
             this.groupBox3.Visible = false;
             // 
+            // numericUpDown10
+            // 
+            this.numericUpDown10.Enabled = false;
+            this.numericUpDown10.Location = new System.Drawing.Point(224, 119);
+            this.numericUpDown10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDown10.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDown10.Name = "numericUpDown10";
+            this.numericUpDown10.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDown10.TabIndex = 37;
+            this.numericUpDown10.Value = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            // 
+            // checkBox6
+            // 
+            this.checkBox6.AutoSize = true;
+            this.checkBox6.Location = new System.Drawing.Point(17, 127);
+            this.checkBox6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBox6.Name = "checkBox6";
+            this.checkBox6.Size = new System.Drawing.Size(207, 25);
+            this.checkBox6.TabIndex = 36;
+            this.checkBox6.Text = "带宽限制(MB/s)：";
+            this.checkBox6.UseVisualStyleBackColor = true;
+            this.checkBox6.CheckedChanged += new System.EventHandler(this.checkBox6_CheckedChanged);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(13, 181);
+            this.label22.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(0, 21);
+            this.label22.TabIndex = 33;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(350, 129);
+            this.label21.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(159, 21);
+            this.label21.TabIndex = 31;
+            this.label21.Text = "测速大小(MB)：";
+            // 
+            // numericUpDown9
+            // 
+            this.numericUpDown9.Location = new System.Drawing.Point(515, 124);
+            this.numericUpDown9.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDown9.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown9.Name = "numericUpDown9";
+            this.numericUpDown9.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDown9.TabIndex = 30;
+            this.numericUpDown9.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(1274, 75);
+            this.button8.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button8.Location = new System.Drawing.Point(1126, 165);
             this.button8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(138, 40);
@@ -658,7 +742,7 @@
             // 
             this.textBox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox10.Enabled = false;
-            this.textBox10.Location = new System.Drawing.Point(258, 128);
+            this.textBox10.Location = new System.Drawing.Point(258, 170);
             this.textBox10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox10.Name = "textBox10";
             this.textBox10.PasswordChar = '*';
@@ -671,7 +755,7 @@
             // checkBox4
             // 
             this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(16, 131);
+            this.checkBox4.Location = new System.Drawing.Point(16, 173);
             this.checkBox4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox4.Name = "checkBox4";
             this.checkBox4.Size = new System.Drawing.Size(240, 25);
@@ -683,7 +767,7 @@
             // numericUpDown8
             // 
             this.numericUpDown8.Enabled = false;
-            this.numericUpDown8.Location = new System.Drawing.Point(224, 79);
+            this.numericUpDown8.Location = new System.Drawing.Point(224, 78);
             this.numericUpDown8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDown8.Maximum = new decimal(new int[] {
             65535,
@@ -707,7 +791,7 @@
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(16, 84);
+            this.checkBox3.Location = new System.Drawing.Point(17, 81);
             this.checkBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(183, 25);
@@ -718,13 +802,16 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(1274, 124);
+            this.button4.BackColor = System.Drawing.Color.LimeGreen;
+            this.button4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button4.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.button4.Location = new System.Drawing.Point(1276, 165);
             this.button4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(138, 40);
             this.button4.TabIndex = 26;
             this.button4.Text = "检查更新";
-            this.button4.UseVisualStyleBackColor = true;
+            this.button4.UseVisualStyleBackColor = false;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // checkBox1
@@ -732,7 +819,7 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(16, 35);
+            this.checkBox1.Location = new System.Drawing.Point(17, 35);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(162, 25);
@@ -744,7 +831,7 @@
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(194, 35);
+            this.checkBox2.Location = new System.Drawing.Point(198, 35);
             this.checkBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(141, 25);
@@ -775,17 +862,17 @@
                 "line_Full_WithIcon.yaml",
             "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/添加直连规则.yam" +
                 "l"});
-            this.comboBox5.Location = new System.Drawing.Point(759, 128);
+            this.comboBox5.Location = new System.Drawing.Point(895, 125);
             this.comboBox5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBox5.Name = "comboBox5";
-            this.comboBox5.Size = new System.Drawing.Size(501, 29);
+            this.comboBox5.Size = new System.Drawing.Size(517, 29);
             this.comboBox5.TabIndex = 24;
             this.comboBox5.SelectedIndexChanged += new System.EventHandler(this.comboBox5_SelectedIndexChanged);
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(477, 133);
+            this.label19.Location = new System.Drawing.Point(633, 129);
             this.label19.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(265, 21);
@@ -1222,7 +1309,7 @@
             "tube.20140301.xyz",
             "vps.pansen626.com",
             "wfgithub.xiaonuomi.ie.eu.org"});
-            this.comboBox3.Location = new System.Drawing.Point(1100, 33);
+            this.comboBox3.Location = new System.Drawing.Point(1104, 33);
             this.comboBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(308, 29);
@@ -1249,10 +1336,10 @@
                 "p.zip",
             "https://github.com/VSCodium/vscodium/releases/download/1.98.0.25067/codium-1.98.0" +
                 ".25067-el9.aarch64.rpm"});
-            this.comboBox2.Location = new System.Drawing.Point(759, 79);
+            this.comboBox2.Location = new System.Drawing.Point(741, 79);
             this.comboBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(501, 29);
+            this.comboBox2.Size = new System.Drawing.Size(671, 29);
             this.comboBox2.TabIndex = 19;
             this.comboBox2.Text = "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
     "Waifu2x-Extension-GUI-v2.21.12-Portable.7z";
@@ -1260,7 +1347,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(631, 84);
+            this.label9.Location = new System.Drawing.Point(631, 83);
             this.label9.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(115, 21);
@@ -1269,11 +1356,15 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(24, 5);
-            this.progressBar1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.progressBar1.Location = new System.Drawing.Point(0, 0);
+            this.progressBar1.Margin = new System.Windows.Forms.Padding(0);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(1430, 5);
+            this.progressBar1.Size = new System.Drawing.Size(1466, 10);
+            this.progressBar1.Step = 1;
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar1.TabIndex = 3;
+            this.toolTip1.SetToolTip(this.progressBar1, "检测进度");
+            this.progressBar1.Visible = false;
             // 
             // timer2
             // 
@@ -1288,7 +1379,7 @@
             this.groupBox4.Controls.Add(this.label12);
             this.groupBox4.Controls.Add(this.textBox2);
             this.groupBox4.Controls.Add(this.label11);
-            this.groupBox4.Location = new System.Drawing.Point(24, 1071);
+            this.groupBox4.Location = new System.Drawing.Point(24, 1106);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1368,7 +1459,7 @@
             this.groupBox5.Controls.Add(this.label15);
             this.groupBox5.Controls.Add(this.textBox7);
             this.groupBox5.Controls.Add(this.label16);
-            this.groupBox5.Location = new System.Drawing.Point(24, 1171);
+            this.groupBox5.Location = new System.Drawing.Point(24, 1205);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1428,7 +1519,7 @@
             this.groupBox6.Controls.Add(this.label17);
             this.groupBox6.Controls.Add(this.textBox9);
             this.groupBox6.Controls.Add(this.label18);
-            this.groupBox6.Location = new System.Drawing.Point(24, 1270);
+            this.groupBox6.Location = new System.Drawing.Point(24, 1304);
             this.groupBox6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1513,7 +1604,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1467, 1372);
+            this.ClientSize = new System.Drawing.Size(1466, 1406);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
@@ -1539,6 +1630,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
@@ -1625,6 +1718,11 @@
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.CheckBox checkBox5;
+        private System.Windows.Forms.NumericUpDown numericUpDown9;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.CheckBox checkBox6;
+        private System.Windows.Forms.NumericUpDown numericUpDown10;
     }
 }
 

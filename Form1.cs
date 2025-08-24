@@ -9,7 +9,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -35,10 +34,8 @@ namespace subs_check.win.gui
         int downloading = 0;
 
         // ——用于避免无意义的重复 UI 重绘——
-        private string _lastStateType = null;     // checking / idle / error
         private string _lastLogLabelNodeInfoText = string.Empty;
         private string _lastNotifyText = string.Empty;
-        private int _lastProgressBarValue = -1;
 
         public Form1()
         {
@@ -54,6 +51,8 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(numericUpDown5, "下载测试时间(s)：与下载链接大小相关，默认最大测试10s。");
             toolTip1.SetToolTip(numericUpDown6, "本地监听端口：用于直接返回测速结果的节点信息，方便 Sub-Store 实现订阅转换。");
             toolTip1.SetToolTip(numericUpDown7, "Sub-Store监听端口：用于订阅订阅转换。\n注意：除非你知道你在干什么，否则不要将你的 Sub-Store 暴露到公网，否则可能会被滥用");
+            toolTip1.SetToolTip(numericUpDown9, "下载测试限制(MB)：当达到下载数据大小时，停止下载，可节省测速流量，减少测速测死的概率");
+            toolTip1.SetToolTip(numericUpDown10, "总下载速度限制(MB/s)：建议设置为 <=带宽/8, 比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20");
             toolTip1.SetToolTip(textBox1, "节点池订阅地址：支持 Link、Base64、Clash 格式的订阅链接。");
             toolTip1.SetToolTip(checkBox1, "以节点IP查询位置重命名节点。\n质量差的节点可能造成IP查询失败，造成整体检查速度稍微变慢。");
             toolTip1.SetToolTip(checkBox2, "是否开启流媒体检测，其中IP欺诈依赖'节点地址查询'，内核版本需要 v2.0.8 以上\n\n示例：美国1 | ⬇️ 5.6MB/s |0%|Netflix|Disney|Openai\n风控值：0% (使用ping0.cc标准)\n流媒体解锁：Netflix、Disney、Openai");
@@ -69,7 +68,10 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(comboBox5, "生成带规则的 Clash 订阅所需的覆写规则文件");
 
             toolTip1.SetToolTip(checkBox3, "保存几个成功的节点，不选代表不限制，内核版本需要 v2.1.0 以上\n如果你的并发数量超过这个参数，那么成功的结果可能会大于这个数值");
+            toolTip1.SetToolTip(checkBox6, "总的下载速度限制,不选代表不限制");
             toolTip1.SetToolTip(numericUpDown8, "保存几个成功的节点，不选代表不限制，内核版本需要 v2.1.0 以上\n如果你的并发数量超过这个参数，那么成功的结果可能会大于这个数值");
+
+            toolTip1.SetToolTip(numericUpDown10, "总的下载速度限制,不选代表不限制");
 
             toolTip1.SetToolTip(textBox11, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
@@ -295,6 +297,12 @@ namespace subs_check.win.gui
                     int? downloadtimeoutValue = 读取config整数(config, "download-timeout");
                     if (downloadtimeoutValue.HasValue) numericUpDown5.Value = downloadtimeoutValue.Value;
 
+                    int? downloadLimitSizeValue = 读取config整数(config, "download-mb");
+                    if (downloadLimitSizeValue.HasValue) numericUpDown9.Value = downloadLimitSizeValue.Value;
+
+                    int? downloadLimitSpeedValue = 读取config整数(config, "total-speed-limit");
+                    if (downloadLimitSpeedValue.HasValue) numericUpDown10.Value = downloadLimitSpeedValue.Value;
+
                     string speedTestUrl = 读取config字符串(config, "speed-test-url");
                     if (speedTestUrl != null) comboBox2.Text = speedTestUrl;
 
@@ -447,6 +455,22 @@ namespace subs_check.win.gui
                         }
                     }
 
+                    int? totalspeedlimit = 读取config整数(config, "total-speed-limit");
+                    if (totalspeedlimit.HasValue)
+                    {
+                        if (totalspeedlimit.Value == 0)
+                        {
+                            checkBox6.Checked = false;
+                            numericUpDown10.Enabled = false;
+                        }
+                        else
+                        {
+                            checkBox6.Checked = true;
+                            numericUpDown10.Enabled = true;
+                            numericUpDown10.Value = totalspeedlimit.Value;
+                        }
+                    }
+
                     string enablewebui = 读取config字符串(config, "enable-web-ui");
                     if (enablewebui != null && enablewebui == "true") checkBox4.Checked = true;
                     else checkBox4.Checked = false;
@@ -557,6 +581,9 @@ namespace subs_check.win.gui
                 config["timeout"] = (int)numericUpDown3.Value;
                 config["min-speed"] = (int)numericUpDown4.Value;
                 config["download-timeout"] = (int)numericUpDown5.Value;
+                config["download-mb"] = (int)numericUpDown9.Value;
+                config["total-speed-limit"] = (int)numericUpDown10.Value;
+
 
                 if (!string.IsNullOrEmpty(comboBox2.Text)) config["speed-test-url"] = comboBox2.Text;
 
@@ -714,6 +741,10 @@ namespace subs_check.win.gui
                 if (checkBox3.Checked) config["success-limit"] = (int)numericUpDown8.Value;
                 else config["success-limit"] = 0;
 
+                //下载速度限制,为0代表不限制
+                if (checkBox6.Checked) config["total-speed-limit"] = (int)numericUpDown10.Value;
+                else config["total-speed-limit"] = 0;
+
                 // 使用YamlDotNet序列化配置
                 var serializer = new YamlDotNet.Serialization.SerializerBuilder()
                     .WithIndentedSequences()  // 使序列化结果更易读
@@ -792,6 +823,8 @@ namespace subs_check.win.gui
                 numericUpDown3.Enabled = false;
                 numericUpDown4.Enabled = false;
                 numericUpDown5.Enabled = false;
+                numericUpDown9.Enabled = false;
+                numericUpDown10.Enabled = false;
                 numericUpDown6.Enabled = false;
                 numericUpDown7.Enabled = false;
                 comboBox1.Enabled = false;
@@ -828,7 +861,8 @@ namespace subs_check.win.gui
                 run = 0;
                 Log("任务停止");
                 progressBar1.Value = 0;
-                groupBox2.Text = "实时日志";
+                progressBar1.Visible = false;
+                LogLabelNodeInfo.Text = "实时日志";
                 notifyIcon1.Text = "SubsCheck: 未运行";
                 // 停止 subs-check.exe 程序
                 StopSubsCheckProcess();
@@ -842,6 +876,8 @@ namespace subs_check.win.gui
                 numericUpDown3.Enabled = true;
                 numericUpDown4.Enabled = true;
                 numericUpDown5.Enabled = true;
+                numericUpDown9.Enabled = true;
+                numericUpDown10.Enabled = true;
                 numericUpDown6.Enabled = true;
                 numericUpDown7.Enabled = true;
                 comboBox1.Enabled = true;
@@ -1054,6 +1090,7 @@ namespace subs_check.win.gui
                                     MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
                                         "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     progressBar1.Value = 0;
+                                    progressBar1.Visible = false;
                                 }
 
                                 // 解压文件
@@ -1263,7 +1300,8 @@ namespace subs_check.win.gui
             {
                 // 重置进度条
                 progressBar1.Value = 0;
-                groupBox2.Text = "实时日志";
+                progressBar1.Visible = true;
+                LogLabelNodeInfo.Text = "实时日志";
                 using (MemoryStream ms = new MemoryStream(Properties.Resources.going))
                 {
                     notifyIcon1.Icon = new Icon(ms);
@@ -1581,6 +1619,8 @@ namespace subs_check.win.gui
                 numericUpDown3.Enabled = true;
                 numericUpDown4.Enabled = true;
                 numericUpDown5.Enabled = true;
+                numericUpDown9.Enabled = true;
+                numericUpDown10.Enabled = true;
                 numericUpDown6.Enabled = true;
                 textBox1.Enabled = true;
                 groupBox3.Enabled = true;
@@ -2319,6 +2359,8 @@ namespace subs_check.win.gui
                 numericUpDown3.Enabled = false;
                 numericUpDown4.Enabled = false;
                 numericUpDown5.Enabled = false;
+                numericUpDown9.Enabled = false;
+                numericUpDown10.Enabled = false;
                 numericUpDown6.Enabled = false;
                 numericUpDown7.Enabled = false;
                 comboBox1.Enabled = false;
@@ -2368,6 +2410,12 @@ namespace subs_check.win.gui
             else numericUpDown8.Enabled = false;
         }
 
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox6.Checked) numericUpDown10.Enabled = true;
+            else numericUpDown10.Enabled = false;
+        }
+
         private async void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox5.Text.Contains("[内置]")) await ProcessComboBox5Selection(true);
@@ -2411,6 +2459,7 @@ namespace subs_check.win.gui
 
                 // 重置进度条
                 progressBar1.Value = 0;
+                progressBar1.Visible = true;
 
                 // 添加GitHub代理前缀如果有
                 string fullDownloadUrl = githubProxyURL + downloadUrl;
@@ -2479,6 +2528,7 @@ namespace subs_check.win.gui
                     Log($"{displayName} 覆写配置文件 下载失败: {ex.Message}", true);
                     // 出错时重置进度条
                     progressBar1.Value = 0;
+                    progressBar1.Visible = false;
                 }
             }
             else
@@ -2654,11 +2704,7 @@ namespace subs_check.win.gui
                     if (进度条百分比 < 0) 进度条百分比 = 0;
                     if (进度条百分比 > 100) 进度条百分比 = 100;
 
-                    if (_lastProgressBarValue != 进度条百分比)
-                    {
-                        _lastProgressBarValue = 进度条百分比;
-                        progressBar1.Value = 进度条百分比;
-                    }
+                    progressBar1.Value = 进度条百分比;
 
                     if (!button7.Enabled) button7.Enabled = true;
                 }
@@ -2678,11 +2724,7 @@ namespace subs_check.win.gui
             {
                 if (button7.Text != "⏯️ 开始") button7.Text = "⏯️ 开始";
 
-                if (_lastProgressBarValue != 100)
-                {
-                    _lastProgressBarValue = 100;
-                    progressBar1.Value = 100;
-                }
+                progressBar1.Value = 100;
 
                 nodeInfo = $"等待{nextCheckTime}";
                 string idleNotify = "SubsCheck: 已就绪\n" + nextCheckTime;
