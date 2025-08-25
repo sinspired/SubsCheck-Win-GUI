@@ -661,7 +661,7 @@
             // numericUpDown10
             // 
             this.numericUpDown10.Enabled = false;
-            this.numericUpDown10.Location = new System.Drawing.Point(224, 119);
+            this.numericUpDown10.Location = new System.Drawing.Point(224, 124);
             this.numericUpDown10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDown10.Maximum = new decimal(new int[] {
             1000,
@@ -803,6 +803,7 @@
             // button4
             // 
             this.button4.BackColor = System.Drawing.Color.LimeGreen;
+            this.button4.FlatAppearance.BorderSize = 0;
             this.button4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button4.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.button4.Location = new System.Drawing.Point(1276, 165);
