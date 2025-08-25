@@ -798,11 +798,22 @@ namespace subs_check.win.gui
             {
                 button2.Text = "高级设置∨";
                 groupBox3.Visible = false;
+                groupBox7.Visible = false;
+                groupBox8.Visible = false;
+                if (checkBox7.Checked)
+                {
+                    groupBox7.Visible = false;
+                    groupBox8.Visible = false;
+                }
             }
             else
             {
                 button2.Text = "高级设置∧";
                 groupBox3.Visible = true;
+                if (checkBox7.Checked) {
+                    groupBox7.Visible = true;
+                    groupBox8.Visible = true;
+                }
             }
             判断保存类型();
         }
