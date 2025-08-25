@@ -304,7 +304,11 @@ namespace subs_check.win.gui
                     if (downloadLimitSpeedValue.HasValue) numericUpDown10.Value = downloadLimitSpeedValue.Value;
 
                     string speedTestUrl = 读取config字符串(config, "speed-test-url");
-                    if (speedTestUrl != null) comboBox2.Text = speedTestUrl;
+                    if (speedTestUrl != null)
+                    {
+                        comboBox2.Items.Add(speedTestUrl);
+                        comboBox2.Text = speedTestUrl;
+                    }
 
                     string savemethod = 读取config字符串(config, "save-method");
                     if (savemethod != null)
@@ -1802,6 +1806,20 @@ namespace subs_check.win.gui
             button3.Text = "复制订阅";
         }
 
+        private void comboBox2_Leave(object sender, EventArgs e)
+        {
+            // 检查是否有内容
+            if (string.IsNullOrWhiteSpace(comboBox2.Text))
+            {
+                return;
+            }
+
+            string input = comboBox2.Text.Trim();
+
+            // 更新 comboBox2 的文本和选项
+            comboBox2.Items.Add(input);
+            comboBox2.Text = input;
+        }
         private void comboBox3_Leave(object sender, EventArgs e)
         {
             // 检查是否有内容
