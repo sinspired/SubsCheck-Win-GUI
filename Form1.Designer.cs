@@ -34,12 +34,11 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.textBox11 = new System.Windows.Forms.TextBox();
+            this.textBoxCron = new System.Windows.Forms.TextBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.button3 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
@@ -49,10 +48,12 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.labelCron = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
@@ -143,12 +144,11 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.checkBox5);
-            this.groupBox1.Controls.Add(this.textBox11);
+            this.groupBox1.Controls.Add(this.textBoxCron);
             this.groupBox1.Controls.Add(this.button7);
             this.groupBox1.Controls.Add(this.button6);
             this.groupBox1.Controls.Add(this.comboBox4);
             this.groupBox1.Controls.Add(this.button3);
-            this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.comboBox1);
             this.groupBox1.Controls.Add(this.numericUpDown4);
             this.groupBox1.Controls.Add(this.numericUpDown3);
@@ -158,10 +158,12 @@
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.labelCron);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Location = new System.Drawing.Point(24, 23);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBox1.Name = "groupBox1";
@@ -183,18 +185,18 @@
             this.checkBox5.UseVisualStyleBackColor = true;
             this.checkBox5.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
             // 
-            // textBox11
+            // textBoxCron
             // 
-            this.textBox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox11.Location = new System.Drawing.Point(16, 600);
-            this.textBox11.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new System.Drawing.Size(281, 31);
-            this.textBox11.TabIndex = 21;
-            this.textBox11.Text = "0 */2 * * *";
-            this.textBox11.Visible = false;
-            this.textBox11.DoubleClick += new System.EventHandler(this.切换cron表达式);
-            this.textBox11.Leave += new System.EventHandler(this.textBox11_Leave);
+            this.textBoxCron.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCron.Location = new System.Drawing.Point(79, 603);
+            this.textBoxCron.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBoxCron.Name = "textBoxCron";
+            this.textBoxCron.Size = new System.Drawing.Size(219, 31);
+            this.textBoxCron.TabIndex = 21;
+            this.textBoxCron.Text = "0 */2 * * *";
+            this.textBoxCron.Visible = false;
+            this.textBoxCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
+            this.textBoxCron.Leave += new System.EventHandler(this.textBoxCron_Leave);
             // 
             // button7
             // 
@@ -244,21 +246,6 @@
             this.button3.Text = "复制订阅";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Location = new System.Drawing.Point(16, 313);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(281, 322);
-            this.textBox1.TabIndex = 17;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
-            this.textBox1.WordWrap = false;
-            this.textBox1.Click += new System.EventHandler(this.textBox1_DoubleClick);
-            this.textBox1.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
             // 
             // comboBox1
             // 
@@ -413,6 +400,18 @@
             this.label2.Text = "检查间隔(分钟)：";
             this.label2.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
+            // labelCron
+            // 
+            this.labelCron.AutoSize = true;
+            this.labelCron.Location = new System.Drawing.Point(13, 608);
+            this.labelCron.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelCron.Name = "labelCron";
+            this.labelCron.Size = new System.Drawing.Size(73, 21);
+            this.labelCron.TabIndex = 40;
+            this.labelCron.Text = "计划：";
+            this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
+            this.labelCron.Visible = false;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -456,6 +455,21 @@
             this.label8.TabIndex = 9;
             this.label8.Text = "节点池订阅链接(点击编辑)：";
             this.label8.Click += new System.EventHandler(this.textBox1_DoubleClick);
+            // 
+            // textBox1
+            // 
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox1.Location = new System.Drawing.Point(16, 313);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(281, 322);
+            this.textBox1.TabIndex = 17;
+            this.textBox1.Text = resources.GetString("textBox1.Text");
+            this.textBox1.WordWrap = false;
+            this.textBox1.Click += new System.EventHandler(this.textBox1_DoubleClick);
+            this.textBox1.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
             // 
             // numericUpDown6
             // 
@@ -1661,6 +1675,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labelCron;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDown6;
         private System.Windows.Forms.NumericUpDown numericUpDown5;
@@ -1715,7 +1730,7 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Timer timer4;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.TextBox textBox11;
+        private System.Windows.Forms.TextBox textBoxCron;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.CheckBox checkBox5;

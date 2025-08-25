@@ -73,7 +73,9 @@ namespace subs_check.win.gui
 
             toolTip1.SetToolTip(numericUpDown10, "总的下载速度限制,不选代表不限制");
 
-            toolTip1.SetToolTip(textBox11, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
+            toolTip1.SetToolTip(labelCron, "双击切换 使用「分钟倒计时」");
+
+            toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
             toolTip1.SetToolTip(checkBox5, "开机启动：勾选后，程序将在Windows启动时自动运行");
             // 设置通知图标的上下文菜单
@@ -506,10 +508,12 @@ namespace subs_check.win.gui
                     string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
                     {
-                        textBox11.Text = cronexpression;
-                        string cronDescription = GetCronExpressionDescription(textBox11.Text);
-                        textBox11.Location = new Point(9, 48);
-                        textBox11.Visible = true;
+                        textBoxCron.Text = cronexpression;
+                        string cronDescription = GetCronExpressionDescription(textBoxCron.Text);
+                        labelCron.Location = new Point(labelCron.Location.X, label2.Location.Y);
+                        textBoxCron.Location = new Point(textBoxCron.Location.X, numericUpDown2.Location.Y);
+                        labelCron.Visible = true;
+                        textBoxCron.Visible = true;
                         label2.Visible = false;
                         numericUpDown2.Visible = false;
                     }
@@ -581,7 +585,7 @@ namespace subs_check.win.gui
                 // 从UI控件获取值并添加到字典中
                 config["concurrent"] = (int)numericUpDown1.Value;
                 config["check-interval"] = (int)numericUpDown2.Value;
-                if (textBox11.Visible) config["cron-expression"] = textBox11.Text;
+                if (textBoxCron.Visible) config["cron-expression"] = textBoxCron.Text;
                 config["timeout"] = (int)numericUpDown3.Value;
                 config["min-speed"] = (int)numericUpDown4.Value;
                 config["download-timeout"] = (int)numericUpDown5.Value;
@@ -823,7 +827,8 @@ namespace subs_check.win.gui
 
                 numericUpDown1.Enabled = false;
                 numericUpDown2.Enabled = false;
-                textBox11.Enabled = false;
+                labelCron.Enabled = false;
+                textBoxCron.Enabled = false;
                 numericUpDown3.Enabled = false;
                 numericUpDown4.Enabled = false;
                 numericUpDown5.Enabled = false;
@@ -876,7 +881,8 @@ namespace subs_check.win.gui
                 button3.Enabled = false;
                 numericUpDown1.Enabled = true;
                 numericUpDown2.Enabled = true;
-                textBox11.Enabled = true;
+                labelCron.Enabled = true;
+                textBoxCron.Enabled = true;
                 numericUpDown3.Enabled = true;
                 numericUpDown4.Enabled = true;
                 numericUpDown5.Enabled = true;
@@ -2847,12 +2853,12 @@ namespace subs_check.win.gui
             }
         }
 
-        private void textBox11_Leave(object sender, EventArgs e)
+        private void textBoxCron_Leave(object sender, EventArgs e)
         {
-            if (IsValidCronExpression(textBox11.Text))
+            if (IsValidCronExpression(textBoxCron.Text))
             {
                 // 计算并显示cron表达式的说明
-                string cronDescription = GetCronExpressionDescription(textBox11.Text);
+                string cronDescription = GetCronExpressionDescription(textBoxCron.Text);
                 // 可以用工具提示或者消息框显示，这里使用消息框
                 //MessageBox.Show(cronDescription, "Cron表达式说明", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Log($"Cron表达式说明 {cronDescription}");
@@ -2861,8 +2867,8 @@ namespace subs_check.win.gui
             {
                 MessageBox.Show("请输入有效的cron表达式，例如：*/30 * * * *", "无效的cron表达式",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                textBox11.Focus();
-                textBox11.Text = "0 */2 * * *"; // 恢复默认值
+                textBoxCron.Focus();
+                textBoxCron.Text = "0 */2 * * *"; // 恢复默认值
             }
         }
 
@@ -3077,17 +3083,20 @@ namespace subs_check.win.gui
 
         private void 切换cron表达式(object sender, EventArgs e)
         {
-            if (textBox11.Visible)
+            if (textBoxCron.Visible)
             {
-                textBox11.Visible = false;
+                labelCron.Visible = false;
+                textBoxCron.Visible = false;
                 label2.Visible = true;
                 numericUpDown2.Visible = true;
                 Log("下次检查时间间隔 使用分钟倒计时");
             }
             else
             {
-                textBox11.Location = new Point(9, 48);
-                textBox11.Visible = true;
+                labelCron.Location =  new Point(labelCron.Location.X, label2.Location.Y);
+                textBoxCron.Location = new Point(textBoxCron.Location.X, numericUpDown2.Location.Y);
+                labelCron.Visible = true;
+                textBoxCron.Visible = true;
                 label2.Visible = false;
                 numericUpDown2.Visible = false;
                 Log("下次检查时间间隔 使用cron表达式");
