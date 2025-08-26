@@ -66,6 +66,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.LogLabelNodeInfo = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
             this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -409,8 +410,8 @@
             this.labelCron.Size = new System.Drawing.Size(73, 21);
             this.labelCron.TabIndex = 40;
             this.labelCron.Text = "计划：";
-            this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             this.labelCron.Visible = false;
+            this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
             // label1
             // 
@@ -637,6 +638,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.checkBoxSwitchArch64);
             this.groupBox3.Controls.Add(this.numericUpDown10);
             this.groupBox3.Controls.Add(this.checkBox6);
             this.groupBox3.Controls.Add(this.label22);
@@ -671,6 +673,17 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "高级设置";
             this.groupBox3.Visible = false;
+            // 
+            // checkBoxSwitchArch64
+            // 
+            this.checkBoxSwitchArch64.AutoSize = true;
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(515, 173);
+            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
+            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(153, 25);
+            this.checkBoxSwitchArch64.TabIndex = 38;
+            this.checkBoxSwitchArch64.Text = "使用x64内核";
+            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
+            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
             // 
             // numericUpDown10
             // 
@@ -1739,6 +1752,7 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.CheckBox checkBox6;
         private System.Windows.Forms.NumericUpDown numericUpDown10;
+        private System.Windows.Forms.CheckBox checkBoxSwitchArch64;
     }
 }
 
