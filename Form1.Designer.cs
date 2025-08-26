@@ -33,10 +33,9 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
-            this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.switchArch = new System.Windows.Forms.CheckBox();
             this.textBoxCron = new System.Windows.Forms.TextBox();
+            this.checkBox5 = new System.Windows.Forms.CheckBox();
+            this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
@@ -55,6 +54,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
+            this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
@@ -163,7 +163,7 @@
             // 
             this.groupBox1.Controls.Add(this.textBoxCron);
             this.groupBox1.Controls.Add(this.checkBox5);
-            this.groupBox1.Controls.Add(this.switchArch);
+            this.groupBox1.Controls.Add(this.checkBoxSwitchArch64);
             this.groupBox1.Controls.Add(this.button7);
             this.groupBox1.Controls.Add(this.button6);
             this.groupBox1.Controls.Add(this.comboBox4);
@@ -193,15 +193,18 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "参数设置";
             // 
-            // checkBox7
+            // textBoxCron
             // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.Location = new System.Drawing.Point(18, 608);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(141, 25);
-            this.checkBox7.TabIndex = 39;
-            this.checkBox7.Text = "高并发模式";
-            this.checkBox7.UseVisualStyleBackColor = true;
+            this.textBoxCron.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCron.Location = new System.Drawing.Point(79, 562);
+            this.textBoxCron.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBoxCron.Name = "textBoxCron";
+            this.textBoxCron.Size = new System.Drawing.Size(219, 31);
+            this.textBoxCron.TabIndex = 21;
+            this.textBoxCron.Text = "0 */2 * * *";
+            this.textBoxCron.Visible = false;
+            this.textBoxCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
+            this.textBoxCron.Leave += new System.EventHandler(this.textBoxCron_Leave);
             // 
             // checkBox5
             // 
@@ -215,28 +218,16 @@
             this.checkBox5.UseVisualStyleBackColor = true;
             this.checkBox5.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
             // 
-            // switchArch
+            // checkBoxSwitchArch64
             // 
-            this.switchArch.AutoSize = true;
-            this.switchArch.Location = new System.Drawing.Point(167, 608);
-            this.switchArch.Name = "switchArch";
-            this.switchArch.Size = new System.Drawing.Size(111, 25);
-            this.switchArch.TabIndex = 38;
-            this.switchArch.Text = "x64内核";
-            this.switchArch.UseVisualStyleBackColor = true;
-            // 
-            // textBoxCron
-            // 
-            this.textBoxCron.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCron.Location = new System.Drawing.Point(79, 562);
-            this.textBoxCron.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.textBoxCron.Name = "textBoxCron";
-            this.textBoxCron.Size = new System.Drawing.Size(219, 31);
-            this.textBoxCron.TabIndex = 21;
-            this.textBoxCron.Text = "0 */2 * * *";
-            this.textBoxCron.Visible = false;
-            this.textBoxCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
-            this.textBoxCron.Leave += new System.EventHandler(this.textBoxCron_Leave);
+            this.checkBoxSwitchArch64.AutoSize = true;
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 608);
+            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
+            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
+            this.checkBoxSwitchArch64.TabIndex = 38;
+            this.checkBoxSwitchArch64.Text = "x64内核";
+            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
+            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
             // 
             // button7
             // 
@@ -449,8 +440,8 @@
             this.labelCron.Size = new System.Drawing.Size(73, 21);
             this.labelCron.TabIndex = 40;
             this.labelCron.Text = "计划：";
-            this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             this.labelCron.Visible = false;
+            this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
             // label1
             // 
@@ -495,6 +486,16 @@
             this.label8.TabIndex = 9;
             this.label8.Text = "节点池订阅链接(点击编辑)：";
             this.label8.Click += new System.EventHandler(this.textBox1_DoubleClick);
+            // 
+            // checkBox7
+            // 
+            this.checkBox7.AutoSize = true;
+            this.checkBox7.Location = new System.Drawing.Point(18, 608);
+            this.checkBox7.Name = "checkBox7";
+            this.checkBox7.Size = new System.Drawing.Size(141, 25);
+            this.checkBox7.TabIndex = 39;
+            this.checkBox7.Text = "高并发模式";
+            this.checkBox7.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
@@ -1949,7 +1950,7 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.CheckBox checkBox6;
         private System.Windows.Forms.NumericUpDown numericUpDown10;
-        private System.Windows.Forms.CheckBox switchArch;
+        private System.Windows.Forms.CheckBox checkBoxSwitchArch64;
         private System.Windows.Forms.CheckBox checkBox7;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.NumericUpDown numericUpDown11;

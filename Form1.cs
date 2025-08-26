@@ -27,6 +27,7 @@ namespace subs_check.win.gui
         string githubProxyURL = "";
         int run = 0;
         string 当前subsCheck版本号 = "未知版本";
+        string currentArch = "i386";
         string 当前GUI版本号 = "未知版本";
         string 最新GUI版本号 = "未知版本";
         private string nextCheckTime = null;// 用于存储下次检查时间
@@ -445,6 +446,9 @@ namespace subs_check.win.gui
                     string subscheckversion = 读取config字符串(config, "subscheck-version");
                     if (subscheckversion != null) 当前subsCheck版本号 = subscheckversion;
 
+                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
+                    if (subscheckArch != null) currentArch = subscheckArch;
+
                     int? successlimit = 读取config整数(config, "success-limit");
                     if (successlimit.HasValue)
                     {
@@ -504,6 +508,10 @@ namespace subs_check.win.gui
                             textBox10.Text = apikey;
                         }
                     }
+
+                    string switchX64 = 读取config字符串(config, "switch-x64");
+                    if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
+                    else checkBoxSwitchArch64.Checked = false;
 
                     string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
@@ -738,10 +746,12 @@ namespace subs_check.win.gui
 
                 config["rename-node"] = checkBox1.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBox2.Checked;//是否开启流媒体检测
+                config["switch-x64"] = checkBoxSwitchArch64.Checked;//是否使用x64内核
                 config["keep-success-proxies"] = false;
                 config["print-progress"] = false;//是否显示进度
                 config["sub-urls-retry"] = 3;//重试次数(获取订阅失败后重试次数)
                 config["subscheck-version"] = 当前subsCheck版本号;//当前subsCheck版本号
+                config["subscheck-arch"] = currentArch; //当前subsCheck架构
 
                 config["gui-auto"] = checkBox5.Checked;//是否开机自启
 
@@ -935,232 +945,228 @@ namespace subs_check.win.gui
                 }
 
                 var result = await 获取版本号("https://api.github.com/repos/beck-8/subs-check/releases/latest", true);
-                if (result.Item1 != "未知版本")
+                if (result.Item1 == "未知版本")
                 {
-                    // 创建不使用系统代理的 HttpClientHandler
-                    HttpClientHandler handler = new HttpClientHandler
-                    {
-                        UseProxy = false,
-                        Proxy = null
-                    };
+                    // 无版本信息
+                    return;
+                }
 
-                    // 使用自定义 handler 创建 HttpClient
-                    using (HttpClient client = new HttpClient(handler))
+                // 决定目标资源名称：64位优先 (amd64)，否则 i386
+                string desiredArchToken = checkBoxSwitchArch64.Checked ? "x86_64" : "i386";
+                string desiredAssetName = $"subs-check_Windows_{desiredArchToken}.zip";
+
+                // 创建不使用系统代理的 HttpClientHandler
+                HttpClientHandler handler = new HttpClientHandler
+                {
+                    UseProxy = false,
+                    Proxy = null
+                };
+
+                // 使用自定义 handler 创建 HttpClient
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    try
                     {
-                        try
+                        string latestVersion = result.Item1;
+                        JArray assets = result.Item2;
+                        Log($"subs-check.exe 最新版本为: {latestVersion} ");
+
+                        // 先尝试精确匹配期望文件名；找不到则回退为任意包含 "Windows" 且包含 arch token 的条目；
+                        // 若仍找不到，再回退为任意包含 "Windows" 的资源。
+                        string downloadUrl = null;
+                        foreach (var asset in assets)
                         {
-                            string latestVersion = result.Item1;
-                            JArray assets = result.Item2;
-                            Log($"subs-check.exe 最新版本为: {latestVersion} ");
-                            // 查找Windows i386版本的资源
-                            string downloadUrl = null;
+                            if (asset["name"]?.ToString().Equals(desiredAssetName, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                downloadUrl = asset["browser_download_url"].ToString();
+                                break;
+                            }
+                        }
 
+                        if (downloadUrl == null)
+                        {
                             foreach (var asset in assets)
                             {
-                                if (asset["name"].ToString() == "subs-check_Windows_i386.zip")
+                                string name = asset["name"]?.ToString() ?? "";
+                                if (name.IndexOf("Windows", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                                    name.IndexOf(desiredArchToken, StringComparison.OrdinalIgnoreCase) >= 0)
                                 {
                                     downloadUrl = asset["browser_download_url"].ToString();
                                     break;
                                 }
                             }
+                        }
 
-                            if (downloadUrl != null)
+                        if (downloadUrl == null)
+                        {
+                            // 最后退化：任何 Windows 包
+                            foreach (var asset in assets)
                             {
-                                string 代理下载链接 = githubProxyURL + downloadUrl;
-                                string 原生下载链接 = 代理下载链接;
-                                // 计算"https://"在下载链接中出现的次数
-                                int httpsCount = 0;
-                                int lastIndex = -1;
-                                int currentIndex = 0;
-
-                                // 查找所有"https://"出现的位置
-                                while ((currentIndex = 代理下载链接.IndexOf("https://", currentIndex)) != -1)
+                                string name = asset["name"]?.ToString() ?? "";
+                                if (name.IndexOf("Windows", StringComparison.OrdinalIgnoreCase) >= 0)
                                 {
-                                    httpsCount++;
-                                    lastIndex = currentIndex;
-                                    currentIndex += 8; // "https://".Length = 8
-                                }
-
-                                // 如果"https://"出现2次或以上，提取最后一个"https://"之后的内容
-                                if (httpsCount >= 2 && lastIndex != -1)
-                                {
-                                    原生下载链接 = 代理下载链接.Substring(lastIndex);
-                                }
-
-                                string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
-
-                                // 创建下载请求 - 优化的多级尝试下载逻辑
-                                Log("开始下载文件...");
-                                bool downloadSuccess = false;
-                                string zipFilePath = Path.Combine(executablePath, "subs-check_Windows_i386.zip");
-                                string failureReason = "";
-
-                                // 如果文件已存在，先删除
-                                if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
-
-                                // 第一次尝试：使用代理下载链接 + 当前HttpClient(不使用系统代理)
-                                try
-                                {
-                                    Log($"[尝试1/4] 使用代理下载链接：{代理下载链接}");
-                                    downloadSuccess = await DownloadFileAsync(client, 代理下载链接, zipFilePath);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log($"[尝试1/4] 失败: {ex.Message}", true);
-                                    failureReason = ex.Message;
-                                }
-
-                                // 如果第一次尝试失败，且代理链接与原生链接不同，使用原生下载链接尝试
-                                if (!downloadSuccess && 代理下载链接 != 原生下载链接)
-                                {
-                                    try
-                                    {
-                                        Log($"[尝试2/4] 使用原生下载链接：{原生下载链接}");
-                                        downloadSuccess = await DownloadFileAsync(client, 原生下载链接, zipFilePath);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log($"[尝试2/4] 失败: {ex.Message}", true);
-                                        failureReason = ex.Message;
-                                    }
-                                }
-
-                                // 如果前面的尝试都失败，创建使用系统代理的HttpClient再次尝试
-                                if (!downloadSuccess)
-                                {
-                                    try
-                                    {
-                                        Log("[尝试3/4] 使用系统代理 + 代理下载链接");
-                                        using (HttpClient proxyClient = new HttpClient())
-                                        {
-                                            proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                                            proxyClient.Timeout = TimeSpan.FromSeconds(30);
-
-                                            downloadSuccess = await DownloadFileAsync(proxyClient, 代理下载链接, zipFilePath);
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log($"[尝试3/4] 失败: {ex.Message}", true);
-                                        failureReason = ex.Message;
-                                    }
-
-                                    // 最后一次尝试：使用系统代理 + 原生链接（如果不同）
-                                    if (!downloadSuccess && 代理下载链接 != 原生下载链接)
-                                    {
-                                        try
-                                        {
-                                            Log("[尝试4/4] 使用系统代理 + 原生下载链接");
-                                            using (HttpClient proxyClient = new HttpClient())
-                                            {
-                                                proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                                                proxyClient.Timeout = TimeSpan.FromSeconds(30);
-
-                                                downloadSuccess = await DownloadFileAsync(proxyClient, 原生下载链接, zipFilePath);
-                                            }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Log($"[尝试4/4] 失败: {ex.Message}", true);
-                                            failureReason = ex.Message;
-                                        }
-                                    }
-                                }
-
-                                if (downloadSuccess)
-                                {
-                                    Log("下载完成，正在解压文件...");
-
-                                    // 解压文件的代码保持不变
-                                    using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(zipFilePath))
-                                    {
-                                        // 查找subs-check.exe
-                                        System.IO.Compression.ZipArchiveEntry exeEntry = archive.Entries.FirstOrDefault(
-                                            entry => entry.Name.Equals("subs-check.exe", StringComparison.OrdinalIgnoreCase));
-
-                                        if (exeEntry != null)
-                                        {
-                                            string exeFilePath = Path.Combine(executablePath, "subs-check.exe");
-
-                                            // 如果文件已存在，先删除
-                                            if (File.Exists(exeFilePath))
-                                            {
-                                                File.Delete(exeFilePath);
-                                            }
-
-                                            // 解压文件
-                                            exeEntry.ExtractToFile(exeFilePath);
-                                            当前subsCheck版本号 = latestVersion;
-                                            Log($"subs-check.exe {当前subsCheck版本号} 已就绪！");
-
-                                            await SaveConfig(false);
-
-                                            // 删除下载的zip文件
-                                            //File.Delete(zipFilePath);
-                                        }
-                                        else
-                                        {
-                                            Log("无法在压缩包中找到 subs-check.exe 文件。", true);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // 所有尝试都失败
-                                    Log($"所有下载尝试均失败，最后错误: {failureReason}", true);
-                                    MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
-                                        "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    progressBar1.Value = 0;
-                                    progressBar1.Visible = false;
-                                }
-
-                                // 解压文件
-                                using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(zipFilePath))
-                                {
-                                    // 查找subs-check.exe
-                                    System.IO.Compression.ZipArchiveEntry exeEntry = archive.Entries.FirstOrDefault(
-                                        entry => entry.Name.Equals("subs-check.exe", StringComparison.OrdinalIgnoreCase));
-
-                                    if (exeEntry != null)
-                                    {
-                                        string exeFilePath = Path.Combine(executablePath, "subs-check.exe");
-
-                                        // 如果文件已存在，先删除
-                                        if (File.Exists(exeFilePath))
-                                        {
-                                            File.Delete(exeFilePath);
-                                        }
-
-                                        // 解压文件
-                                        exeEntry.ExtractToFile(exeFilePath);
-                                        当前subsCheck版本号 = latestVersion;
-                                        Log($"subs-check.exe {当前subsCheck版本号} 已就绪！");
-
-                                        await SaveConfig(false);
-                                        // 这里保留原有行为，不修改button1.Enabled
-
-                                        // 删除下载的zip文件
-                                        //File.Delete(zipFilePath);
-                                    }
-                                    else
-                                    {
-                                        Log("无法在压缩包中找到 subs-check.exe 文件。", true);
-                                    }
+                                    downloadUrl = asset["browser_download_url"].ToString();
+                                    break;
                                 }
                             }
-                            else
-                            {
-                                Log("无法找到适用于 Windows i386 的下载链接。", true);
-                                MessageBox.Show("未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
-                                    "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
+                        }
+
+                        if (downloadUrl == null)
+                        {
+                            Log("无法找到适用于 Windows 的下载链接。", true);
+                            MessageBox.Show("未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                                "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return;
+                        }
+
+                        // 处理代理链接里可能嵌套 https:// 的情况
+                        string 代理下载链接 = githubProxyURL + downloadUrl;
+                        string 原生下载链接 = 代理下载链接;
+                        // 计算"https://"在下载链接中出现的次数
+                        int httpsCount = 0;
+                        int lastIndex = -1;
+                        int currentIndex = 0;
+
+                        // 查找所有"https://"出现的位置
+                        while ((currentIndex = 代理下载链接.IndexOf("https://", currentIndex)) != -1)
+                        {
+                            httpsCount++;
+                            lastIndex = currentIndex;
+                            currentIndex += 8; // "https://".Length = 8
+                        }
+
+                        // 如果"https://"出现2次或以上，提取最后一个"https://"之后的内容
+                        if (httpsCount >= 2 && lastIndex != -1)
+                        {
+                            原生下载链接 = 代理下载链接.Substring(lastIndex);
+                        }
+
+                        string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
+                        // 创建下载请求 - 优化的多级尝试下载逻辑
+                        Log("开始下载文件...");
+                        bool downloadSuccess = false;
+                        string zipFilePath = Path.Combine(executablePath, desiredAssetName);
+                        string failureReason = "";
+
+                        // 如果文件已存在，先删除
+                        if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
+
+                        // 第一次尝试：使用代理下载链接 + 当前HttpClient(不使用系统代理)
+                        try
+                        {
+                            Log($"[尝试1/4] 使用代理下载链接：{代理下载链接}");
+                            downloadSuccess = await DownloadFileAsync(client, 代理下载链接, zipFilePath);
                         }
                         catch (Exception ex)
                         {
-                            Log($"下载过程中出错: {ex.Message}", true);
-                            MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
-                                "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Log($"[尝试1/4] 失败: {ex.Message}", true);
+                            failureReason = ex.Message;
                         }
+
+                        // 如果第一次尝试失败，且代理链接与原生链接不同，使用原生下载链接尝试
+                        if (!downloadSuccess && 代理下载链接 != 原生下载链接)
+                        {
+                            try
+                            {
+                                Log($"[尝试2/4] 使用原生下载链接：{原生下载链接}");
+                                downloadSuccess = await DownloadFileAsync(client, 原生下载链接, zipFilePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log($"[尝试2/4] 失败: {ex.Message}", true);
+                                failureReason = ex.Message;
+                            }
+                        }
+
+                        // 如果前面的尝试都失败，创建使用系统代理的HttpClient再次尝试
+                        if (!downloadSuccess)
+                        {
+                            try
+                            {
+                                Log("[尝试3/4] 使用系统代理 + 代理下载链接");
+                                using (HttpClient proxyClient = new HttpClient())
+                                {
+                                    proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
+                                    proxyClient.Timeout = TimeSpan.FromSeconds(30);
+
+                                    downloadSuccess = await DownloadFileAsync(proxyClient, 代理下载链接, zipFilePath);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Log($"[尝试3/4] 失败: {ex.Message}", true);
+                                failureReason = ex.Message;
+                            }
+
+                            // 最后一次尝试：使用系统代理 + 原生链接（如果不同）
+                            if (!downloadSuccess && 代理下载链接 != 原生下载链接)
+                            {
+                                try
+                                {
+                                    Log("[尝试4/4] 使用系统代理 + 原生下载链接");
+                                    using (HttpClient proxyClient = new HttpClient())
+                                    {
+                                        proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
+                                        proxyClient.Timeout = TimeSpan.FromSeconds(30);
+
+                                        downloadSuccess = await DownloadFileAsync(proxyClient, 原生下载链接, zipFilePath);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log($"[尝试4/4] 失败: {ex.Message}", true);
+                                    failureReason = ex.Message;
+                                }
+                            }
+                        }
+
+                        if (!downloadSuccess)
+                        {
+                            Log($"所有下载尝试均失败，最后错误: {failureReason}", true);
+                            MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                                "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            progressBar1.Value = 0;
+                            progressBar1.Visible = false;
+                            return;
+                        }
+
+                        // 下载成功 -> 解压并查找 subs-check.exe
+                        Log("下载完成，正在解压文件...");
+                        // 解压文件
+                        using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(zipFilePath))
+                        {
+                            // 查找subs-check.exe
+                            var exeEntry = archive.Entries.FirstOrDefault(
+                                entry => entry.Name.Equals("subs-check.exe", StringComparison.OrdinalIgnoreCase));
+
+                            if (exeEntry != null)
+                            {
+                                string exeFilePath = Path.Combine(executablePath, "subs-check.exe");
+                                // 如果文件已存在，先删除
+                                if (File.Exists(exeFilePath)) File.Delete(exeFilePath);
+
+                                // 解压文件
+                                exeEntry.ExtractToFile(exeFilePath);
+                                当前subsCheck版本号 = latestVersion;
+                                currentArch = desiredArchToken;
+                                Log($"subs-check.exe {当前subsCheck版本号} 已就绪！");
+
+                                await SaveConfig(false);
+
+                                // 可选：删除 zip 文件（注释状态保留原样）
+                                // File.Delete(zipFilePath);
+                            }
+                            else
+                            {
+                                Log("无法在压缩包中找到 subs-check.exe 文件。", true);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"下载过程中出错: {ex.Message}", true);
+                        MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                            "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -1169,10 +1175,13 @@ namespace subs_check.win.gui
                 Log($"初始化下载过程出错: {ex.Message}", true);
                 MessageBox.Show($"下载准备过程出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            button1.Enabled = true;
-            downloading = 0;
+            finally
+            {
+                button1.Enabled = true;
+                downloading = 0;
+            }
         }
+
 
         /// <summary>
         /// 获取最新版本号和对应的下载链接
@@ -3104,7 +3113,7 @@ namespace subs_check.win.gui
             }
             else
             {
-                labelCron.Location =  new Point(labelCron.Location.X, label2.Location.Y);
+                labelCron.Location = new Point(labelCron.Location.X, label2.Location.Y);
                 textBoxCron.Location = new Point(textBoxCron.Location.X, numericUpDown2.Location.Y);
                 labelCron.Visible = true;
                 textBoxCron.Visible = true;
@@ -3417,6 +3426,31 @@ namespace subs_check.win.gui
                 Log(warningMessage);
             }
 
+        }
+
+        private async void checkBoxSwitchArch64_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!checkBoxSwitchArch64.Checked)
+            {
+                if (currentArch != "i386"){
+                    Log("切换为 i386 内核,内存占用更低,但CPU占用可能更高");
+                    _ = DownloadSubsCheckEXE();
+                }
+                Log("使用32位内核,如CPU占用较高,可在[高级设置]切换");
+            }
+            else
+            {
+                if (currentArch != "x86_64")
+                {
+                    Log(currentArch);
+                    Log("切换为 x64 内核,内存占用更高,但CPU占用可能较低");
+                    _ = DownloadSubsCheckEXE();
+                }
+                Log("使用64位内核,如内存占用较高,可在[高级设置]切换");
+            }
+
+            // 保存配置
+            await SaveConfig();    
         }
     }
 }
