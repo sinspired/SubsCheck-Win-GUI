@@ -768,6 +768,10 @@ namespace subs_check.win.gui
                     .WithIndentedSequences()  // 使序列化结果更易读
                     .Build();
 
+
+                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                    .Build();
+
                 string yamlContent = serializer.Serialize(config);
 
                 // 确保配置目录存在
@@ -781,14 +785,34 @@ namespace subs_check.win.gui
                     // 读取more.yaml的内容
                     string moreYamlContent = File.ReadAllText(moreYamlPath);
 
-                    // 确保more.yaml内容以换行开始
-                    if (!moreYamlContent.StartsWith("\n") && !moreYamlContent.StartsWith("\r\n"))
+                    // 解析主配置和补充配置
+                    var Config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
+                    var moreConfig = deserializer.Deserialize<Dictionary<string, object>>(moreYamlContent);
+
+                    if (Config == null) Config = new Dictionary<string, object>();
+                    if (moreConfig == null) moreConfig = new Dictionary<string, object>();
+
+                    // 检查并记录冲突的键
+                    var conflictKeys = new List<string>();
+                    var mergedKeys = new List<string>();
+
+                    foreach (var kvp in moreConfig)
                     {
-                        yamlContent += "\n"; // 添加换行符作为分隔
+                        if (Config.ContainsKey(kvp.Key))
+                        {
+                            conflictKeys.Add(kvp.Key);
+                            Log($"发现重复键 '{kvp.Key}'，使用GUI配置");
+                        }
+                        else
+                        {
+                            Config[kvp.Key] = kvp.Value;
+                            mergedKeys.Add(kvp.Key);
+                        }
                     }
 
-                    // 将more.yaml的内容追加到要写入的config.yaml内容后
-                    yamlContent += moreYamlContent;
+                    // 重新序列化合并后的配置
+                    yamlContent = serializer.Serialize(Config);
+
 
                     Log($"已将补充参数配置 more.yaml 内容追加到配置文件");
                 }
@@ -3421,7 +3445,8 @@ namespace subs_check.win.gui
         {
             if (!checkBoxSwitchArch64.Checked)
             {
-                if (currentArch != "i386"){
+                if (currentArch != "i386")
+                {
                     Log("切换为 i386 内核,内存占用更低,但CPU占用可能更高");
                     _ = DownloadSubsCheckEXE();
                 }
@@ -3439,7 +3464,7 @@ namespace subs_check.win.gui
             }
 
             // 保存配置
-            await SaveConfig();    
+            await SaveConfig();
         }
     }
 }
