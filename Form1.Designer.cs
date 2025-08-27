@@ -180,7 +180,7 @@
             this.checkBox5.Location = new System.Drawing.Point(167, 749);
             this.checkBox5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox5.Name = "checkBox5";
-            this.checkBox5.Size = new System.Drawing.Size(120, 25);
+            this.checkBox5.Size = new System.Drawing.Size(113, 25);
             this.checkBox5.TabIndex = 30;
             this.checkBox5.Text = "开机自启";
             this.checkBox5.UseVisualStyleBackColor = true;
@@ -679,7 +679,7 @@
             this.checkBoxSwitchArch64.AutoSize = true;
             this.checkBoxSwitchArch64.Location = new System.Drawing.Point(515, 173);
             this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
-            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(153, 25);
+            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(146, 25);
             this.checkBoxSwitchArch64.TabIndex = 38;
             this.checkBoxSwitchArch64.Text = "使用x64内核";
             this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
@@ -710,7 +710,7 @@
             this.checkBox6.Location = new System.Drawing.Point(17, 127);
             this.checkBox6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox6.Name = "checkBox6";
-            this.checkBox6.Size = new System.Drawing.Size(207, 25);
+            this.checkBox6.Size = new System.Drawing.Size(200, 25);
             this.checkBox6.TabIndex = 36;
             this.checkBox6.Text = "带宽限制(MB/s)：";
             this.checkBox6.UseVisualStyleBackColor = true;
@@ -785,7 +785,7 @@
             this.checkBox4.Location = new System.Drawing.Point(16, 173);
             this.checkBox4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(240, 25);
+            this.checkBox4.Size = new System.Drawing.Size(233, 25);
             this.checkBox4.TabIndex = 28;
             this.checkBox4.Text = "启用WebUI API密钥：";
             this.checkBox4.UseVisualStyleBackColor = true;
@@ -821,7 +821,7 @@
             this.checkBox3.Location = new System.Drawing.Point(17, 81);
             this.checkBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(183, 25);
+            this.checkBox3.Size = new System.Drawing.Size(176, 25);
             this.checkBox3.TabIndex = 27;
             this.checkBox3.Text = "节点保存数目：";
             this.checkBox3.UseVisualStyleBackColor = true;
@@ -850,7 +850,7 @@
             this.checkBox1.Location = new System.Drawing.Point(17, 35);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(162, 25);
+            this.checkBox1.Size = new System.Drawing.Size(155, 25);
             this.checkBox1.TabIndex = 22;
             this.checkBox1.Text = "节点地址查询";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -862,7 +862,7 @@
             this.checkBox2.Location = new System.Drawing.Point(198, 35);
             this.checkBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(141, 25);
+            this.checkBox2.Size = new System.Drawing.Size(134, 25);
             this.checkBox2.TabIndex = 25;
             this.checkBox2.Text = "流媒体检测";
             this.checkBox2.UseVisualStyleBackColor = true;
@@ -1632,7 +1632,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1466, 1406);
+            this.ClientSize = new System.Drawing.Size(1460, 799);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
