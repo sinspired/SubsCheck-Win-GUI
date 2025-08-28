@@ -284,6 +284,10 @@ namespace subs_check.win.gui
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
                     var config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
 
+                    //变量放在前面,以防后续读取时未定义
+                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
+                    if (subscheckArch != null) currentArch = subscheckArch;
+
                     // 使用新函数获取整数值并设置UI控件
                     int? concurrentValue = 读取config整数(config, "concurrent");
                     if (concurrentValue.HasValue) numericUpDown1.Value = concurrentValue.Value;
@@ -446,8 +450,9 @@ namespace subs_check.win.gui
                     string subscheckversion = 读取config字符串(config, "subscheck-version");
                     if (subscheckversion != null) 当前subsCheck版本号 = subscheckversion;
 
-                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
-                    if (subscheckArch != null) currentArch = subscheckArch;
+                    string switchX64 = 读取config字符串(config, "switch-x64");
+                    if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
+                    else checkBoxSwitchArch64.Checked = false;
 
                     int? successlimit = 读取config整数(config, "success-limit");
                     if (successlimit.HasValue)
@@ -508,10 +513,6 @@ namespace subs_check.win.gui
                             textBox10.Text = apikey;
                         }
                     }
-
-                    string switchX64 = 读取config字符串(config, "switch-x64");
-                    if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
-                    else checkBoxSwitchArch64.Checked = false;
 
                     string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
@@ -645,24 +646,7 @@ namespace subs_check.win.gui
                 if (githubProxyCheck)
                 {
                     // 检查并处理 GitHub Raw URLs
-                    if (comboBox3.Text == "自动选择")
-                    {
-                        // 创建不包含"自动选择"的代理列表
-                        List<string> proxyItems = new List<string>();
-                        for (int j = 0; j < comboBox3.Items.Count; j++)
-                        {
-                            string proxyItem = comboBox3.Items[j].ToString();
-                            if (proxyItem != "自动选择")
-                                proxyItems.Add(proxyItem);
-                        }
-
-                        // 随机打乱列表顺序
-                        Random random = new Random();
-                        proxyItems = proxyItems.OrderBy(x => random.Next()).ToList();
-
-                        // 异步检测可用代理
-                        githubProxyURL = await DetectGitHubProxyAsync(proxyItems);
-                    }
+                    githubProxyURL = await GetGithubProxyUrlAsync();
                 }
 
                 if (comboBox3.Text != "自动选择") githubProxyURL = $"https://{comboBox3.Text}/";
@@ -2191,36 +2175,8 @@ namespace subs_check.win.gui
                 }
 
                 // 检测可用的 GitHub 代理
-                if (!string.IsNullOrEmpty(comboBox3.Text) && comboBox3.Text == "自动选择")
-                {
-                    // 创建不包含"自动选择"的代理列表
-                    List<string> proxyItems = new List<string>();
-                    for (int j = 0; j < comboBox3.Items.Count; j++)
-                    {
-                        string proxyItem = comboBox3.Items[j].ToString();
-                        if (proxyItem != "自动选择")
-                            proxyItems.Add(proxyItem);
-                    }
-
-                    // 随机打乱列表顺序
-                    Random random = new Random();
-                    proxyItems = proxyItems.OrderBy(x => random.Next()).ToList();
-
-                    // 异步检测可用代理
-                    githubProxyURL = await DetectGitHubProxyAsync(proxyItems);
-
-                    // 如果未能找到可用代理，提示用户
-                    if (string.IsNullOrEmpty(githubProxyURL))
-                    {
-                        Log("未能找到可用的 GitHub 代理，下载可能会失败", true);
-                    }
-                }
-                else if (!string.IsNullOrEmpty(comboBox3.Text))
-                {
-                    githubProxyURL = $"https://{comboBox3.Text}/";
-                    Log($"使用指定的 GitHub 代理: {comboBox3.Text}");
-                }
-                else
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                if (githubProxyURL == "")
                 {
                     Log("未设置 GitHub 代理，将尝试直接下载", true);
                 }
@@ -3441,30 +3397,40 @@ namespace subs_check.win.gui
 
         }
 
-        private async void checkBoxSwitchArch64_CheckedChanged(object sender, EventArgs e)
+        // 获取可用 github 代理
+        private async Task<string> GetGithubProxyUrlAsync()
         {
-            if (!checkBoxSwitchArch64.Checked)
-            {
-                if (currentArch != "i386")
-                {
-                    Log("切换为 i386 内核,内存占用更低,但CPU占用可能更高");
-                    _ = DownloadSubsCheckEXE();
-                }
-                Log("使用32位内核,如CPU占用较高,可在[高级设置]切换");
-            }
-            else
-            {
-                if (currentArch != "x86_64")
-                {
-                    Log(currentArch);
-                    Log("切换为 x64 内核,内存占用更高,但CPU占用可能较低");
-                    _ = DownloadSubsCheckEXE();
-                }
-                Log("使用64位内核,如内存占用较高,可在[高级设置]切换");
-            }
+            const string AUTO = "自动选择";
 
-            // 保存配置
-            await SaveConfig();
+            if (comboBox3 == null) return githubProxyURL;
+            var text = comboBox3.Text ?? "";
+            // 如果已指定代理，直接返回结果
+            if (text != AUTO && text.Length > 0) return $"https://{text}/";
+
+            //乱序
+            var candidates = comboBox3.Items
+                .OfType<string>()
+                .Where(s => !string.IsNullOrWhiteSpace(s) && s != AUTO)
+                .OrderBy(_ => Guid.NewGuid())
+                .ToList();
+
+            if (!candidates.Any()) return githubProxyURL;
+            try { var detected = await DetectGitHubProxyAsync(candidates); return string.IsNullOrWhiteSpace(detected) ? githubProxyURL : detected; }
+            catch { return githubProxyURL; }
+        }
+
+        private async void CheckBoxSwitchArch64_CheckedChanged(object sender, EventArgs e)
+        {
+            bool useX64 = checkBoxSwitchArch64.Checked;
+            string want = useX64 ? "x86_64" : "i386";
+            if (currentArch != want)
+            {
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高");
+                await DownloadSubsCheckEXE();
+                currentArch = want;
+            }
+            Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换");
         }
     }
 }
