@@ -42,10 +42,10 @@
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.button3 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownMinSpeed = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownConcurrent = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -68,7 +68,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.LogLabelNodeInfo = new System.Windows.Forms.Label();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
-            this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownTotalBandwidthLimit = new System.Windows.Forms.NumericUpDown();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
@@ -123,16 +123,16 @@
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBoxAdvanceSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTotalBandwidthLimit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
             this.groupBox4.SuspendLayout();
@@ -170,10 +170,10 @@
             this.groupBox1.Controls.Add(this.comboBox4);
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.comboBox1);
-            this.groupBox1.Controls.Add(this.numericUpDown4);
+            this.groupBox1.Controls.Add(this.numericUpDownMinSpeed);
             this.groupBox1.Controls.Add(this.numericUpDown3);
             this.groupBox1.Controls.Add(this.numericUpDown2);
-            this.groupBox1.Controls.Add(this.numericUpDown1);
+            this.groupBox1.Controls.Add(this.numericUpDownConcurrent);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label3);
@@ -305,29 +305,29 @@
             this.comboBox1.TabIndex = 16;
             this.comboBox1.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
             // 
-            // numericUpDown4
+            // numericUpDownMinSpeed
             // 
-            this.numericUpDown4.Location = new System.Drawing.Point(192, 186);
-            this.numericUpDown4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown4.Maximum = new decimal(new int[] {
+            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 186);
+            this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
             20480,
             0,
             0,
             0});
-            this.numericUpDown4.Minimum = new decimal(new int[] {
+            this.numericUpDownMinSpeed.Minimum = new decimal(new int[] {
             128,
             0,
             0,
             0});
-            this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown4.TabIndex = 13;
-            this.numericUpDown4.Value = new decimal(new int[] {
+            this.numericUpDownMinSpeed.Name = "numericUpDownMinSpeed";
+            this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownMinSpeed.TabIndex = 13;
+            this.numericUpDownMinSpeed.Value = new decimal(new int[] {
             1024,
             0,
             0,
             0});
-            this.numericUpDown4.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
+            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
             // 
             // numericUpDown3
             // 
@@ -377,29 +377,29 @@
             0});
             this.numericUpDown2.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
-            // numericUpDown1
+            // numericUpDownConcurrent
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(192, 33);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numericUpDownConcurrent.Location = new System.Drawing.Point(192, 33);
+            this.numericUpDownConcurrent.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownConcurrent.Maximum = new decimal(new int[] {
             1024,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.numericUpDownConcurrent.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown1.TabIndex = 10;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.numericUpDownConcurrent.Name = "numericUpDownConcurrent";
+            this.numericUpDownConcurrent.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownConcurrent.TabIndex = 10;
+            this.numericUpDownConcurrent.Value = new decimal(new int[] {
             32,
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.numericUpDownConcurrent.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label7
             // 
@@ -679,7 +679,7 @@
             // 
             // groupBoxAdvanceSettings
             // 
-            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown10);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBox6);
             this.groupBoxAdvanceSettings.Controls.Add(this.label22);
             this.groupBoxAdvanceSettings.Controls.Add(this.label21);
@@ -714,20 +714,20 @@
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
             // 
-            // numericUpDown10
+            // numericUpDownTotalBandwidthLimit
             // 
-            this.numericUpDown10.Enabled = false;
-            this.numericUpDown10.Location = new System.Drawing.Point(224, 124);
-            this.numericUpDown10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown10.Maximum = new decimal(new int[] {
+            this.numericUpDownTotalBandwidthLimit.Enabled = false;
+            this.numericUpDownTotalBandwidthLimit.Location = new System.Drawing.Point(224, 124);
+            this.numericUpDownTotalBandwidthLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownTotalBandwidthLimit.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.numericUpDown10.Name = "numericUpDown10";
-            this.numericUpDown10.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown10.TabIndex = 37;
-            this.numericUpDown10.Value = new decimal(new int[] {
+            this.numericUpDownTotalBandwidthLimit.Name = "numericUpDownTotalBandwidthLimit";
+            this.numericUpDownTotalBandwidthLimit.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownTotalBandwidthLimit.TabIndex = 37;
+            this.numericUpDownTotalBandwidthLimit.Value = new decimal(new int[] {
             12,
             0,
             0,
@@ -1743,6 +1743,7 @@
             this.numericUpDownPipeAlive.Name = "numericUpDownPipeAlive";
             this.numericUpDownPipeAlive.Size = new System.Drawing.Size(106, 31);
             this.numericUpDownPipeAlive.TabIndex = 39;
+            this.numericUpDownPipeAlive.Tag = "";
             this.numericUpDownPipeAlive.ValueChanged += new System.EventHandler(this.numericUpDownPipeAlive_ValueChanged);
             // 
             // labelPipeAlive
@@ -1811,10 +1812,10 @@
             this.Text = "SubsCheck Win GUI";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).EndInit();
@@ -1822,7 +1823,7 @@
             this.groupBox2.PerformLayout();
             this.groupBoxAdvanceSettings.ResumeLayout(false);
             this.groupBoxAdvanceSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTotalBandwidthLimit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
             this.groupBox4.ResumeLayout(false);
@@ -1863,10 +1864,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDown6;
         private System.Windows.Forms.NumericUpDown numericUpDown5;
-        private System.Windows.Forms.NumericUpDown numericUpDown4;
+        private System.Windows.Forms.NumericUpDown numericUpDownMinSpeed;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numericUpDownConcurrent;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
@@ -1922,7 +1923,7 @@
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.CheckBox checkBox6;
-        private System.Windows.Forms.NumericUpDown numericUpDown10;
+        private System.Windows.Forms.NumericUpDown numericUpDownTotalBandwidthLimit;
         private System.Windows.Forms.CheckBox checkBoxSwitchArch64;
         private System.Windows.Forms.CheckBox checkBoxHighConcurrent;
         private System.Windows.Forms.GroupBox groupBoxPipe;

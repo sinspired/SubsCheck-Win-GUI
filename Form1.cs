@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,17 +52,17 @@ namespace subs_check.win.gui
             InitializeComponent();
             originalNotifyIcon = notifyIcon1.Icon;
 
-            toolTip1.SetToolTip(numericUpDown1, "并发线程数：推荐 宽带峰值/50M。");
+            toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。");
             toolTip1.SetToolTip(numericUpDown2, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
             toolTip1.SetToolTip(label2, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
 
             toolTip1.SetToolTip(numericUpDown3, "超时时间(毫秒)：节点的最大延迟。");
-            toolTip1.SetToolTip(numericUpDown4, "最低测速结果舍弃(KB/s)。");
+            toolTip1.SetToolTip(numericUpDownMinSpeed, "最低测速结果舍弃(KB/s)。");
             toolTip1.SetToolTip(numericUpDown5, "下载测试时间(s)：与下载链接大小相关，默认最大测试10s。");
             toolTip1.SetToolTip(numericUpDown6, "本地监听端口：用于直接返回测速结果的节点信息，方便 Sub-Store 实现订阅转换。");
             toolTip1.SetToolTip(numericUpDown7, "Sub-Store监听端口：用于订阅订阅转换。\n注意：除非你知道你在干什么，否则不要将你的 Sub-Store 暴露到公网，否则可能会被滥用");
             toolTip1.SetToolTip(numericUpDown9, "下载测试限制(MB)：当达到下载数据大小时，停止下载，可节省测速流量，减少测速测死的概率");
-            toolTip1.SetToolTip(numericUpDown10, "总下载速度限制(MB/s)：建议设置为 <=带宽/8, 比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20");
+            toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, "总下载速度限制(MB/s)：建议设置为 <=带宽/8, 比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20");
             toolTip1.SetToolTip(textBox1, "节点池订阅地址：支持 Link、Base64、Clash 格式的订阅链接。");
             toolTip1.SetToolTip(checkBox1, "以节点IP查询位置重命名节点。\n质量差的节点可能造成IP查询失败，造成整体检查速度稍微变慢。");
             toolTip1.SetToolTip(checkBox2, "是否开启流媒体检测，其中IP欺诈依赖'节点地址查询'，内核版本需要 v2.0.8 以上\n\n示例：美国1 | ⬇️ 5.6MB/s |0%|Netflix|Disney|Openai\n风控值：0% (使用ping0.cc标准)\n流媒体解锁：Netflix、Disney、Openai");
@@ -80,7 +81,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBox6, "总的下载速度限制,不选代表不限制");
             toolTip1.SetToolTip(numericUpDown8, "保存几个成功的节点，不选代表不限制，内核版本需要 v2.1.0 以上\n如果你的并发数量超过这个参数，那么成功的结果可能会大于这个数值");
 
-            toolTip1.SetToolTip(numericUpDown10, "总的下载速度限制,不选代表不限制");
+            toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, "总的下载速度限制,不选代表不限制");
 
             toolTip1.SetToolTip(labelCron, "双击切换 使用「分钟倒计时」");
 
@@ -292,46 +293,85 @@ namespace subs_check.win.gui
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
                     var config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
 
-                    //变量放在前面,以防后续读取时未定义
-                    // Use x64架构
-                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
-                    if (subscheckArch != null) currentArch = subscheckArch;
+                    string savemethod = 读取config字符串(config, "save-method");
+                    if (savemethod != null)
+                    {
+                        if (savemethod == "local") comboBox1.Text = "本地";
+                        else comboBox1.Text = savemethod;
+                    }
 
-                    // 使用高并发版本
+                    // 变量放在前面,以防后续读取时未定义
+                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
+                    if (!string.IsNullOrWhiteSpace(subscheckArch)) currentArch = subscheckArch;
+
                     string subscheckKernel = 读取config字符串(config, "subscheck-kernel");
-                    if (subscheckKernel != null) currentKernel = subscheckKernel;
+                    if (!string.IsNullOrWhiteSpace(subscheckKernel)) currentKernel = subscheckKernel;
 
                     // 使用新函数获取整数值并设置UI控件
                     int? concurrentValue = 读取config整数(config, "concurrent");
-                    if (concurrentValue.HasValue) numericUpDown1.Value = concurrentValue.Value;
+                    if (concurrentValue.HasValue) numericUpDownConcurrent.Value = concurrentValue.Value;
 
-                    // 测活阶段并发数
+                    // 临时禁用事件
+                    numericUpDownPipeAlive.ValueChanged -= numericUpDownPipeAlive_ValueChanged;
+                    numericUpDownPipeSpeed.ValueChanged -= numericUpDownPipeSpeed_ValueChanged;
+                    numericUpDownPipeMedia.ValueChanged -= numericUpDownPipeMedia_ValueChanged;
+
+                    // 测活/测速/流媒体阶段并发数（先赋值到控件，再从控件读取最终值，保证非 null）
                     int? aliveConcurrentValue = 读取config整数(config, "alive-concurrent");
                     if (aliveConcurrentValue.HasValue) numericUpDownPipeAlive.Value = aliveConcurrentValue.Value;
-                    // 测速阶段并发数
+
                     int? speedConcurrentValue = 读取config整数(config, "speed-concurrent");
                     if (speedConcurrentValue.HasValue) numericUpDownPipeSpeed.Value = speedConcurrentValue.Value;
-                    // 流媒体检测阶段并发数
+
                     int? mediaConcurrentValue = 读取config整数(config, "media-concurrent");
                     if (mediaConcurrentValue.HasValue) numericUpDownPipeMedia.Value = mediaConcurrentValue.Value;
 
-                    // 根据各阶段并发数切换设置项,如果任一为0,则启用自适应高并发
-                    switchPipeAutoConcurrent();
+                    // 根据各阶段并发数切换设置项, 如果任一为0, 则启用自适应高并发
+                    switchPipeAutoConcurrent(); // 现在控件已被赋值，函数可以安全读取 numericUpDown 的值
 
-                    //读取高并发版本设置
-                    string EnableHighConcurrent = 读取config字符串(config, "enable-high-concurrent");
-                    if (EnableHighConcurrent != null && EnableHighConcurrent == "true") checkBoxHighConcurrent.Checked = true;
-                    else checkBoxHighConcurrent.Checked = false;
+                    // 重新启用事件
+                    numericUpDownPipeAlive.ValueChanged += numericUpDownPipeAlive_ValueChanged;
+                    numericUpDownPipeSpeed.ValueChanged += numericUpDownPipeSpeed_ValueChanged;
+                    numericUpDownPipeMedia.ValueChanged += numericUpDownPipeMedia_ValueChanged;
 
-                    // Enhance-tag相关设置
-                    string EnhanceTag = 读取config字符串(config, "enhanced-tag");
-                    if (EnhanceTag != null && EnhanceTag == "true") checkBoxEhanceTag.Checked = true;
-                    else checkBoxEhanceTag.Checked = false;
-                    // 丢弃低质量的cf节点
-                    string DropBadCFNodes = 读取config字符串(config, "drop-bad-cf-nodes");
-                    if (DropBadCFNodes != null && DropBadCFNodes == "true") checkBoxDropBadCFNodes.Checked = true;
-                    else checkBoxDropBadCFNodes.Checked = false;
+                    // Enhance-tag 相关设置（稳健解析 "true"/"false"）
+                    string enhanceTagRaw = 读取config字符串(config, "enhanced-tag");
+                    bool enhanceTagFlag = false;
+                    if (!string.IsNullOrWhiteSpace(enhanceTagRaw))
+                    {
+                        bool.TryParse(enhanceTagRaw.Trim(), out enhanceTagFlag);
+                    }
+                    checkBoxEhanceTag.Checked = enhanceTagFlag;
 
+                    // 丢弃低质量的 cf 节点
+                    string dropBadCFRaw = 读取config字符串(config, "drop-bad-cf-nodes");
+                    bool dropBadCFFlag = false;
+                    if (!string.IsNullOrWhiteSpace(dropBadCFRaw))
+                    {
+                        bool.TryParse(dropBadCFRaw.Trim(), out dropBadCFFlag);
+                    }
+                    checkBoxDropBadCFNodes.Checked = dropBadCFFlag;
+
+                    // 读取 enable-high-concurrent，并解析为 bool
+                    string enableHighConcurrentRaw = 读取config字符串(config, "enable-high-concurrent");
+                    bool enableHighConcurrentFlag = false;
+                    if (!string.IsNullOrWhiteSpace(enableHighConcurrentRaw))
+                    {
+                        bool.TryParse(enableHighConcurrentRaw.Trim(), out enableHighConcurrentFlag);
+                    }
+
+                    // 从控件读取最终并发数（确保不会访问 Nullable.Value）
+                    int alive = (int)numericUpDownPipeAlive.Value;
+                    int speed = (int)numericUpDownPipeSpeed.Value;
+                    int media = (int)numericUpDownPipeMedia.Value;
+
+                    // 决定是否启用高并发：只要显式开启 或 drop/enhance 为 true 或 三阶段并发均 > 0
+                    bool needHighConcurrent = enableHighConcurrentFlag
+                                            || dropBadCFFlag
+                                            || enhanceTagFlag
+                                            || (alive > 0 && speed > 0 && media > 0);
+
+                    checkBoxHighConcurrent.Checked = needHighConcurrent;
 
                     string switchX64 = 读取config字符串(config, "switch-x64");
                     if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
@@ -345,7 +385,7 @@ namespace subs_check.win.gui
                     if (timeoutValue.HasValue) numericUpDown3.Value = timeoutValue.Value;
 
                     int? minspeedValue = 读取config整数(config, "min-speed");
-                    if (minspeedValue.HasValue) numericUpDown4.Value = minspeedValue.Value;
+                    if (minspeedValue.HasValue) numericUpDownMinSpeed.Value = minspeedValue.Value;
 
                     int? downloadtimeoutValue = 读取config整数(config, "download-timeout");
                     if (downloadtimeoutValue.HasValue) numericUpDown5.Value = downloadtimeoutValue.Value;
@@ -354,20 +394,13 @@ namespace subs_check.win.gui
                     if (downloadLimitSizeValue.HasValue) numericUpDown9.Value = downloadLimitSizeValue.Value;
 
                     int? downloadLimitSpeedValue = 读取config整数(config, "total-speed-limit");
-                    if (downloadLimitSpeedValue.HasValue) numericUpDown10.Value = downloadLimitSpeedValue.Value;
+                    if (downloadLimitSpeedValue.HasValue) numericUpDownTotalBandwidthLimit.Value = downloadLimitSpeedValue.Value;
 
                     string speedTestUrl = 读取config字符串(config, "speed-test-url");
                     if (speedTestUrl != null)
                     {
                         comboBox2.Items.Add(speedTestUrl);
                         comboBox2.Text = speedTestUrl;
-                    }
-
-                    string savemethod = 读取config字符串(config, "save-method");
-                    if (savemethod != null)
-                    {
-                        if (savemethod == "local") comboBox1.Text = "本地";
-                        else comboBox1.Text = savemethod;
                     }
 
                     string listenport = 读取config字符串(config, "listen-port");
@@ -518,13 +551,13 @@ namespace subs_check.win.gui
                         if (totalspeedlimit.Value == 0)
                         {
                             checkBox6.Checked = false;
-                            numericUpDown10.Enabled = false;
+                            numericUpDownTotalBandwidthLimit.Enabled = false;
                         }
                         else
                         {
                             checkBox6.Checked = true;
-                            numericUpDown10.Enabled = true;
-                            numericUpDown10.Value = totalspeedlimit.Value;
+                            numericUpDownTotalBandwidthLimit.Enabled = true;
+                            numericUpDownTotalBandwidthLimit.Value = totalspeedlimit.Value;
                         }
                     }
 
@@ -634,7 +667,7 @@ namespace subs_check.win.gui
                 var config = new Dictionary<string, object>();
 
                 // 从UI控件获取值并添加到字典中
-                config["concurrent"] = (int)numericUpDown1.Value;
+                config["concurrent"] = (int)numericUpDownConcurrent.Value;
 
 
                 // 测活阶段并发数
@@ -650,10 +683,10 @@ namespace subs_check.win.gui
                 config["check-interval"] = (int)numericUpDown2.Value;
                 if (textBoxCron.Visible) config["cron-expression"] = textBoxCron.Text;
                 config["timeout"] = (int)numericUpDown3.Value;
-                config["min-speed"] = (int)numericUpDown4.Value;
+                config["min-speed"] = (int)numericUpDownMinSpeed.Value;
                 config["download-timeout"] = (int)numericUpDown5.Value;
                 config["download-mb"] = (int)numericUpDown9.Value;
-                config["total-speed-limit"] = (int)numericUpDown10.Value;
+                config["total-speed-limit"] = (int)numericUpDownTotalBandwidthLimit.Value;
 
 
                 if (!string.IsNullOrEmpty(comboBox2.Text)) config["speed-test-url"] = comboBox2.Text;
@@ -801,7 +834,7 @@ namespace subs_check.win.gui
                 else config["success-limit"] = 0;
 
                 //下载速度限制,为0代表不限制
-                if (checkBox6.Checked) config["total-speed-limit"] = (int)numericUpDown10.Value;
+                if (checkBox6.Checked) config["total-speed-limit"] = (int)numericUpDownTotalBandwidthLimit.Value;
                 else config["total-speed-limit"] = 0;
 
                 // 使用YamlDotNet序列化配置
@@ -937,15 +970,15 @@ namespace subs_check.win.gui
                     button3.Enabled = File.Exists(allyamlFilePath);
                 }
 
-                numericUpDown1.Enabled = false;
+                numericUpDownConcurrent.Enabled = false;
                 numericUpDown2.Enabled = false;
                 labelCron.Enabled = false;
                 textBoxCron.Enabled = false;
                 numericUpDown3.Enabled = false;
-                numericUpDown4.Enabled = false;
+                numericUpDownMinSpeed.Enabled = false;
                 numericUpDown5.Enabled = false;
                 numericUpDown9.Enabled = false;
-                numericUpDown10.Enabled = false;
+                numericUpDownTotalBandwidthLimit.Enabled = false;
                 numericUpDown6.Enabled = false;
                 numericUpDown7.Enabled = false;
 
@@ -997,15 +1030,15 @@ namespace subs_check.win.gui
                 await KillNodeProcessAsync();
                 if (checkBox4.Checked) ReadConfig();
                 button3.Enabled = false;
-                numericUpDown1.Enabled = true;
+                numericUpDownConcurrent.Enabled = true;
                 numericUpDown2.Enabled = true;
                 labelCron.Enabled = true;
                 textBoxCron.Enabled = true;
                 numericUpDown3.Enabled = true;
-                numericUpDown4.Enabled = true;
+                numericUpDownMinSpeed.Enabled = true;
                 numericUpDown5.Enabled = true;
                 numericUpDown9.Enabled = true;
-                numericUpDown10.Enabled = true;
+                numericUpDownTotalBandwidthLimit.Enabled = true;
                 numericUpDown6.Enabled = true;
                 numericUpDown7.Enabled = true;
 
@@ -1029,7 +1062,7 @@ namespace subs_check.win.gui
             if (downloading == 0) button1.Enabled = true;
         }
 
-        private async Task DownloadSubsCheckEXE()
+        public async Task DownloadSubsCheckEXE()
         {
             button1.Enabled = false;
             downloading = 1;
@@ -1758,13 +1791,13 @@ namespace subs_check.win.gui
                 stopMenuItem.Enabled = false;
 
                 // 重新启用控件
-                numericUpDown1.Enabled = true;
+                numericUpDownConcurrent.Enabled = true;
                 numericUpDown2.Enabled = true;
                 numericUpDown3.Enabled = true;
-                numericUpDown4.Enabled = true;
+                numericUpDownMinSpeed.Enabled = true;
                 numericUpDown5.Enabled = true;
                 numericUpDown9.Enabled = true;
-                numericUpDown10.Enabled = true;
+                numericUpDownTotalBandwidthLimit.Enabled = true;
                 numericUpDown6.Enabled = true;
                 textBox1.Enabled = true;
                 groupBoxAdvanceSettings.Enabled = true;
@@ -2500,13 +2533,13 @@ namespace subs_check.win.gui
                 await KillNodeProcessAsync();
                 // 重新启动 subs-check.exe 程序
                 StartSubsCheckProcess();
-                numericUpDown1.Enabled = false;
+                numericUpDownConcurrent.Enabled = false;
                 numericUpDown2.Enabled = false;
                 numericUpDown3.Enabled = false;
-                numericUpDown4.Enabled = false;
+                numericUpDownMinSpeed.Enabled = false;
                 numericUpDown5.Enabled = false;
                 numericUpDown9.Enabled = false;
-                numericUpDown10.Enabled = false;
+                numericUpDownTotalBandwidthLimit.Enabled = false;
                 numericUpDown6.Enabled = false;
                 numericUpDown7.Enabled = false;
                 comboBox1.Enabled = false;
@@ -2531,6 +2564,10 @@ namespace subs_check.win.gui
             checkUpdatesForm.当前subsCheck版本号 = 当前subsCheck版本号;
             checkUpdatesForm.当前GUI版本号 = 当前GUI版本号;
             checkUpdatesForm.最新GUI版本号 = 最新GUI版本号;
+            checkUpdatesForm.EnableHighConcurrent = checkBoxHighConcurrent.Checked;
+            checkUpdatesForm.EnableArch64 = checkBoxSwitchArch64.Checked;
+
+
 
             // 为 CheckUpdates 的 button2 添加点击事件处理程序
             checkUpdatesForm.FormClosed += (s, args) =>
@@ -2558,8 +2595,8 @@ namespace subs_check.win.gui
 
         private void checkBox6_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox6.Checked) numericUpDown10.Enabled = true;
-            else numericUpDown10.Enabled = false;
+            if (checkBox6.Checked) numericUpDownTotalBandwidthLimit.Enabled = true;
+            else numericUpDownTotalBandwidthLimit.Enabled = false;
         }
 
         private async void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
@@ -2685,7 +2722,7 @@ namespace subs_check.win.gui
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            if (numericUpDown1.Value > 128)
+            if (numericUpDownConcurrent.Value > 128)
             {
                 string warningMessage =
                     "⚠️ 高并发风险提醒 ⚠️\n\n" +
@@ -3495,7 +3532,7 @@ namespace subs_check.win.gui
 
         private void numericUpDown4_ValueChanged(object sender, EventArgs e)
         {
-            if (numericUpDown4.Value > 4096)
+            if (numericUpDownMinSpeed.Value > 4096)
             {
                 string warningMessage =
                     "⚠️ 测速下限设置提醒 ⚠️\n\n" +
@@ -3531,7 +3568,7 @@ namespace subs_check.win.gui
         }
 
         // 获取 githubproxy 地址
-        private async Task<string> GetGithubProxyUrlAsync()
+        public async Task<string> GetGithubProxyUrlAsync()
         {
             const string AUTO = "自动选择";
             if (comboBox3 == null) return githubProxyURL;
@@ -3616,6 +3653,7 @@ namespace subs_check.win.gui
             if (currentArch != want)
             {
                 checkBoxSwitchArch64.Enabled = false;
+                githubProxyURL = await GetGithubProxyUrlAsync();
                 Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高");
                 await DownloadSubsCheckEXE();
                 currentArch = want;
@@ -3624,55 +3662,160 @@ namespace subs_check.win.gui
             Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换");
         }
 
+        // 计算一个推荐并发参数
+        private (int alive, int speed, int media) CalcSimpleConcurrent()
+        {
+            int baseVal = (int)numericUpDownConcurrent.Value;
+            int aliveConc = baseVal * 4;
+            int speedConc = baseVal;
+            int mediaConc = baseVal * 2;
+
+            // alive 最小为 200
+            aliveConc = Math.Max(aliveConc, 200);
+            // media 最大为 100
+            mediaConc = Math.Min(mediaConc, 100);
+
+            // 处理总带宽限制与最小速度
+            double totalBw = (double)numericUpDownTotalBandwidthLimit.Value; // 用户设定的总带宽（单位与逻辑由你定义）
+            double minSpeed = (double)numericUpDownMinSpeed.Value; // 单个连接的最小速度
+
+            if (totalBw <= 0)
+            {
+                // 无带宽限制时，给 speed 一个保守上限
+                speedConc = Math.Min(speedConc, 32);
+            }
+            else if (minSpeed > 0)
+            {
+                // 估算在 minSpeed 情况下能支持的最大并发数（向下取整）
+                int estimated = (int)Math.Floor(totalBw / minSpeed);
+                estimated = Math.Max(1, estimated); // 至少为 1
+                speedConc = Math.Max(speedConc, estimated); // 把 speedConc 限制到估算值
+            }
+            else
+            {
+                speedConc = Math.Min(speedConc, 32);
+            }
+
+            speedConc = Math.Max(1, speedConc);
+
+            return (aliveConc, speedConc, mediaConc);
+        }
+
+        // 类成员：唯一的程序化修改旗标（防重入/防循环）
+        private bool _inProgrammaticChange = false;
+
+        // 安全写入 NumericUpDown（避免超出 Min/Max 导致异常）
+        private void SetNumericUpDownValueSafe(NumericUpDown ctrl, int value)
+        {
+            if (ctrl == null) return;
+            int min = (int)ctrl.Minimum;
+            int max = (int)ctrl.Maximum;
+            if (value < min) value = min;
+            if (value > max) value = max;
+            if ((decimal)value != ctrl.Value) // 只有值变化时才赋值，减少不必要触发
+                ctrl.Value = (decimal)value;
+        }
+
+        // switchPipeAutoConcurrent：根据当前 numericUpDown 的值决定是否为自动模式
         private void switchPipeAutoConcurrent()
         {
-            if (numericUpDownPipeAlive.Value <= 0 || numericUpDownPipeSpeed.Value <= 0 || numericUpDownPipeMedia.Value <= 0)
+            // 计算是否进入自动模式（任一为 0 则自动）
+            bool anyZero = (int)numericUpDownPipeAlive.Value <= 0
+                           || (int)numericUpDownPipeSpeed.Value <= 0
+                           || (int)numericUpDownPipeMedia.Value <= 0;
+
+            // 在程序化修改期间抑制事件响应
+            _inProgrammaticChange = true;
+            try
             {
-                numericUpDownPipeAlive.Enabled = false;
-                numericUpDownPipeSpeed.Enabled = false;
-                numericUpDownPipeMedia.Enabled = false;
-                numericUpDownPipeAlive.Value = 0;
-                numericUpDownPipeSpeed.Value = 0;
-                numericUpDownPipeMedia.Value = 0;
-                checkBoxPipeAuto.Checked = true;
+                if (anyZero)
+                {
+                    // 进入自适应：禁用控件并把值统一为 0（只在必要时写入）
+                    numericUpDownPipeAlive.Enabled = false;
+                    numericUpDownPipeSpeed.Enabled = false;
+                    numericUpDownPipeMedia.Enabled = false;
+
+                    SetNumericUpDownValueSafe(numericUpDownPipeAlive, 0);
+                    SetNumericUpDownValueSafe(numericUpDownPipeSpeed, 0);
+                    SetNumericUpDownValueSafe(numericUpDownPipeMedia, 0);
+
+                    if (!checkBoxPipeAuto.Checked) checkBoxPipeAuto.Checked = true; // 程序化设置
+                }
+                else
+                {
+                    // 退出自适应：启用控件，但不要覆盖用户已经设置的数值
+                    numericUpDownPipeAlive.Enabled = true;
+                    numericUpDownPipeSpeed.Enabled = true;
+                    numericUpDownPipeMedia.Enabled = true;
+
+                    if (checkBoxPipeAuto.Checked) checkBoxPipeAuto.Checked = false; // 程序化设置
+                }
             }
-            else
+            finally
             {
-                numericUpDownPipeAlive.Enabled = true;
-                numericUpDownPipeSpeed.Enabled = true;
-                numericUpDownPipeMedia.Enabled = true;
-                checkBoxPipeAuto.Checked = false;
+                _inProgrammaticChange = false;
             }
         }
 
-        //定义 “自适应” 按钮选中事件
+        // checkBoxPipeAuto_CheckedChanged：用户点击或程序化修改都会走这里，使用 guard 来区分
         private void checkBoxPipeAuto_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBoxPipeAuto.Checked)
+            if (_inProgrammaticChange) return; // 如果是程序化触发，直接忽略
+
+            _inProgrammaticChange = true;
+            try
             {
-                numericUpDownPipeAlive.Enabled = false;
-                numericUpDownPipeSpeed.Enabled = false;
-                numericUpDownPipeMedia.Enabled = false;
+                if (checkBoxPipeAuto.Checked)
+                {
+                    // 切到自适应：禁用并清零
+                    numericUpDownPipeAlive.Enabled = false;
+                    numericUpDownPipeSpeed.Enabled = false;
+                    numericUpDownPipeMedia.Enabled = false;
+
+                    SetNumericUpDownValueSafe(numericUpDownPipeAlive, 0);
+                    SetNumericUpDownValueSafe(numericUpDownPipeSpeed, 0);
+                    SetNumericUpDownValueSafe(numericUpDownPipeMedia, 0);
+                    Log("并发检测模式: 自适应分段流水线(内核自带衰减算法)");
+                }
+                else
+                {
+                    // 退出自适应：启用并使用推荐值（推荐值从函数获得）
+                    numericUpDownPipeAlive.Enabled = true;
+                    numericUpDownPipeSpeed.Enabled = true;
+                    numericUpDownPipeMedia.Enabled = true;
+
+                    var (alive, speed, media) = CalcSimpleConcurrent();
+
+                    SetNumericUpDownValueSafe(numericUpDownPipeAlive, alive);
+                    SetNumericUpDownValueSafe(numericUpDownPipeSpeed, speed);
+                    SetNumericUpDownValueSafe(numericUpDownPipeMedia, media);
+                    Log($"默认并发参数: 测活: {alive}, 测速: {speed}, 流媒体: {media}");
+                }
             }
-            else
+            finally
             {
-                numericUpDownPipeAlive.Enabled = true;
-                numericUpDownPipeSpeed.Enabled = true;
-                numericUpDownPipeMedia.Enabled = true;
+                _inProgrammaticChange = false;
             }
         }
 
+        // ValueChanged 事件：只有用户交互时才触发 switchPipeAutoConcurrent（guard 防止程序化导致二次处理）
         private void numericUpDownPipeAlive_ValueChanged(object sender, EventArgs e)
         {
+            if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
         }
         private void numericUpDownPipeSpeed_ValueChanged(object sender, EventArgs e)
         {
+            if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
         }
         private void numericUpDownPipeMedia_ValueChanged(object sender, EventArgs e)
         {
+            if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
         }
     }
 }

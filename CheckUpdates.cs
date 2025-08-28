@@ -20,6 +20,8 @@ namespace subs_check.win.gui
         public string 当前subsCheck版本号 { get; set; }
         public string 当前GUI版本号 { get; set; }
         public string 最新GUI版本号 { get; set; }
+        public bool EnableHighConcurrent { get; set; }
+        public bool EnableArch64 { get; set; }
 
         public CheckUpdates()
         {
@@ -51,28 +53,9 @@ namespace subs_check.win.gui
 
             label5.Text = 当前subsCheck版本号;
 
-            if (comboBox1.Text == "自动选择")
-            {
-                // 创建不包含"自动选择"的代理列表
-                List<string> proxyItems = new List<string>();
-                for (int j = 0; j < comboBox1.Items.Count; j++)
-                {
-                    string proxyItem = comboBox1.Items[j].ToString();
-                    if (proxyItem != "自动选择")
-                        proxyItems.Add(proxyItem);
-                }
+            Form1 mainForm = new Form1();
 
-                // 随机打乱列表顺序
-                Random random = new Random();
-                proxyItems = proxyItems.OrderBy(x => random.Next()).ToList();
-
-                // 异步检测可用代理
-                githubProxyURL = await DetectGitHubProxyAsync(proxyItems);
-            }
-            else
-            {
-                githubProxyURL = $"https://{comboBox1.Text}/";
-            }
+            githubProxyURL = await mainForm.GetGithubProxyUrlAsync();
 
             if (最新GUI版本号 != 当前GUI版本号)
             {
@@ -95,6 +78,9 @@ namespace subs_check.win.gui
                 button1.Enabled = false;
             }
 
+            // 根据并发参数选择仓库
+            string repoOwner = EnableHighConcurrent ? "sinspired" : "beck-8";
+
             using (HttpClient client = new HttpClient())
             {
                 try
@@ -102,8 +88,9 @@ namespace subs_check.win.gui
                     client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
                     client.Timeout = TimeSpan.FromSeconds(30); // 增加超时时间以适应下载需求
 
-                    string url = "https://api.github.com/repos/beck-8/subs-check/releases/latest";
-                    string 备用url = "https://api.github.cmliussss.net/repos/beck-8/subs-check/releases/latest";
+
+                    string url = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
+                    string 备用url = $"https://api.github.cmliussss.net/repos/{repoOwner}/subs-check/releases/latest";
 
                     HttpResponseMessage response = null;
                     string responseBody = null;
@@ -227,7 +214,7 @@ namespace subs_check.win.gui
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n请前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                    MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n请前往 https://github.com/{repoOwner}/subs-check/releases 自行下载！",
                         "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
