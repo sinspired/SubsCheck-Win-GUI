@@ -27,6 +27,7 @@ namespace subs_check.win.gui
         string githubProxyURL = "";
         int run = 0;
         string 当前subsCheck版本号 = "未知版本";
+        string currentKernel = "原版内核";
         string currentArch = "i386";
         string 当前GUI版本号 = "未知版本";
         string 最新GUI版本号 = "未知版本";
@@ -37,6 +38,13 @@ namespace subs_check.win.gui
         // ——用于避免无意义的重复 UI 重绘——
         private string _lastLogLabelNodeInfoText = string.Empty;
         private string _lastNotifyText = string.Empty;
+
+        // 存储groupBox原始位置
+        private Point _pipeOriginalLocation;
+        private Point _enhanceOriginalLocation;
+        private bool _originalLocationSaved = false;
+
+
 
         public Form1()
         {
@@ -185,7 +193,7 @@ namespace subs_check.win.gui
         private async void timer1_Tick(object sender, EventArgs e)//初始化
         {
             timer1.Enabled = false;
-            if (button2.Text == "高级设置∧") button2_Click(sender, e);
+            if (buttonAdvanceSettings.Text == "高级设置∧") button2_Click(sender, e);
             // 检查并创建config文件夹
             string executablePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
             string configFolderPath = System.IO.Path.Combine(executablePath, "config");
@@ -283,6 +291,13 @@ namespace subs_check.win.gui
                     // 使用YamlDotNet解析YAML
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
                     var config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
+
+                    //变量放在前面,以防后续读取时未定义
+                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
+                    if (subscheckArch != null) currentArch = subscheckArch;
+
+                    string subscheckKernel = 读取config字符串(config, "subscheck-kernel");
+                    if (subscheckKernel != null) currentKernel = subscheckKernel;
 
                     // 使用新函数获取整数值并设置UI控件
                     int? concurrentValue = 读取config整数(config, "concurrent");
@@ -446,8 +461,14 @@ namespace subs_check.win.gui
                     string subscheckversion = 读取config字符串(config, "subscheck-version");
                     if (subscheckversion != null) 当前subsCheck版本号 = subscheckversion;
 
-                    string subscheckArch = 读取config字符串(config, "subscheck-arch");
-                    if (subscheckArch != null) currentArch = subscheckArch;
+                    //读取高并发版本设置
+                    string EnableHighConcurrent = 读取config字符串(config, "enable-high-concurrent");
+                    if (EnableHighConcurrent != null && EnableHighConcurrent == "true") checkBoxHighConcurrent.Checked = true;
+                    else checkBoxHighConcurrent.Checked = false;
+
+                    string switchX64 = 读取config字符串(config, "switch-x64");
+                    if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
+                    else checkBoxSwitchArch64.Checked = false;
 
                     int? successlimit = 读取config整数(config, "success-limit");
                     if (successlimit.HasValue)
@@ -508,10 +529,6 @@ namespace subs_check.win.gui
                             textBox10.Text = apikey;
                         }
                     }
-
-                    string switchX64 = 读取config字符串(config, "switch-x64");
-                    if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
-                    else checkBoxSwitchArch64.Checked = false;
 
                     string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
@@ -645,24 +662,7 @@ namespace subs_check.win.gui
                 if (githubProxyCheck)
                 {
                     // 检查并处理 GitHub Raw URLs
-                    if (comboBox3.Text == "自动选择")
-                    {
-                        // 创建不包含"自动选择"的代理列表
-                        List<string> proxyItems = new List<string>();
-                        for (int j = 0; j < comboBox3.Items.Count; j++)
-                        {
-                            string proxyItem = comboBox3.Items[j].ToString();
-                            if (proxyItem != "自动选择")
-                                proxyItems.Add(proxyItem);
-                        }
-
-                        // 随机打乱列表顺序
-                        Random random = new Random();
-                        proxyItems = proxyItems.OrderBy(x => random.Next()).ToList();
-
-                        // 异步检测可用代理
-                        githubProxyURL = await DetectGitHubProxyAsync(proxyItems);
-                    }
+                    githubProxyURL = await GetGithubProxyUrlAsync();
                 }
 
                 if (comboBox3.Text != "自动选择") githubProxyURL = $"https://{comboBox3.Text}/";
@@ -744,14 +744,16 @@ namespace subs_check.win.gui
                 else if (comboBox5.Text.StartsWith(githubRawPrefix)) config["mihomo-overwrite-url"] = githubProxyURL + comboBox5.Text;
                 else config["mihomo-overwrite-url"] = comboBox5.Text != "" ? comboBox5.Text : $"http://127.0.0.1:{numericUpDown6.Value}/ACL4SSR_Online_Full.yaml";
 
+                config["enable-high-concurrent"] = checkBoxHighConcurrent.Checked;//使用自适应高并发版本
+                config["switch-x64"] = checkBoxSwitchArch64.Checked;//是否使用x64内核
                 config["rename-node"] = checkBox1.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBox2.Checked;//是否开启流媒体检测
-                config["switch-x64"] = checkBoxSwitchArch64.Checked;//是否使用x64内核
                 config["keep-success-proxies"] = false;
                 config["print-progress"] = false;//是否显示进度
                 config["sub-urls-retry"] = 3;//重试次数(获取订阅失败后重试次数)
                 config["subscheck-version"] = 当前subsCheck版本号;//当前subsCheck版本号
                 config["subscheck-arch"] = currentArch; //当前subsCheck架构
+                config["subscheck-kernel"] = currentKernel; //当前内核
 
                 config["gui-auto"] = checkBox5.Checked;//是否开机自启
 
@@ -768,6 +770,10 @@ namespace subs_check.win.gui
                     .WithIndentedSequences()  // 使序列化结果更易读
                     .Build();
 
+
+                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                    .Build();
+
                 string yamlContent = serializer.Serialize(config);
 
                 // 确保配置目录存在
@@ -781,14 +787,34 @@ namespace subs_check.win.gui
                     // 读取more.yaml的内容
                     string moreYamlContent = File.ReadAllText(moreYamlPath);
 
-                    // 确保more.yaml内容以换行开始
-                    if (!moreYamlContent.StartsWith("\n") && !moreYamlContent.StartsWith("\r\n"))
+                    // 解析主配置和补充配置
+                    var Config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
+                    var moreConfig = deserializer.Deserialize<Dictionary<string, object>>(moreYamlContent);
+
+                    if (Config == null) Config = new Dictionary<string, object>();
+                    if (moreConfig == null) moreConfig = new Dictionary<string, object>();
+
+                    // 检查并记录冲突的键
+                    var conflictKeys = new List<string>();
+                    var mergedKeys = new List<string>();
+
+                    foreach (var kvp in moreConfig)
                     {
-                        yamlContent += "\n"; // 添加换行符作为分隔
+                        if (Config.ContainsKey(kvp.Key))
+                        {
+                            conflictKeys.Add(kvp.Key);
+                            Log($"发现重复键 '{kvp.Key}'，使用GUI配置");
+                        }
+                        else
+                        {
+                            Config[kvp.Key] = kvp.Value;
+                            mergedKeys.Add(kvp.Key);
+                        }
                     }
 
-                    // 将more.yaml的内容追加到要写入的config.yaml内容后
-                    yamlContent += moreYamlContent;
+                    // 重新序列化合并后的配置
+                    yamlContent = serializer.Serialize(Config);
+
 
                     Log($"已将补充参数配置 more.yaml 内容追加到配置文件");
                 }
@@ -804,25 +830,51 @@ namespace subs_check.win.gui
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (button2.Text == "高级设置∧")
+            if (!_originalLocationSaved)
             {
-                button2.Text = "高级设置∨";
-                groupBox3.Visible = false;
-                groupBox7.Visible = false;
-                groupBox8.Visible = false;
-                if (checkBox7.Checked)
+                _originalLocationSaved = true;
+                _pipeOriginalLocation = groupBoxPipe.Location;
+                _enhanceOriginalLocation = groupBoxEnhance.Location;
+            }
+            //展开状态
+            if (buttonAdvanceSettings.Text == "高级设置∧")
+            {
+                buttonAdvanceSettings.Text = "高级设置∨";
+                groupBoxAdvanceSettings.Visible = false;
+                if (!checkBoxHighConcurrent.Checked)
                 {
-                    groupBox7.Visible = false;
-                    groupBox8.Visible = false;
+                    groupBoxPipe.Visible = false;
+                    groupBoxEnhance.Visible = false;
+
+                    groupBox4.Location = _pipeOriginalLocation;
+                    groupBox5.Location = _pipeOriginalLocation;
+                    groupBox6.Location = _pipeOriginalLocation;
+                }
+                else
+                {
+                    groupBoxPipe.Visible = true;
+                    groupBoxEnhance.Visible = true;
+
+                    groupBoxPipe.Location = groupBoxAdvanceSettings.Location;
+                    groupBoxEnhance.Location = new Point(groupBoxEnhance.Location.X, groupBoxAdvanceSettings.Location.Y);
                 }
             }
             else
             {
-                button2.Text = "高级设置∧";
-                groupBox3.Visible = true;
-                if (checkBox7.Checked) {
-                    groupBox7.Visible = true;
-                    groupBox8.Visible = true;
+                // 收缩状态
+                buttonAdvanceSettings.Text = "高级设置∧";
+                groupBoxAdvanceSettings.Visible = true;
+                if (!checkBoxHighConcurrent.Checked)
+                {
+                    groupBoxPipe.Visible = false;
+                    groupBoxEnhance.Visible = false;
+                }
+                else
+                {
+                    groupBoxPipe.Visible = true;
+                    groupBoxEnhance.Visible = true;
+                    groupBoxPipe.Location = _pipeOriginalLocation;
+                    groupBoxEnhance.Location = _enhanceOriginalLocation;
                 }
             }
             判断保存类型();
@@ -859,7 +911,7 @@ namespace subs_check.win.gui
                 numericUpDown7.Enabled = false;
                 comboBox1.Enabled = false;
                 textBox1.Enabled = false;
-                groupBox3.Enabled = false;
+                groupBoxAdvanceSettings.Enabled = false;
                 groupBox4.Enabled = false;
                 groupBox5.Enabled = false;
                 groupBox6.Enabled = false;
@@ -913,7 +965,7 @@ namespace subs_check.win.gui
                 numericUpDown7.Enabled = true;
                 comboBox1.Enabled = true;
                 textBox1.Enabled = true;
-                groupBox3.Enabled = true;
+                groupBoxAdvanceSettings.Enabled = true;
                 groupBox4.Enabled = true;
                 groupBox5.Enabled = true;
                 groupBox6.Enabled = true;
@@ -935,16 +987,21 @@ namespace subs_check.win.gui
             {
                 Log("正在检查网络连接...");
 
+                // 动态决定使用哪个仓库（checkBoxHighConcurrent 为 true 时使用 sinspired，否则使用 beck-8）
+                string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
+                string releasesPageUrl = $"https://github.com/{repoOwner}/subs-check/releases";
+
                 // 首先检查是否有网络连接
                 if (!IsNetworkAvailable())
                 {
                     Log("网络连接不可用，无法下载核心文件。", true);
-                    MessageBox.Show("缺少 subs-check.exe 核心文件。\n\n您可以前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                    MessageBox.Show($"缺少 subs-check.exe 核心文件。\n\n您可以前往 {releasesPageUrl} 自行下载！",
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                var result = await 获取版本号("https://api.github.com/repos/beck-8/subs-check/releases/latest", true);
+                var result = await 获取版本号(apiUrl, true);
                 if (result.Item1 == "未知版本")
                 {
                     // 无版本信息
@@ -1014,7 +1071,7 @@ namespace subs_check.win.gui
                         if (downloadUrl == null)
                         {
                             Log("无法找到适用于 Windows 的下载链接。", true);
-                            MessageBox.Show("未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                            MessageBox.Show($"未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return;
                         }
@@ -1123,7 +1180,7 @@ namespace subs_check.win.gui
                         if (!downloadSuccess)
                         {
                             Log($"所有下载尝试均失败，最后错误: {failureReason}", true);
-                            MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                            MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             progressBar1.Value = 0;
                             progressBar1.Visible = false;
@@ -1147,9 +1204,12 @@ namespace subs_check.win.gui
 
                                 // 解压文件
                                 exeEntry.ExtractToFile(exeFilePath);
-                                当前subsCheck版本号 = latestVersion;
+                                currentKernel = checkBoxHighConcurrent.Checked ? "高并发内核" : "原版内核";
                                 currentArch = desiredArchToken;
-                                Log($"subs-check.exe {当前subsCheck版本号} 已就绪！");
+
+                                当前subsCheck版本号 = $"{latestVersion}";
+
+                                Log($"{currentKernel}({currentArch}): subs-check.exe {当前subsCheck版本号} 已就绪！");
 
                                 await SaveConfig(false);
 
@@ -1165,7 +1225,7 @@ namespace subs_check.win.gui
                     catch (Exception ex)
                     {
                         Log($"下载过程中出错: {ex.Message}", true);
-                        MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 https://github.com/beck-8/subs-check/releases 自行下载！",
+                        MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                             "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -1653,7 +1713,7 @@ namespace subs_check.win.gui
                 numericUpDown10.Enabled = true;
                 numericUpDown6.Enabled = true;
                 textBox1.Enabled = true;
-                groupBox3.Enabled = true;
+                groupBoxAdvanceSettings.Enabled = true;
             }));
         }
 
@@ -1879,29 +1939,42 @@ namespace subs_check.win.gui
 
         private void 判断保存类型()
         {
-            if (comboBox1.Text == "本地" || button2.Text == "高级设置∨")
+            if (comboBox1.Text == "本地" || buttonAdvanceSettings.Text == "高级设置∨")
             {
                 groupBox4.Visible = false;
                 groupBox5.Visible = false;
                 groupBox6.Visible = false;
             }
-            else if (comboBox1.Text == "gist" && button2.Text == "高级设置∧")
+            else if (comboBox1.Text == "gist" && buttonAdvanceSettings.Text == "高级设置∧")
             {
+                if (!checkBoxHighConcurrent.Checked)
+                {
+                    groupBox4.Location = _pipeOriginalLocation;
+                }
+
                 groupBox4.Visible = true;
 
                 groupBox5.Visible = false;
                 groupBox6.Visible = false;
             }
-            else if (comboBox1.Text == "r2" && button2.Text == "高级设置∧")
+            else if (comboBox1.Text == "r2" && buttonAdvanceSettings.Text == "高级设置∧")
             {
+                if (!checkBoxHighConcurrent.Checked)
+                {
+                    groupBox5.Location = _pipeOriginalLocation;
+                }
                 groupBox5.Location = groupBox4.Location;
                 groupBox5.Visible = true;
 
                 groupBox4.Visible = false;
                 groupBox6.Visible = false;
             }
-            else if (comboBox1.Text == "webdav" && button2.Text == "高级设置∧")
+            else if (comboBox1.Text == "webdav" && buttonAdvanceSettings.Text == "高级设置∧")
             {
+                if (!checkBoxHighConcurrent.Checked)
+                {
+                    groupBox6.Location = _pipeOriginalLocation;
+                }
                 groupBox6.Location = groupBox4.Location;
                 groupBox6.Visible = true;
 
@@ -1913,7 +1986,7 @@ namespace subs_check.win.gui
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
             判断保存类型();
-            if (!(comboBox1.Text == "本地" || comboBox1.Text == "") && button2.Text == "高级设置∨") button2_Click(sender, e);
+            if (!(comboBox1.Text == "本地" || comboBox1.Text == "") && buttonAdvanceSettings.Text == "高级设置∨") button2_Click(sender, e);
         }
 
         private void textBox3_Enter(object sender, EventArgs e)
@@ -2178,36 +2251,8 @@ namespace subs_check.win.gui
                 }
 
                 // 检测可用的 GitHub 代理
-                if (!string.IsNullOrEmpty(comboBox3.Text) && comboBox3.Text == "自动选择")
-                {
-                    // 创建不包含"自动选择"的代理列表
-                    List<string> proxyItems = new List<string>();
-                    for (int j = 0; j < comboBox3.Items.Count; j++)
-                    {
-                        string proxyItem = comboBox3.Items[j].ToString();
-                        if (proxyItem != "自动选择")
-                            proxyItems.Add(proxyItem);
-                    }
-
-                    // 随机打乱列表顺序
-                    Random random = new Random();
-                    proxyItems = proxyItems.OrderBy(x => random.Next()).ToList();
-
-                    // 异步检测可用代理
-                    githubProxyURL = await DetectGitHubProxyAsync(proxyItems);
-
-                    // 如果未能找到可用代理，提示用户
-                    if (string.IsNullOrEmpty(githubProxyURL))
-                    {
-                        Log("未能找到可用的 GitHub 代理，下载可能会失败", true);
-                    }
-                }
-                else if (!string.IsNullOrEmpty(comboBox3.Text))
-                {
-                    githubProxyURL = $"https://{comboBox3.Text}/";
-                    Log($"使用指定的 GitHub 代理: {comboBox3.Text}");
-                }
-                else
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                if (githubProxyURL == "")
                 {
                     Log("未设置 GitHub 代理，将尝试直接下载", true);
                 }
@@ -2409,7 +2454,7 @@ namespace subs_check.win.gui
                 numericUpDown7.Enabled = false;
                 comboBox1.Enabled = false;
                 textBox1.Enabled = false;
-                groupBox3.Enabled = false;
+                groupBoxAdvanceSettings.Enabled = false;
                 groupBox4.Enabled = false;
                 groupBox5.Enabled = false;
                 groupBox6.Enabled = false;
@@ -3428,29 +3473,107 @@ namespace subs_check.win.gui
 
         }
 
-        private async void checkBoxSwitchArch64_CheckedChanged(object sender, EventArgs e)
+        private const string AUTO = "自动选择";
+
+        // 简化：获取 candidates 并处理 "自动选择"
+        private async Task<string> GetGithubProxyUrlAsync()
         {
-            if (!checkBoxSwitchArch64.Checked)
+            if (comboBox3 == null) return githubProxyURL;
+            var text = (comboBox3.Text ?? "");
+            if (text != AUTO && text.Length > 0) return $"https://{text}/";
+            var candidates = comboBox3.Items
+                .OfType<string>()
+                .Where(s => !string.IsNullOrWhiteSpace(s) && s != AUTO)
+                .OrderBy(_ => Guid.NewGuid())
+                .ToList();
+
+            if (!candidates.Any()) return githubProxyURL;
+            try { var detected = await DetectGitHubProxyAsync(candidates); return string.IsNullOrWhiteSpace(detected) ? githubProxyURL : detected; }
+            catch { return githubProxyURL; }
+        }
+
+        private void ApplyHighConcurrentLayout(bool high)
+        {
+            bool collapsed = buttonAdvanceSettings.Text == "高级设置∨";
+            groupBoxPipe.Visible = high;
+            groupBoxEnhance.Visible = high;
+            if (collapsed)
             {
-                if (currentArch != "i386"){
-                    Log("切换为 i386 内核,内存占用更低,但CPU占用可能更高");
-                    _ = DownloadSubsCheckEXE();
+                if (high)
+                {
+                    if (!_originalLocationSaved)
+                    {
+                        _originalLocationSaved = true;
+                        _pipeOriginalLocation = groupBoxPipe.Location;
+                        _enhanceOriginalLocation = groupBoxEnhance.Location;
+                    }
+                    groupBoxPipe.Location = groupBoxAdvanceSettings.Location;
+                    groupBoxEnhance.Location = new Point(groupBoxEnhance.Location.X, groupBoxAdvanceSettings.Location.Y);
                 }
-                Log("使用32位内核,如CPU占用较高,可在[高级设置]切换");
             }
             else
             {
-                if (currentArch != "x86_64")
+                if (high)
                 {
-                    Log(currentArch);
-                    Log("切换为 x64 内核,内存占用更高,但CPU占用可能较低");
-                    _ = DownloadSubsCheckEXE();
+                    groupBoxPipe.Location = _pipeOriginalLocation;
+                    groupBoxEnhance.Location = _enhanceOriginalLocation;
+                    groupBox4.Location = new Point(groupBox4.Location.X, groupBox4.Location.Y + groupBoxPipe.Height);
+                    groupBox5.Location = groupBox4.Location; groupBox6.Location = groupBox4.Location;
                 }
-                Log("使用64位内核,如内存占用较高,可在[高级设置]切换");
+                else
+                {
+                    groupBox4.Location = _pipeOriginalLocation; groupBox5.Location = groupBox4.Location; groupBox6.Location = groupBox4.Location;
+                }
             }
+        }
 
-            // 保存配置
-            await SaveConfig();    
+        // 极简事件：只做状态变更检查、统一获取 proxy、更新并保存
+        private async void checkBoxHighConcurrent_CheckedChanged(object sender, EventArgs e)
+        {
+            bool high = checkBoxHighConcurrent.Checked;
+            string want = high ? "高并发内核" : "原版内核";
+            if (currentKernel != want)
+            {
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                if (comboBox3?.Text != null && comboBox3.Text != AUTO) githubProxyURL = $"https://{comboBox3.Text}/";
+                Log(high ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核");
+                _ = DownloadSubsCheckEXE();// 若要后台并行改为 _ = DownloadSubsCheckEXE();
+                currentKernel = want;
+            }
+            ApplyHighConcurrentLayout(high);
+            Log(high ? "已切换高并发内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。");
+        }
+
+        private async void checkBoxSwitchArch64_CheckedChanged(object sender, EventArgs e)
+        {
+            bool useX64 = checkBoxSwitchArch64.Checked;
+            string want = useX64 ? "x86_64" : "i386";
+            if (currentArch != want)
+            {
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                if (comboBox3?.Text != null && comboBox3.Text != AUTO) githubProxyURL = $"https://{comboBox3.Text}/";
+                Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高");
+                await DownloadSubsCheckEXE();
+                currentArch = want;
+            }
+            Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换");
+        }
+
+
+        private void checkBoxPipeAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxPipeAuto.Checked)
+            {
+                numericUpDownPipeAlive.Enabled = false;
+                numericUpDownPipeSpeed.Enabled = false;
+                numericUpDownPipeMedia.Enabled = false;
+            }
+            else
+            {
+                numericUpDownPipeAlive.Enabled = true;
+                numericUpDownPipeSpeed.Enabled = true;
+                numericUpDownPipeMedia.Enabled = true;
+            }
         }
     }
 }

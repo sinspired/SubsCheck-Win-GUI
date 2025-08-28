@@ -35,6 +35,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBoxCron = new System.Windows.Forms.TextBox();
             this.checkBox5 = new System.Windows.Forms.CheckBox();
+            this.checkBoxHighConcurrent = new System.Windows.Forms.CheckBox();
             this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
@@ -51,10 +52,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.labelCron = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.buttonAdvanceSettings = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
@@ -67,7 +67,7 @@
             this.button5 = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.LogLabelNodeInfo = new System.Windows.Forms.Label();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
             this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -111,17 +111,17 @@
             this.label18 = new System.Windows.Forms.Label();
             this.timer3 = new System.Windows.Forms.Timer(this.components);
             this.timer4 = new System.Windows.Forms.Timer(this.components);
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.numericUpDown13 = new System.Windows.Forms.NumericUpDown();
-            this.label25 = new System.Windows.Forms.Label();
-            this.numericUpDown12 = new System.Windows.Forms.NumericUpDown();
-            this.label24 = new System.Windows.Forms.Label();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown11 = new System.Windows.Forms.NumericUpDown();
-            this.label23 = new System.Windows.Forms.Label();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.checkBox10 = new System.Windows.Forms.CheckBox();
-            this.checkBox9 = new System.Windows.Forms.CheckBox();
+            this.groupBoxPipe = new System.Windows.Forms.GroupBox();
+            this.numericUpDownPipeMedia = new System.Windows.Forms.NumericUpDown();
+            this.labelPipeMedia = new System.Windows.Forms.Label();
+            this.numericUpDownPipeSpeed = new System.Windows.Forms.NumericUpDown();
+            this.labelPipeSpeed = new System.Windows.Forms.Label();
+            this.checkBoxPipeAuto = new System.Windows.Forms.CheckBox();
+            this.numericUpDownPipeAlive = new System.Windows.Forms.NumericUpDown();
+            this.labelPipeAlive = new System.Windows.Forms.Label();
+            this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
+            this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
+            this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -131,18 +131,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
             this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.groupBoxAdvanceSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox6.SuspendLayout();
-            this.groupBox7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown13)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown12)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11)).BeginInit();
-            this.groupBox8.SuspendLayout();
+            this.groupBoxPipe.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeMedia)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeSpeed)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeAlive)).BeginInit();
+            this.groupBoxEnhance.SuspendLayout();
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -163,6 +163,7 @@
             // 
             this.groupBox1.Controls.Add(this.textBoxCron);
             this.groupBox1.Controls.Add(this.checkBox5);
+            this.groupBox1.Controls.Add(this.checkBoxHighConcurrent);
             this.groupBox1.Controls.Add(this.checkBoxSwitchArch64);
             this.groupBox1.Controls.Add(this.button7);
             this.groupBox1.Controls.Add(this.button6);
@@ -179,10 +180,9 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.labelCron);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Controls.Add(this.buttonAdvanceSettings);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.checkBox7);
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Location = new System.Drawing.Point(24, 23);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -217,6 +217,17 @@
             this.checkBox5.Text = "开机自启";
             this.checkBox5.UseVisualStyleBackColor = true;
             this.checkBox5.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
+            // 
+            // checkBoxHighConcurrent
+            // 
+            this.checkBoxHighConcurrent.AutoSize = true;
+            this.checkBoxHighConcurrent.Location = new System.Drawing.Point(18, 608);
+            this.checkBoxHighConcurrent.Name = "checkBoxHighConcurrent";
+            this.checkBoxHighConcurrent.Size = new System.Drawing.Size(141, 25);
+            this.checkBoxHighConcurrent.TabIndex = 39;
+            this.checkBoxHighConcurrent.Text = "高并发模式";
+            this.checkBoxHighConcurrent.UseVisualStyleBackColor = true;
+            this.checkBoxHighConcurrent.CheckedChanged += new System.EventHandler(this.checkBoxHighConcurrent_CheckedChanged);
             // 
             // checkBoxSwitchArch64
             // 
@@ -453,16 +464,16 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "并发线程数：";
             // 
-            // button2
+            // buttonAdvanceSettings
             // 
-            this.button2.Location = new System.Drawing.Point(161, 788);
-            this.button2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(138, 40);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "高级设置∧";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.buttonAdvanceSettings.Location = new System.Drawing.Point(161, 788);
+            this.buttonAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonAdvanceSettings.Name = "buttonAdvanceSettings";
+            this.buttonAdvanceSettings.Size = new System.Drawing.Size(138, 40);
+            this.buttonAdvanceSettings.TabIndex = 1;
+            this.buttonAdvanceSettings.Text = "高级设置∧";
+            this.buttonAdvanceSettings.UseVisualStyleBackColor = true;
+            this.buttonAdvanceSettings.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
@@ -486,16 +497,6 @@
             this.label8.TabIndex = 9;
             this.label8.Text = "节点池订阅链接(点击编辑)：";
             this.label8.Click += new System.EventHandler(this.textBox1_DoubleClick);
-            // 
-            // checkBox7
-            // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.Location = new System.Drawing.Point(18, 608);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(141, 25);
-            this.checkBox7.TabIndex = 39;
-            this.checkBox7.Text = "高并发模式";
-            this.checkBox7.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
@@ -676,42 +677,42 @@
             this.LogLabelNodeInfo.TabIndex = 22;
             this.LogLabelNodeInfo.Text = "实时日志";
             // 
-            // groupBox3
+            // groupBoxAdvanceSettings
             // 
-            this.groupBox3.Controls.Add(this.numericUpDown10);
-            this.groupBox3.Controls.Add(this.checkBox6);
-            this.groupBox3.Controls.Add(this.label22);
-            this.groupBox3.Controls.Add(this.label21);
-            this.groupBox3.Controls.Add(this.numericUpDown9);
-            this.groupBox3.Controls.Add(this.button8);
-            this.groupBox3.Controls.Add(this.textBox10);
-            this.groupBox3.Controls.Add(this.checkBox4);
-            this.groupBox3.Controls.Add(this.numericUpDown8);
-            this.groupBox3.Controls.Add(this.checkBox3);
-            this.groupBox3.Controls.Add(this.button4);
-            this.groupBox3.Controls.Add(this.checkBox1);
-            this.groupBox3.Controls.Add(this.numericUpDown6);
-            this.groupBox3.Controls.Add(this.checkBox2);
-            this.groupBox3.Controls.Add(this.numericUpDown5);
-            this.groupBox3.Controls.Add(this.comboBox5);
-            this.groupBox3.Controls.Add(this.label19);
-            this.groupBox3.Controls.Add(this.comboBox3);
-            this.groupBox3.Controls.Add(this.label10);
-            this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Controls.Add(this.comboBox2);
-            this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Controls.Add(this.label5);
-            this.groupBox3.Controls.Add(this.numericUpDown7);
-            this.groupBox3.Controls.Add(this.label20);
-            this.groupBox3.Location = new System.Drawing.Point(24, 880);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.groupBox3.Size = new System.Drawing.Size(1430, 216);
-            this.groupBox3.TabIndex = 2;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "高级设置";
-            this.groupBox3.Visible = false;
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown10);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBox6);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label22);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label21);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown9);
+            this.groupBoxAdvanceSettings.Controls.Add(this.button8);
+            this.groupBoxAdvanceSettings.Controls.Add(this.textBox10);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBox4);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown8);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBox3);
+            this.groupBoxAdvanceSettings.Controls.Add(this.button4);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBox1);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown6);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBox2);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown5);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBox5);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label19);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBox3);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label10);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label4);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBox2);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label9);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label5);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDown7);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label20);
+            this.groupBoxAdvanceSettings.Location = new System.Drawing.Point(24, 880);
+            this.groupBoxAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.groupBoxAdvanceSettings.Name = "groupBoxAdvanceSettings";
+            this.groupBoxAdvanceSettings.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.groupBoxAdvanceSettings.Size = new System.Drawing.Size(1430, 216);
+            this.groupBoxAdvanceSettings.TabIndex = 2;
+            this.groupBoxAdvanceSettings.TabStop = false;
+            this.groupBoxAdvanceSettings.Text = "高级设置";
+            this.groupBoxAdvanceSettings.Visible = false;
             // 
             // numericUpDown10
             // 
@@ -1654,166 +1655,167 @@
             // 
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
             // 
-            // groupBox7
+            // groupBoxPipe
             // 
-            this.groupBox7.Controls.Add(this.numericUpDown13);
-            this.groupBox7.Controls.Add(this.label25);
-            this.groupBox7.Controls.Add(this.numericUpDown12);
-            this.groupBox7.Controls.Add(this.label24);
-            this.groupBox7.Controls.Add(this.checkBox8);
-            this.groupBox7.Controls.Add(this.numericUpDown11);
-            this.groupBox7.Controls.Add(this.label23);
-            this.groupBox7.Location = new System.Drawing.Point(24, 1104);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(1009, 89);
-            this.groupBox7.TabIndex = 7;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "流水线并发 参数";
+            this.groupBoxPipe.Controls.Add(this.numericUpDownPipeMedia);
+            this.groupBoxPipe.Controls.Add(this.labelPipeMedia);
+            this.groupBoxPipe.Controls.Add(this.numericUpDownPipeSpeed);
+            this.groupBoxPipe.Controls.Add(this.labelPipeSpeed);
+            this.groupBoxPipe.Controls.Add(this.checkBoxPipeAuto);
+            this.groupBoxPipe.Controls.Add(this.numericUpDownPipeAlive);
+            this.groupBoxPipe.Controls.Add(this.labelPipeAlive);
+            this.groupBoxPipe.Location = new System.Drawing.Point(24, 1104);
+            this.groupBoxPipe.Name = "groupBoxPipe";
+            this.groupBoxPipe.Size = new System.Drawing.Size(1009, 89);
+            this.groupBoxPipe.TabIndex = 7;
+            this.groupBoxPipe.TabStop = false;
+            this.groupBoxPipe.Text = "流水线并发 参数";
             // 
-            // numericUpDown13
+            // numericUpDownPipeMedia
             // 
-            this.numericUpDown13.Location = new System.Drawing.Point(883, 36);
-            this.numericUpDown13.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown13.Maximum = new decimal(new int[] {
+            this.numericUpDownPipeMedia.Location = new System.Drawing.Point(883, 36);
+            this.numericUpDownPipeMedia.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownPipeMedia.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.numericUpDown13.Minimum = new decimal(new int[] {
+            this.numericUpDownPipeMedia.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown13.Name = "numericUpDown13";
-            this.numericUpDown13.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown13.TabIndex = 43;
-            this.numericUpDown13.Value = new decimal(new int[] {
+            this.numericUpDownPipeMedia.Name = "numericUpDownPipeMedia";
+            this.numericUpDownPipeMedia.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownPipeMedia.TabIndex = 43;
+            this.numericUpDownPipeMedia.Value = new decimal(new int[] {
             100,
             0,
             0,
             0});
             // 
-            // label25
+            // labelPipeMedia
             // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(684, 41);
-            this.label25.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(199, 21);
-            this.label25.TabIndex = 42;
-            this.label25.Text = "流媒体检测并发数：";
+            this.labelPipeMedia.AutoSize = true;
+            this.labelPipeMedia.Location = new System.Drawing.Point(684, 41);
+            this.labelPipeMedia.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelPipeMedia.Name = "labelPipeMedia";
+            this.labelPipeMedia.Size = new System.Drawing.Size(199, 21);
+            this.labelPipeMedia.TabIndex = 42;
+            this.labelPipeMedia.Text = "流媒体检测并发数：";
             // 
-            // numericUpDown12
+            // numericUpDownPipeSpeed
             // 
-            this.numericUpDown12.Location = new System.Drawing.Point(538, 36);
-            this.numericUpDown12.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown12.Maximum = new decimal(new int[] {
+            this.numericUpDownPipeSpeed.Location = new System.Drawing.Point(538, 36);
+            this.numericUpDownPipeSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownPipeSpeed.Maximum = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            this.numericUpDown12.Minimum = new decimal(new int[] {
+            this.numericUpDownPipeSpeed.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown12.Name = "numericUpDown12";
-            this.numericUpDown12.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown12.TabIndex = 41;
-            this.numericUpDown12.Value = new decimal(new int[] {
+            this.numericUpDownPipeSpeed.Name = "numericUpDownPipeSpeed";
+            this.numericUpDownPipeSpeed.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownPipeSpeed.TabIndex = 41;
+            this.numericUpDownPipeSpeed.Value = new decimal(new int[] {
             32,
             0,
             0,
             0});
             // 
-            // label24
+            // labelPipeSpeed
             // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(404, 41);
-            this.label24.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(136, 21);
-            this.label24.TabIndex = 40;
-            this.label24.Text = "下载并发数：";
+            this.labelPipeSpeed.AutoSize = true;
+            this.labelPipeSpeed.Location = new System.Drawing.Point(404, 41);
+            this.labelPipeSpeed.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelPipeSpeed.Name = "labelPipeSpeed";
+            this.labelPipeSpeed.Size = new System.Drawing.Size(136, 21);
+            this.labelPipeSpeed.TabIndex = 40;
+            this.labelPipeSpeed.Text = "下载并发数：";
             // 
-            // checkBox8
+            // checkBoxPipeAuto
             // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Checked = true;
-            this.checkBox8.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox8.Location = new System.Drawing.Point(18, 39);
-            this.checkBox8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(99, 25);
-            this.checkBox8.TabIndex = 38;
-            this.checkBox8.Text = "自适应";
-            this.checkBox8.UseVisualStyleBackColor = true;
+            this.checkBoxPipeAuto.AutoSize = true;
+            this.checkBoxPipeAuto.Checked = true;
+            this.checkBoxPipeAuto.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxPipeAuto.Location = new System.Drawing.Point(18, 39);
+            this.checkBoxPipeAuto.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxPipeAuto.Name = "checkBoxPipeAuto";
+            this.checkBoxPipeAuto.Size = new System.Drawing.Size(99, 25);
+            this.checkBoxPipeAuto.TabIndex = 38;
+            this.checkBoxPipeAuto.Text = "自适应";
+            this.checkBoxPipeAuto.UseVisualStyleBackColor = true;
+            this.checkBoxPipeAuto.CheckedChanged += new System.EventHandler(this.checkBoxPipeAuto_CheckedChanged);
             // 
-            // numericUpDown11
+            // numericUpDownPipeAlive
             // 
-            this.numericUpDown11.Location = new System.Drawing.Point(275, 38);
-            this.numericUpDown11.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDown11.Maximum = new decimal(new int[] {
+            this.numericUpDownPipeAlive.Location = new System.Drawing.Point(275, 38);
+            this.numericUpDownPipeAlive.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownPipeAlive.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.numericUpDown11.Minimum = new decimal(new int[] {
+            this.numericUpDownPipeAlive.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown11.Name = "numericUpDown11";
-            this.numericUpDown11.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDown11.TabIndex = 39;
-            this.numericUpDown11.Value = new decimal(new int[] {
+            this.numericUpDownPipeAlive.Name = "numericUpDownPipeAlive";
+            this.numericUpDownPipeAlive.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownPipeAlive.TabIndex = 39;
+            this.numericUpDownPipeAlive.Value = new decimal(new int[] {
             500,
             0,
             0,
             0});
             // 
-            // label23
+            // labelPipeAlive
             // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(138, 41);
-            this.label23.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(136, 21);
-            this.label23.TabIndex = 38;
-            this.label23.Text = "测活并发数：";
+            this.labelPipeAlive.AutoSize = true;
+            this.labelPipeAlive.Location = new System.Drawing.Point(138, 41);
+            this.labelPipeAlive.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelPipeAlive.Name = "labelPipeAlive";
+            this.labelPipeAlive.Size = new System.Drawing.Size(136, 21);
+            this.labelPipeAlive.TabIndex = 38;
+            this.labelPipeAlive.Text = "测活并发数：";
             // 
-            // groupBox8
+            // groupBoxEnhance
             // 
-            this.groupBox8.Controls.Add(this.checkBox10);
-            this.groupBox8.Controls.Add(this.checkBox9);
-            this.groupBox8.Location = new System.Drawing.Point(1039, 1104);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(415, 89);
-            this.groupBox8.TabIndex = 44;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Enhance 参数";
+            this.groupBoxEnhance.Controls.Add(this.checkBoxDropBadCFNodes);
+            this.groupBoxEnhance.Controls.Add(this.checkBoxEhanceTag);
+            this.groupBoxEnhance.Location = new System.Drawing.Point(1039, 1104);
+            this.groupBoxEnhance.Name = "groupBoxEnhance";
+            this.groupBoxEnhance.Size = new System.Drawing.Size(415, 89);
+            this.groupBoxEnhance.TabIndex = 44;
+            this.groupBoxEnhance.TabStop = false;
+            this.groupBoxEnhance.Text = "Enhance 参数";
             // 
-            // checkBox10
+            // checkBoxDropBadCFNodes
             // 
-            this.checkBox10.AutoSize = true;
-            this.checkBox10.Location = new System.Drawing.Point(201, 38);
-            this.checkBox10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBox10.Name = "checkBox10";
-            this.checkBox10.Size = new System.Drawing.Size(205, 25);
-            this.checkBox10.TabIndex = 39;
-            this.checkBox10.Text = "丢弃低质量CF节点";
-            this.checkBox10.UseVisualStyleBackColor = true;
+            this.checkBoxDropBadCFNodes.AutoSize = true;
+            this.checkBoxDropBadCFNodes.Location = new System.Drawing.Point(201, 38);
+            this.checkBoxDropBadCFNodes.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxDropBadCFNodes.Name = "checkBoxDropBadCFNodes";
+            this.checkBoxDropBadCFNodes.Size = new System.Drawing.Size(205, 25);
+            this.checkBoxDropBadCFNodes.TabIndex = 39;
+            this.checkBoxDropBadCFNodes.Text = "丢弃低质量CF节点";
+            this.checkBoxDropBadCFNodes.UseVisualStyleBackColor = true;
             // 
-            // checkBox9
+            // checkBoxEhanceTag
             // 
-            this.checkBox9.AutoSize = true;
-            this.checkBox9.Location = new System.Drawing.Point(18, 39);
-            this.checkBox9.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBox9.Name = "checkBox9";
-            this.checkBox9.Size = new System.Drawing.Size(162, 25);
-            this.checkBox9.TabIndex = 38;
-            this.checkBox9.Text = "增强位置标签";
-            this.checkBox9.UseVisualStyleBackColor = true;
+            this.checkBoxEhanceTag.AutoSize = true;
+            this.checkBoxEhanceTag.Location = new System.Drawing.Point(18, 39);
+            this.checkBoxEhanceTag.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxEhanceTag.Name = "checkBoxEhanceTag";
+            this.checkBoxEhanceTag.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxEhanceTag.TabIndex = 38;
+            this.checkBoxEhanceTag.Text = "增强位置标签";
+            this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -1822,12 +1824,12 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1466, 1510);
-            this.Controls.Add(this.groupBox8);
-            this.Controls.Add(this.groupBox7);
+            this.Controls.Add(this.groupBoxEnhance);
+            this.Controls.Add(this.groupBoxPipe);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBoxAdvanceSettings);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.progressBar1);
@@ -1847,8 +1849,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.groupBoxAdvanceSettings.ResumeLayout(false);
+            this.groupBoxAdvanceSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
@@ -1858,13 +1860,13 @@
             this.groupBox5.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
-            this.groupBox7.ResumeLayout(false);
-            this.groupBox7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown13)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown12)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11)).EndInit();
-            this.groupBox8.ResumeLayout(false);
-            this.groupBox8.PerformLayout();
+            this.groupBoxPipe.ResumeLayout(false);
+            this.groupBoxPipe.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeMedia)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeSpeed)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPipeAlive)).EndInit();
+            this.groupBoxEnhance.ResumeLayout(false);
+            this.groupBoxEnhance.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1876,9 +1878,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label LogLabelNodeInfo;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button buttonAdvanceSettings;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupBoxAdvanceSettings;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label4;
@@ -1951,18 +1953,18 @@
         private System.Windows.Forms.CheckBox checkBox6;
         private System.Windows.Forms.NumericUpDown numericUpDown10;
         private System.Windows.Forms.CheckBox checkBoxSwitchArch64;
-        private System.Windows.Forms.CheckBox checkBox7;
-        private System.Windows.Forms.GroupBox groupBox7;
-        private System.Windows.Forms.NumericUpDown numericUpDown11;
-        private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.CheckBox checkBox8;
-        private System.Windows.Forms.NumericUpDown numericUpDown13;
-        private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.NumericUpDown numericUpDown12;
-        private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.CheckBox checkBox9;
-        private System.Windows.Forms.CheckBox checkBox10;
+        private System.Windows.Forms.CheckBox checkBoxHighConcurrent;
+        private System.Windows.Forms.GroupBox groupBoxPipe;
+        private System.Windows.Forms.NumericUpDown numericUpDownPipeAlive;
+        private System.Windows.Forms.Label labelPipeAlive;
+        private System.Windows.Forms.CheckBox checkBoxPipeAuto;
+        private System.Windows.Forms.NumericUpDown numericUpDownPipeMedia;
+        private System.Windows.Forms.Label labelPipeMedia;
+        private System.Windows.Forms.NumericUpDown numericUpDownPipeSpeed;
+        private System.Windows.Forms.Label labelPipeSpeed;
+        private System.Windows.Forms.GroupBox groupBoxEnhance;
+        private System.Windows.Forms.CheckBox checkBoxEhanceTag;
+        private System.Windows.Forms.CheckBox checkBoxDropBadCFNodes;
     }
 }
 
