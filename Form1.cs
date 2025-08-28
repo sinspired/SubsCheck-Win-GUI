@@ -224,6 +224,11 @@ namespace subs_check.win.gui
             comboBox4.Text = "通用订阅";
             ReadConfig();
 
+            if (checkBoxHighConcurrent.Checked)
+            {
+                groupBox4.Location = new Point(groupBox4.Location.X, groupBox4.Location.Y + groupBoxPipe.Height);
+            }
+
             if (CheckCommandLineParameter("-auto"))
             {
                 Log("检测到开机启动，准备执行任务...");
@@ -293,12 +298,6 @@ namespace subs_check.win.gui
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
                     var config = deserializer.Deserialize<Dictionary<string, object>>(yamlContent);
 
-                    string savemethod = 读取config字符串(config, "save-method");
-                    if (savemethod != null)
-                    {
-                        if (savemethod == "local") comboBox1.Text = "本地";
-                        else comboBox1.Text = savemethod;
-                    }
 
                     // 变量放在前面,以防后续读取时未定义
                     string subscheckArch = 读取config字符串(config, "subscheck-arch");
@@ -506,13 +505,21 @@ namespace subs_check.win.gui
                     if (mediacheck != null && mediacheck == "true") checkBox2.Checked = true;
                     else checkBox2.Checked = false;
 
+                    string githubapimirror = 读取config字符串(config, "github-api-mirror");
+                    if (githubapimirror != null) textBox4.Text = githubapimirror;
+
+
+                    string savemethod = 读取config字符串(config, "save-method");
+                    if (savemethod != null)
+                    {
+                        if (savemethod == "local") comboBox1.Text = "本地";
+                        else comboBox1.Text = savemethod;
+                    }
+
                     string githubgistid = 读取config字符串(config, "github-gist-id");
                     if (githubgistid != null) textBox2.Text = githubgistid;
                     string githubtoken = 读取config字符串(config, "github-token");
                     if (githubtoken != null) textBox3.Text = githubtoken;
-
-                    string githubapimirror = 读取config字符串(config, "github-api-mirror");
-                    if (githubapimirror != null) textBox4.Text = githubapimirror;
 
                     string workerurl = 读取config字符串(config, "worker-url");
                     if (workerurl != null) textBox7.Text = workerurl;
