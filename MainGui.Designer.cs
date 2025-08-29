@@ -37,25 +37,25 @@
             this.numericUpDownConcurrent = new System.Windows.Forms.NumericUpDown();
             this.labelInterval = new System.Windows.Forms.Label();
             this.numericUpDownInterval = new System.Windows.Forms.NumericUpDown();
+            this.labelTimeout = new System.Windows.Forms.Label();
+            this.numericUpDownTimeout = new System.Windows.Forms.NumericUpDown();
+            this.labelMinSpped = new System.Windows.Forms.Label();
+            this.numericUpDownMinSpeed = new System.Windows.Forms.NumericUpDown();
+            this.labelSaveMethod = new System.Windows.Forms.Label();
+            this.comboBoxSaveMethod = new System.Windows.Forms.ComboBox();
             this.checkBoxHighConcurrent = new System.Windows.Forms.CheckBox();
             this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
+            this.comboBoxSubscriptionType = new System.Windows.Forms.ComboBox();
+            this.buttonCopySubscriptionUrl = new System.Windows.Forms.Button();
             this.buttonTriggerCheck = new System.Windows.Forms.Button();
             this.buttonWebUi = new System.Windows.Forms.Button();
-            this.comboBoxSubscriptionType = new System.Windows.Forms.ComboBox();
             this.checkBoxStartup = new System.Windows.Forms.CheckBox();
-            this.buttonCopySubscriptionUrl = new System.Windows.Forms.Button();
-            this.comboBoxSaveMethod = new System.Windows.Forms.ComboBox();
-            this.labelTimeout = new System.Windows.Forms.Label();
-            this.numericUpDownMinSpeed = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDownTimeout = new System.Windows.Forms.NumericUpDown();
-            this.labelSaveMethod = new System.Windows.Forms.Label();
-            this.labelMinSpped = new System.Windows.Forms.Label();
             this.textBoxCron = new System.Windows.Forms.TextBox();
             this.labelCron = new System.Windows.Forms.Label();
-            this.buttonAdvanceSettings = new System.Windows.Forms.Button();
-            this.buttonStartCheck = new System.Windows.Forms.Button();
             this.labelSubUrls = new System.Windows.Forms.Label();
             this.textBoxSubsUrls = new System.Windows.Forms.TextBox();
+            this.buttonStartCheck = new System.Windows.Forms.Button();
+            this.buttonAdvanceSettings = new System.Windows.Forms.Button();
             this.numericUpDownWebUIPort = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownDLTimehot = new System.Windows.Forms.NumericUpDown();
             this.labelWebUIPort = new System.Windows.Forms.Label();
@@ -124,8 +124,8 @@
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWebUIPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDLTimehot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSubStorePort)).BeginInit();
@@ -261,105 +261,6 @@
             0});
             this.numericUpDownInterval.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
-            // checkBoxHighConcurrent
-            // 
-            this.checkBoxHighConcurrent.AutoSize = true;
-            this.checkBoxHighConcurrent.Location = new System.Drawing.Point(18, 608);
-            this.checkBoxHighConcurrent.Name = "checkBoxHighConcurrent";
-            this.checkBoxHighConcurrent.Size = new System.Drawing.Size(141, 25);
-            this.checkBoxHighConcurrent.TabIndex = 39;
-            this.checkBoxHighConcurrent.Text = "高并发模式";
-            this.checkBoxHighConcurrent.UseVisualStyleBackColor = true;
-            this.checkBoxHighConcurrent.CheckedChanged += new System.EventHandler(this.checkBoxHighConcurrent_CheckedChanged);
-            // 
-            // checkBoxSwitchArch64
-            // 
-            this.checkBoxSwitchArch64.AutoSize = true;
-            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 608);
-            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
-            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
-            this.checkBoxSwitchArch64.TabIndex = 38;
-            this.checkBoxSwitchArch64.Text = "x64内核";
-            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
-            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
-            // 
-            // buttonTriggerCheck
-            // 
-            this.buttonTriggerCheck.Enabled = false;
-            this.buttonTriggerCheck.Location = new System.Drawing.Point(13, 698);
-            this.buttonTriggerCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonTriggerCheck.Name = "buttonTriggerCheck";
-            this.buttonTriggerCheck.Size = new System.Drawing.Size(138, 40);
-            this.buttonTriggerCheck.TabIndex = 30;
-            this.buttonTriggerCheck.Text = "🔀未启动";
-            this.buttonTriggerCheck.UseVisualStyleBackColor = true;
-            this.buttonTriggerCheck.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // buttonWebUi
-            // 
-            this.buttonWebUi.Enabled = false;
-            this.buttonWebUi.Location = new System.Drawing.Point(161, 698);
-            this.buttonWebUi.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonWebUi.Name = "buttonWebUi";
-            this.buttonWebUi.Size = new System.Drawing.Size(138, 40);
-            this.buttonWebUi.TabIndex = 29;
-            this.buttonWebUi.Text = "访问WebUI";
-            this.buttonWebUi.UseVisualStyleBackColor = true;
-            this.buttonWebUi.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // comboBoxSubscriptionType
-            // 
-            this.comboBoxSubscriptionType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSubscriptionType.FormattingEnabled = true;
-            this.comboBoxSubscriptionType.Items.AddRange(new object[] {
-            "通用订阅",
-            "Clash"});
-            this.comboBoxSubscriptionType.Location = new System.Drawing.Point(15, 651);
-            this.comboBoxSubscriptionType.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxSubscriptionType.Name = "comboBoxSubscriptionType";
-            this.comboBoxSubscriptionType.Size = new System.Drawing.Size(132, 29);
-            this.comboBoxSubscriptionType.TabIndex = 19;
-            // 
-            // checkBoxStartup
-            // 
-            this.checkBoxStartup.AutoSize = true;
-            this.checkBoxStartup.Location = new System.Drawing.Point(167, 749);
-            this.checkBoxStartup.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxStartup.Name = "checkBoxStartup";
-            this.checkBoxStartup.Size = new System.Drawing.Size(120, 25);
-            this.checkBoxStartup.TabIndex = 30;
-            this.checkBoxStartup.Text = "开机自启";
-            this.checkBoxStartup.UseVisualStyleBackColor = true;
-            this.checkBoxStartup.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
-            // 
-            // buttonCopySubscriptionUrl
-            // 
-            this.buttonCopySubscriptionUrl.Enabled = false;
-            this.buttonCopySubscriptionUrl.Location = new System.Drawing.Point(161, 648);
-            this.buttonCopySubscriptionUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonCopySubscriptionUrl.Name = "buttonCopySubscriptionUrl";
-            this.buttonCopySubscriptionUrl.Size = new System.Drawing.Size(138, 40);
-            this.buttonCopySubscriptionUrl.TabIndex = 18;
-            this.buttonCopySubscriptionUrl.Text = "复制订阅";
-            this.buttonCopySubscriptionUrl.UseVisualStyleBackColor = true;
-            this.buttonCopySubscriptionUrl.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // comboBoxSaveMethod
-            // 
-            this.comboBoxSaveMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSaveMethod.FormattingEnabled = true;
-            this.comboBoxSaveMethod.Items.AddRange(new object[] {
-            "本地",
-            "gist",
-            "r2",
-            "webdav"});
-            this.comboBoxSaveMethod.Location = new System.Drawing.Point(192, 236);
-            this.comboBoxSaveMethod.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
-            this.comboBoxSaveMethod.Size = new System.Drawing.Size(103, 29);
-            this.comboBoxSaveMethod.TabIndex = 16;
-            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
-            // 
             // labelTimeout
             // 
             this.labelTimeout.AutoSize = true;
@@ -369,30 +270,6 @@
             this.labelTimeout.Size = new System.Drawing.Size(179, 21);
             this.labelTimeout.TabIndex = 4;
             this.labelTimeout.Text = "超时时间(毫秒)：";
-            // 
-            // numericUpDownMinSpeed
-            // 
-            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 186);
-            this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
-            20480,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.Minimum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.Name = "numericUpDownMinSpeed";
-            this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownMinSpeed.TabIndex = 13;
-            this.numericUpDownMinSpeed.Value = new decimal(new int[] {
-            1024,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
             // 
             // numericUpDownTimeout
             // 
@@ -418,6 +295,40 @@
             0});
             this.numericUpDownTimeout.ValueChanged += new System.EventHandler(this.numericUpDown3_ValueChanged);
             // 
+            // labelMinSpped
+            // 
+            this.labelMinSpped.AutoSize = true;
+            this.labelMinSpped.Location = new System.Drawing.Point(13, 189);
+            this.labelMinSpped.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelMinSpped.Name = "labelMinSpped";
+            this.labelMinSpped.Size = new System.Drawing.Size(181, 21);
+            this.labelMinSpped.TabIndex = 5;
+            this.labelMinSpped.Text = "测速下限(KB/s)：";
+            // 
+            // numericUpDownMinSpeed
+            // 
+            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 186);
+            this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
+            20480,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.Name = "numericUpDownMinSpeed";
+            this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownMinSpeed.TabIndex = 13;
+            this.numericUpDownMinSpeed.Value = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
+            // 
             // labelSaveMethod
             // 
             this.labelSaveMethod.AutoSize = true;
@@ -428,15 +339,104 @@
             this.labelSaveMethod.TabIndex = 8;
             this.labelSaveMethod.Text = "保存方法：";
             // 
-            // labelMinSpped
+            // comboBoxSaveMethod
             // 
-            this.labelMinSpped.AutoSize = true;
-            this.labelMinSpped.Location = new System.Drawing.Point(13, 189);
-            this.labelMinSpped.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.labelMinSpped.Name = "labelMinSpped";
-            this.labelMinSpped.Size = new System.Drawing.Size(181, 21);
-            this.labelMinSpped.TabIndex = 5;
-            this.labelMinSpped.Text = "测速下限(KB/s)：";
+            this.comboBoxSaveMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSaveMethod.FormattingEnabled = true;
+            this.comboBoxSaveMethod.Items.AddRange(new object[] {
+            "本地",
+            "gist",
+            "r2",
+            "webdav"});
+            this.comboBoxSaveMethod.Location = new System.Drawing.Point(192, 236);
+            this.comboBoxSaveMethod.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
+            this.comboBoxSaveMethod.Size = new System.Drawing.Size(103, 29);
+            this.comboBoxSaveMethod.TabIndex = 16;
+            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
+            // 
+            // checkBoxHighConcurrent
+            // 
+            this.checkBoxHighConcurrent.AutoSize = true;
+            this.checkBoxHighConcurrent.Location = new System.Drawing.Point(18, 608);
+            this.checkBoxHighConcurrent.Name = "checkBoxHighConcurrent";
+            this.checkBoxHighConcurrent.Size = new System.Drawing.Size(141, 25);
+            this.checkBoxHighConcurrent.TabIndex = 39;
+            this.checkBoxHighConcurrent.Text = "高并发模式";
+            this.checkBoxHighConcurrent.UseVisualStyleBackColor = true;
+            this.checkBoxHighConcurrent.CheckedChanged += new System.EventHandler(this.checkBoxHighConcurrent_CheckedChanged);
+            // 
+            // checkBoxSwitchArch64
+            // 
+            this.checkBoxSwitchArch64.AutoSize = true;
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 608);
+            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
+            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
+            this.checkBoxSwitchArch64.TabIndex = 38;
+            this.checkBoxSwitchArch64.Text = "x64内核";
+            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
+            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
+            // 
+            // comboBoxSubscriptionType
+            // 
+            this.comboBoxSubscriptionType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSubscriptionType.FormattingEnabled = true;
+            this.comboBoxSubscriptionType.Items.AddRange(new object[] {
+            "通用订阅",
+            "Clash"});
+            this.comboBoxSubscriptionType.Location = new System.Drawing.Point(15, 651);
+            this.comboBoxSubscriptionType.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxSubscriptionType.Name = "comboBoxSubscriptionType";
+            this.comboBoxSubscriptionType.Size = new System.Drawing.Size(132, 29);
+            this.comboBoxSubscriptionType.TabIndex = 19;
+            // 
+            // buttonCopySubscriptionUrl
+            // 
+            this.buttonCopySubscriptionUrl.Enabled = false;
+            this.buttonCopySubscriptionUrl.Location = new System.Drawing.Point(161, 648);
+            this.buttonCopySubscriptionUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonCopySubscriptionUrl.Name = "buttonCopySubscriptionUrl";
+            this.buttonCopySubscriptionUrl.Size = new System.Drawing.Size(138, 40);
+            this.buttonCopySubscriptionUrl.TabIndex = 18;
+            this.buttonCopySubscriptionUrl.Text = "复制订阅";
+            this.buttonCopySubscriptionUrl.UseVisualStyleBackColor = true;
+            this.buttonCopySubscriptionUrl.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // buttonTriggerCheck
+            // 
+            this.buttonTriggerCheck.Enabled = false;
+            this.buttonTriggerCheck.Location = new System.Drawing.Point(13, 698);
+            this.buttonTriggerCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonTriggerCheck.Name = "buttonTriggerCheck";
+            this.buttonTriggerCheck.Size = new System.Drawing.Size(138, 40);
+            this.buttonTriggerCheck.TabIndex = 30;
+            this.buttonTriggerCheck.Text = "🔀未启动";
+            this.buttonTriggerCheck.UseVisualStyleBackColor = true;
+            this.buttonTriggerCheck.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // buttonWebUi
+            // 
+            this.buttonWebUi.Enabled = false;
+            this.buttonWebUi.Location = new System.Drawing.Point(161, 698);
+            this.buttonWebUi.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonWebUi.Name = "buttonWebUi";
+            this.buttonWebUi.Size = new System.Drawing.Size(138, 40);
+            this.buttonWebUi.TabIndex = 29;
+            this.buttonWebUi.Text = "访问WebUI";
+            this.buttonWebUi.UseVisualStyleBackColor = true;
+            this.buttonWebUi.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // checkBoxStartup
+            // 
+            this.checkBoxStartup.AutoSize = true;
+            this.checkBoxStartup.Location = new System.Drawing.Point(167, 749);
+            this.checkBoxStartup.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxStartup.Name = "checkBoxStartup";
+            this.checkBoxStartup.Size = new System.Drawing.Size(120, 25);
+            this.checkBoxStartup.TabIndex = 30;
+            this.checkBoxStartup.Text = "开机自启";
+            this.checkBoxStartup.UseVisualStyleBackColor = true;
+            this.checkBoxStartup.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
             // 
             // textBoxCron
             // 
@@ -463,29 +463,6 @@
             this.labelCron.Visible = false;
             this.labelCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
-            // buttonAdvanceSettings
-            // 
-            this.buttonAdvanceSettings.Location = new System.Drawing.Point(161, 788);
-            this.buttonAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonAdvanceSettings.Name = "buttonAdvanceSettings";
-            this.buttonAdvanceSettings.Size = new System.Drawing.Size(138, 40);
-            this.buttonAdvanceSettings.TabIndex = 1;
-            this.buttonAdvanceSettings.Text = "高级设置∧";
-            this.buttonAdvanceSettings.UseVisualStyleBackColor = true;
-            this.buttonAdvanceSettings.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // buttonStartCheck
-            // 
-            this.buttonStartCheck.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonStartCheck.Location = new System.Drawing.Point(13, 749);
-            this.buttonStartCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonStartCheck.Name = "buttonStartCheck";
-            this.buttonStartCheck.Size = new System.Drawing.Size(138, 79);
-            this.buttonStartCheck.TabIndex = 0;
-            this.buttonStartCheck.Text = "▶️ 启动";
-            this.buttonStartCheck.UseVisualStyleBackColor = true;
-            this.buttonStartCheck.Click += new System.EventHandler(this.button1_Click);
-            // 
             // labelSubUrls
             // 
             this.labelSubUrls.AutoSize = true;
@@ -511,6 +488,29 @@
             this.textBoxSubsUrls.WordWrap = false;
             this.textBoxSubsUrls.Click += new System.EventHandler(this.textBox1_DoubleClick);
             this.textBoxSubsUrls.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
+            // 
+            // buttonStartCheck
+            // 
+            this.buttonStartCheck.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonStartCheck.Location = new System.Drawing.Point(13, 749);
+            this.buttonStartCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonStartCheck.Name = "buttonStartCheck";
+            this.buttonStartCheck.Size = new System.Drawing.Size(138, 79);
+            this.buttonStartCheck.TabIndex = 0;
+            this.buttonStartCheck.Text = "▶️ 启动";
+            this.buttonStartCheck.UseVisualStyleBackColor = true;
+            this.buttonStartCheck.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // buttonAdvanceSettings
+            // 
+            this.buttonAdvanceSettings.Location = new System.Drawing.Point(161, 788);
+            this.buttonAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonAdvanceSettings.Name = "buttonAdvanceSettings";
+            this.buttonAdvanceSettings.Size = new System.Drawing.Size(138, 40);
+            this.buttonAdvanceSettings.TabIndex = 1;
+            this.buttonAdvanceSettings.Text = "高级设置∧";
+            this.buttonAdvanceSettings.UseVisualStyleBackColor = true;
+            this.buttonAdvanceSettings.Click += new System.EventHandler(this.button2_Click);
             // 
             // numericUpDownWebUIPort
             // 
@@ -730,6 +730,7 @@
             0,
             0,
             0});
+            this.numericUpDownTotalBandwidthLimit.ValueChanged += new System.EventHandler(this.NumericUpDownTotalBandwidthLimit_ValueChanged);
             // 
             // checkBoxTotalBandwidthLimit
             // 
@@ -1425,7 +1426,7 @@
             this.groupBoxGist.Controls.Add(this.label12);
             this.groupBoxGist.Controls.Add(this.textBox2);
             this.groupBoxGist.Controls.Add(this.label11);
-            this.groupBoxGist.Location = new System.Drawing.Point(24, 1202);
+            this.groupBoxGist.Location = new System.Drawing.Point(24, 1211);
             this.groupBoxGist.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBoxGist.Name = "groupBoxGist";
             this.groupBoxGist.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1505,7 +1506,7 @@
             this.groupBoxR2.Controls.Add(this.label15);
             this.groupBoxR2.Controls.Add(this.textBox7);
             this.groupBoxR2.Controls.Add(this.label16);
-            this.groupBoxR2.Location = new System.Drawing.Point(24, 1300);
+            this.groupBoxR2.Location = new System.Drawing.Point(24, 1314);
             this.groupBoxR2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBoxR2.Name = "groupBoxR2";
             this.groupBoxR2.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1565,7 +1566,7 @@
             this.groupBoxWebdav.Controls.Add(this.label17);
             this.groupBoxWebdav.Controls.Add(this.textBox9);
             this.groupBoxWebdav.Controls.Add(this.label18);
-            this.groupBoxWebdav.Location = new System.Drawing.Point(24, 1398);
+            this.groupBoxWebdav.Location = new System.Drawing.Point(24, 1417);
             this.groupBoxWebdav.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBoxWebdav.Name = "groupBoxWebdav";
             this.groupBoxWebdav.Padding = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -1653,7 +1654,7 @@
             this.groupBoxPipeConcurrent.Controls.Add(this.checkBoxPipeAuto);
             this.groupBoxPipeConcurrent.Controls.Add(this.numericUpDownPipeAlive);
             this.groupBoxPipeConcurrent.Controls.Add(this.labelPipeAlive);
-            this.groupBoxPipeConcurrent.Location = new System.Drawing.Point(24, 1104);
+            this.groupBoxPipeConcurrent.Location = new System.Drawing.Point(24, 1108);
             this.groupBoxPipeConcurrent.Name = "groupBoxPipeConcurrent";
             this.groupBoxPipeConcurrent.Size = new System.Drawing.Size(998, 89);
             this.groupBoxPipeConcurrent.TabIndex = 7;
@@ -1749,7 +1750,7 @@
             // 
             this.groupBoxEnhance.Controls.Add(this.checkBoxDropBadCFNodes);
             this.groupBoxEnhance.Controls.Add(this.checkBoxEhanceTag);
-            this.groupBoxEnhance.Location = new System.Drawing.Point(1028, 1104);
+            this.groupBoxEnhance.Location = new System.Drawing.Point(1028, 1108);
             this.groupBoxEnhance.Name = "groupBoxEnhance";
             this.groupBoxEnhance.Size = new System.Drawing.Size(426, 89);
             this.groupBoxEnhance.TabIndex = 44;
@@ -1785,7 +1786,7 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1466, 1510);
+            this.ClientSize = new System.Drawing.Size(1466, 1518);
             this.Controls.Add(this.groupBoxLog);
             this.Controls.Add(this.groupBoxComonSettings);
             this.Controls.Add(this.groupBoxAdvanceSettings);
@@ -1804,8 +1805,8 @@
             this.groupBoxComonSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWebUIPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDLTimehot)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSubStorePort)).EndInit();

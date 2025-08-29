@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -52,17 +53,39 @@ namespace subs_check.win.gui
             InitializeComponent();
             originalNotifyIcon = notifyIcon1.Icon;
 
-            toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。");
+            toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高并发而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高并发后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
             toolTip1.SetToolTip(numericUpDownInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
             toolTip1.SetToolTip(labelInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
-
+            toolTip1.SetToolTip(labelCron, "双击切换 使用「分钟倒计时」");
+            toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
             toolTip1.SetToolTip(numericUpDownTimeout, "超时时间(毫秒)：节点的最大延迟。");
             toolTip1.SetToolTip(numericUpDownMinSpeed, "最低测速结果舍弃(KB/s)。");
+
+            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用流水线分段高并发版本内核。");
+            toolTip1.SetToolTip(checkBoxSwitchArch64, "启用64位版本内核。");
+
+            toolTip1.SetToolTip(checkBoxPipeAuto, "auto: 切换自适应流水线分段并发模式。");
+            toolTip1.SetToolTip(numericUpDownPipeAlive, "测活任务并发数：\n取决于CPU和路由器芯片性能，建议设置 100-1000。\n\n量力而行！");
+            toolTip1.SetToolTip(numericUpDownPipeSpeed, "测速任务并发数。\n建议设置 10-32。");
+            toolTip1.SetToolTip(numericUpDownPipeMedia, "流媒体检测任务并发数。\n建议设置100-200。");
+
+            toolTip1.SetToolTip(checkBoxEhanceTag, "开启增强位置标签：\n- 无法访问 CF 的 CF 节点: HK⁻¹\r\n- 正常访问 CF: a.出口位置与cdn位置一致: HK¹⁺; b.位置不一致: HK¹-US⁰\r\n- 非 CF 节点,直接显示: HK²\r\n- 未获取到位置: HKˣ (使用原方案)\r\n- 前两位字母是实际浏览网站识别的位置,-US⁰为使用CF CDN服务的网站识别的位置,比如GPT, X等。");
+            toolTip1.SetToolTip(checkBoxDropBadCFNodes, "丢弃无法访问CF CDN网站的节点。\r\n- 这类节点可以正常访问YouTube、Google等网站。\r\n- 无法访问cloudflare及使用了CDN服务的网站，比如Twitter、claude等。\r\n- 开启会导致节点数量大幅减少。");
+
+
+            toolTip1.SetToolTip(comboBoxSubscriptionType, "通用订阅：内置了Sub-Store程序，自适应订阅格式。\nClash订阅：带规则的 Mihomo、Clash 订阅格式。");
+            toolTip1.SetToolTip(comboBoxOverwriteUrls, "生成带规则的 Clash 订阅所需的覆写规则文件");
+
+            toolTip1.SetToolTip(checkBoxStartup, "开机启动：勾选后，程序将在Windows启动时自动运行");
+            toolTip1.SetToolTip(buttonAdvanceSettings, "高级设置：展开更多设置参数项");
+
+            toolTip1.SetToolTip(buttonMoreSettings, "更多参数: 添加GUI未涵盖的参数项");
+            toolTip1.SetToolTip(buttonCheckUpdate, "检查GUI和内核版本更新");
+
             toolTip1.SetToolTip(numericUpDownDLTimehot, "下载测试时间(s)：与下载链接大小相关，默认最大测试10s。");
             toolTip1.SetToolTip(numericUpDownWebUIPort, "本地监听端口：用于直接返回测速结果的节点信息，方便 Sub-Store 实现订阅转换。");
             toolTip1.SetToolTip(numericUpDownSubStorePort, "Sub-Store监听端口：用于订阅订阅转换。\n注意：除非你知道你在干什么，否则不要将你的 Sub-Store 暴露到公网，否则可能会被滥用");
             toolTip1.SetToolTip(numericUpDownDownloadMb, "下载测试限制(MB)：当达到下载数据大小时，停止下载，可节省测速流量，减少测速测死的概率");
-            toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, "总下载速度限制(MB/s)：建议设置为 <=带宽/8, 比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20");
             toolTip1.SetToolTip(textBoxSubsUrls, "节点池订阅地址：支持 Link、Base64、Clash 格式的订阅链接。");
             toolTip1.SetToolTip(checkBoxEnableRenameNode, "以节点IP查询位置重命名节点。\n质量差的节点可能造成IP查询失败，造成整体检查速度稍微变慢。");
             toolTip1.SetToolTip(checkBoxEnableMediaCheck, "是否开启流媒体检测，其中IP欺诈依赖'节点地址查询'，内核版本需要 v2.0.8 以上\n\n示例：美国1 | ⬇️ 5.6MB/s |0%|Netflix|Disney|Openai\n风控值：0% (使用ping0.cc标准)\n流媒体解锁：Netflix、Disney、Openai");
@@ -74,20 +97,12 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBox2, "Gist ID：注意！非Github用户名！");
             toolTip1.SetToolTip(textBox3, "Github TOKEN");
 
-            toolTip1.SetToolTip(comboBoxSubscriptionType, "通用订阅：内置了Sub-Store程序，自适应订阅格式。\nClash订阅：带规则的 Mihomo、Clash 订阅格式。");
-            toolTip1.SetToolTip(comboBoxOverwriteUrls, "生成带规则的 Clash 订阅所需的覆写规则文件");
-
             toolTip1.SetToolTip(checkBoxEnableSuccessLimit, "保存几个成功的节点，不选代表不限制，内核版本需要 v2.1.0 以上\n如果你的并发数量超过这个参数，那么成功的结果可能会大于这个数值");
             toolTip1.SetToolTip(checkBoxTotalBandwidthLimit, "总的下载速度限制,不选代表不限制");
             toolTip1.SetToolTip(numericUpDownSuccessLimit, "保存几个成功的节点，不选代表不限制，内核版本需要 v2.1.0 以上\n如果你的并发数量超过这个参数，那么成功的结果可能会大于这个数值");
 
             toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, "总的下载速度限制,不选代表不限制");
 
-            toolTip1.SetToolTip(labelCron, "双击切换 使用「分钟倒计时」");
-
-            toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
-
-            toolTip1.SetToolTip(checkBoxStartup, "开机启动：勾选后，程序将在Windows启动时自动运行");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
         }
@@ -2729,20 +2744,27 @@ namespace subs_check.win.gui
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            if (numericUpDownConcurrent.Value > 128)
+            if (checkBoxHighConcurrent.Checked)
             {
-                string warningMessage =
-                    "⚠️ 高并发风险提醒 ⚠️\n\n" +
-                    "您设置的并发数值过高，可能导致：\n\n" +
-                    "• 运营商判定为异常流量并限制网络\n" +
-                    "• 路由器性能压力过大\n" +
-                    "• 测速结果不准确\n\n" +
-                    "并发数设置建议：\n" +
-                    "• 宽带峰值/50Mbps：一般对网络无影响\n" +
-                    "• 宽带峰值/25Mbps：可能会影响同网络下载任务\n" +
-                    "• 宽带峰值/10Mbps：可能会影响同网络下其他设备的上网体验\n";
+                Log("已启用流水线高并发模式✨\n- 此值将作为计算测活-测速-流媒体检测各阶段并发数的基准.\n- 内核已启用衰减算法,可放心设置");
+            }
+            else
+            {
+                if (numericUpDownConcurrent.Value > 128)
+                {
+                    string warningMessage =
+                        "⚠️ 高并发风险提醒 ⚠️\n\n" +
+                        "您设置的并发数值过高，可能导致：\n\n" +
+                        "• 运营商判定为异常流量并限制网络\n" +
+                        "• 路由器性能压力过大\n" +
+                        "• 测速结果不准确\n\n" +
+                        "并发数设置建议：\n" +
+                        "• 宽带峰值/50Mbps：一般对网络无影响\n" +
+                        "• 宽带峰值/25Mbps：可能会影响同网络下载任务\n" +
+                        "• 宽带峰值/10Mbps：可能会影响同网络下其他设备的上网体验\n";
 
-                Log(warningMessage);
+                    Log(warningMessage);
+                }
             }
         }
 
@@ -3796,7 +3818,7 @@ namespace subs_check.win.gui
                     SetNumericUpDownValueSafe(numericUpDownPipeAlive, alive);
                     SetNumericUpDownValueSafe(numericUpDownPipeSpeed, speed);
                     SetNumericUpDownValueSafe(numericUpDownPipeMedia, media);
-                    Log($"默认并发参数: 测活: {alive}, 测速: {speed}, 流媒体: {media}");
+                    Log($"默认并发参数: 测活: {alive}, 测速: {speed}, 流媒体: {media} [根据并发数 {numericUpDownConcurrent.Value} 计算]");
                 }
             }
             finally
@@ -3823,6 +3845,13 @@ namespace subs_check.win.gui
             if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
             Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
+        }
+
+        private void NumericUpDownTotalBandwidthLimit_ValueChanged(object sender, EventArgs e)
+        {
+            float calcBandWidth = (float)numericUpDownTotalBandwidthLimit.Value * 8;
+            Log($"当前设置下载速度限制带宽 {calcBandWidth} 兆。");
+            toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, $"总下载速度限制(MB/s)：\n建议设置为 <=带宽/8, \n比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20。\n\n当前设置下载速度对应带宽 {calcBandWidth}");
         }
     }
 }
