@@ -9,7 +9,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
@@ -253,6 +252,8 @@ namespace subs_check.win.gui
             if (checkBoxHighConcurrent.Checked)
             {
                 groupBoxGist.Location = new Point(groupBoxGist.Location.X, groupBoxGist.Location.Y + groupBoxPipeConcurrent.Height);
+                groupBoxR2.Location = groupBoxGist.Location;
+                groupBoxWebdav.Location = groupBoxGist.Location;
             }
 
             if (CheckCommandLineParameter("-auto"))
