@@ -110,6 +110,7 @@
             this.label18 = new System.Windows.Forms.Label();
             this.timer3 = new System.Windows.Forms.Timer(this.components);
             this.timer4 = new System.Windows.Forms.Timer(this.components);
+            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -638,6 +639,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.checkBoxKeepSucced);
             this.groupBox3.Controls.Add(this.checkBoxSwitchArch64);
             this.groupBox3.Controls.Add(this.numericUpDown10);
             this.groupBox3.Controls.Add(this.checkBox6);
@@ -677,7 +679,7 @@
             // checkBoxSwitchArch64
             // 
             this.checkBoxSwitchArch64.AutoSize = true;
-            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(515, 173);
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(856, 173);
             this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
             this.checkBoxSwitchArch64.Size = new System.Drawing.Size(153, 25);
             this.checkBoxSwitchArch64.TabIndex = 38;
@@ -773,7 +775,7 @@
             this.textBox10.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox10.Name = "textBox10";
             this.textBox10.PasswordChar = '*';
-            this.textBox10.Size = new System.Drawing.Size(200, 31);
+            this.textBox10.Size = new System.Drawing.Size(363, 31);
             this.textBox10.TabIndex = 6;
             this.textBox10.Text = "admin";
             this.textBox10.Enter += new System.EventHandler(this.textBox10_Enter);
@@ -1419,16 +1421,16 @@
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(856, 32);
+            this.textBox4.Location = new System.Drawing.Point(838, 32);
             this.textBox4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(558, 31);
+            this.textBox4.Size = new System.Drawing.Size(576, 31);
             this.textBox4.TabIndex = 5;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(658, 37);
+            this.label13.Location = new System.Drawing.Point(633, 37);
             this.label13.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(205, 21);
@@ -1441,7 +1443,7 @@
             this.textBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox3.Name = "textBox3";
             this.textBox3.PasswordChar = '*';
-            this.textBox3.Size = new System.Drawing.Size(180, 31);
+            this.textBox3.Size = new System.Drawing.Size(157, 31);
             this.textBox3.TabIndex = 3;
             this.textBox3.Enter += new System.EventHandler(this.textBox3_Enter);
             this.textBox3.Leave += new System.EventHandler(this.textBox3_Leave);
@@ -1461,7 +1463,7 @@
             this.textBox2.Location = new System.Drawing.Point(114, 32);
             this.textBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(180, 31);
+            this.textBox2.Size = new System.Drawing.Size(173, 31);
             this.textBox2.TabIndex = 1;
             // 
             // label11
@@ -1499,11 +1501,11 @@
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(856, 32);
+            this.textBox6.Location = new System.Drawing.Point(802, 32);
             this.textBox6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox6.Name = "textBox6";
             this.textBox6.PasswordChar = '*';
-            this.textBox6.Size = new System.Drawing.Size(558, 31);
+            this.textBox6.Size = new System.Drawing.Size(612, 31);
             this.textBox6.TabIndex = 3;
             this.textBox6.Text = "1234567890";
             this.textBox6.Enter += new System.EventHandler(this.textBox3_Enter);
@@ -1512,7 +1514,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(700, 37);
+            this.label15.Location = new System.Drawing.Point(633, 37);
             this.label15.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(163, 21);
@@ -1524,7 +1526,7 @@
             this.textBox7.Location = new System.Drawing.Point(161, 32);
             this.textBox7.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(519, 31);
+            this.textBox7.Size = new System.Drawing.Size(460, 31);
             this.textBox7.TabIndex = 1;
             this.textBox7.Text = "https://example.worker.dev";
             this.textBox7.Leave += new System.EventHandler(this.textBox7_Leave);
@@ -1559,17 +1561,17 @@
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(856, 32);
+            this.textBox5.Location = new System.Drawing.Point(786, 32);
             this.textBox5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(558, 31);
+            this.textBox5.Size = new System.Drawing.Size(628, 31);
             this.textBox5.TabIndex = 5;
             this.textBox5.Text = "https://example.com/dav/";
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(700, 37);
+            this.label14.Location = new System.Drawing.Point(633, 37);
             this.label14.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(141, 21);
@@ -1578,11 +1580,11 @@
             // 
             // textBox8
             // 
-            this.textBox8.Location = new System.Drawing.Point(471, 32);
+            this.textBox8.Location = new System.Drawing.Point(426, 32);
             this.textBox8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox8.Name = "textBox8";
             this.textBox8.PasswordChar = '*';
-            this.textBox8.Size = new System.Drawing.Size(198, 31);
+            this.textBox8.Size = new System.Drawing.Size(195, 31);
             this.textBox8.TabIndex = 3;
             this.textBox8.Text = "admin";
             this.textBox8.Enter += new System.EventHandler(this.textBox3_Enter);
@@ -1591,7 +1593,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(341, 37);
+            this.label17.Location = new System.Drawing.Point(308, 37);
             this.label17.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(119, 21);
@@ -1603,7 +1605,7 @@
             this.textBox9.Location = new System.Drawing.Point(128, 32);
             this.textBox9.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(198, 31);
+            this.textBox9.Size = new System.Drawing.Size(159, 31);
             this.textBox9.TabIndex = 1;
             this.textBox9.Text = "admin";
             // 
@@ -1625,6 +1627,16 @@
             // timer4
             // 
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
+            // 
+            // checkBoxKeepSucced
+            // 
+            this.checkBoxKeepSucced.AutoSize = true;
+            this.checkBoxKeepSucced.Location = new System.Drawing.Point(633, 173);
+            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
+            this.checkBoxKeepSucced.Size = new System.Drawing.Size(204, 25);
+            this.checkBoxKeepSucced.TabIndex = 39;
+            this.checkBoxKeepSucced.Text = "保留检测成功节点";
+            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -1753,6 +1765,7 @@
         private System.Windows.Forms.CheckBox checkBox6;
         private System.Windows.Forms.NumericUpDown numericUpDown10;
         private System.Windows.Forms.CheckBox checkBoxSwitchArch64;
+        private System.Windows.Forms.CheckBox checkBoxKeepSucced;
     }
 }
 
