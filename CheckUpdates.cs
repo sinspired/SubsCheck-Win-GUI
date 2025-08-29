@@ -53,7 +53,7 @@ namespace subs_check.win.gui
 
             label5.Text = 当前subsCheck版本号;
 
-            Form1 mainForm = new Form1();
+            MainGui mainForm = new MainGui();
 
             githubProxyURL = await mainForm.GetGithubProxyUrlAsync();
 
