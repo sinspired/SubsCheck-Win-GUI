@@ -2618,7 +2618,11 @@ namespace subs_check.win.gui
         private void checkBox6_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxTotalBandwidthLimit.Checked) numericUpDownTotalBandwidthLimit.Enabled = true;
-            else numericUpDownTotalBandwidthLimit.Enabled = false;
+            else
+            {
+                numericUpDownTotalBandwidthLimit.Enabled = false;
+                numericUpDownTotalBandwidthLimit.Value = 0;
+            }
         }
 
         private async void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
@@ -3665,11 +3669,15 @@ namespace subs_check.win.gui
             string want = EnableHighConcurrent ? "高并发内核" : "原版内核";
             if (currentKernel != want)
             {
+                checkBoxSwitchArch64.Enabled = false;
                 checkBoxHighConcurrent.Enabled = false;
+                buttonCheckUpdate.Enabled = false;
                 Log(EnableHighConcurrent ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核");
                 await DownloadSubsCheckEXE();// 若要后台并行改为 _ = DownloadSubsCheckEXE();
                 currentKernel = want;
+                checkBoxSwitchArch64.Enabled = true;
                 checkBoxHighConcurrent.Enabled = true;
+                buttonCheckUpdate.Enabled = true;
             }
             Log(EnableHighConcurrent ? "已切换高并发内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。");
         }
@@ -3682,11 +3690,15 @@ namespace subs_check.win.gui
             if (currentArch != want)
             {
                 checkBoxSwitchArch64.Enabled = false;
+                checkBoxHighConcurrent.Enabled = false;
+                buttonCheckUpdate.Enabled = false;
                 githubProxyURL = await GetGithubProxyUrlAsync();
                 Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高");
                 await DownloadSubsCheckEXE();
                 currentArch = want;
                 checkBoxSwitchArch64.Enabled = true;
+                checkBoxHighConcurrent.Enabled = true;
+                buttonCheckUpdate.Enabled = true;
             }
             Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换");
         }
@@ -3850,8 +3862,10 @@ namespace subs_check.win.gui
         private void NumericUpDownTotalBandwidthLimit_ValueChanged(object sender, EventArgs e)
         {
             float calcBandWidth = (float)numericUpDownTotalBandwidthLimit.Value * 8;
-            Log($"当前设置下载速度限制带宽 {calcBandWidth} 兆。");
-            toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, $"总下载速度限制(MB/s)：\n建议设置为 <=带宽/8, \n比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20。\n\n当前设置下载速度对应带宽 {calcBandWidth}");
+            if (calcBandWidth > 0) { 
+                Log($"当前设置下载速度限制带宽 {calcBandWidth} 兆。");
+                toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, $"总下载速度限制(MB/s)：\n建议设置为 <=带宽/8, \n比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20。\n\n当前设置下载速度对应带宽 {calcBandWidth}");
+            }  
         }
     }
 }
