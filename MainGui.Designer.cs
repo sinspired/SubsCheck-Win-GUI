@@ -121,6 +121,7 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
+            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
@@ -678,6 +679,7 @@
             // 
             // groupBoxAdvanceSettings
             // 
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxKeepSucced);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadMb);
@@ -1438,16 +1440,16 @@
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(856, 32);
+            this.textBox4.Location = new System.Drawing.Point(830, 32);
             this.textBox4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(558, 31);
+            this.textBox4.Size = new System.Drawing.Size(584, 31);
             this.textBox4.TabIndex = 5;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(658, 37);
+            this.label13.Location = new System.Drawing.Point(633, 37);
             this.label13.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(205, 21);
@@ -1460,7 +1462,7 @@
             this.textBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox3.Name = "textBox3";
             this.textBox3.PasswordChar = '*';
-            this.textBox3.Size = new System.Drawing.Size(180, 31);
+            this.textBox3.Size = new System.Drawing.Size(157, 31);
             this.textBox3.TabIndex = 3;
             this.textBox3.Enter += new System.EventHandler(this.textBox3_Enter);
             this.textBox3.Leave += new System.EventHandler(this.textBox3_Leave);
@@ -1480,7 +1482,7 @@
             this.textBox2.Location = new System.Drawing.Point(114, 32);
             this.textBox2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(180, 31);
+            this.textBox2.Size = new System.Drawing.Size(185, 31);
             this.textBox2.TabIndex = 1;
             // 
             // label11
@@ -1518,11 +1520,11 @@
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(856, 32);
+            this.textBox6.Location = new System.Drawing.Point(794, 32);
             this.textBox6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox6.Name = "textBox6";
             this.textBox6.PasswordChar = '*';
-            this.textBox6.Size = new System.Drawing.Size(558, 31);
+            this.textBox6.Size = new System.Drawing.Size(620, 31);
             this.textBox6.TabIndex = 3;
             this.textBox6.Text = "1234567890";
             this.textBox6.Enter += new System.EventHandler(this.textBox3_Enter);
@@ -1531,7 +1533,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(700, 37);
+            this.label15.Location = new System.Drawing.Point(633, 37);
             this.label15.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(163, 21);
@@ -1543,7 +1545,7 @@
             this.textBox7.Location = new System.Drawing.Point(161, 32);
             this.textBox7.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(519, 31);
+            this.textBox7.Size = new System.Drawing.Size(460, 31);
             this.textBox7.TabIndex = 1;
             this.textBox7.Text = "https://example.worker.dev";
             this.textBox7.Leave += new System.EventHandler(this.textBox7_Leave);
@@ -1578,17 +1580,17 @@
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(856, 32);
+            this.textBox5.Location = new System.Drawing.Point(768, 32);
             this.textBox5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(558, 31);
+            this.textBox5.Size = new System.Drawing.Size(646, 31);
             this.textBox5.TabIndex = 5;
             this.textBox5.Text = "https://example.com/dav/";
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(700, 37);
+            this.label14.Location = new System.Drawing.Point(633, 37);
             this.label14.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(141, 21);
@@ -1597,11 +1599,11 @@
             // 
             // textBox8
             // 
-            this.textBox8.Location = new System.Drawing.Point(471, 32);
+            this.textBox8.Location = new System.Drawing.Point(424, 32);
             this.textBox8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox8.Name = "textBox8";
             this.textBox8.PasswordChar = '*';
-            this.textBox8.Size = new System.Drawing.Size(198, 31);
+            this.textBox8.Size = new System.Drawing.Size(197, 31);
             this.textBox8.TabIndex = 3;
             this.textBox8.Text = "admin";
             this.textBox8.Enter += new System.EventHandler(this.textBox3_Enter);
@@ -1610,7 +1612,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(341, 37);
+            this.label17.Location = new System.Drawing.Point(308, 37);
             this.label17.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(119, 21);
@@ -1622,7 +1624,7 @@
             this.textBox9.Location = new System.Drawing.Point(128, 32);
             this.textBox9.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(198, 31);
+            this.textBox9.Size = new System.Drawing.Size(171, 31);
             this.textBox9.TabIndex = 1;
             this.textBox9.Text = "admin";
             // 
@@ -1656,14 +1658,14 @@
             this.groupBoxPipeConcurrent.Controls.Add(this.labelPipeAlive);
             this.groupBoxPipeConcurrent.Location = new System.Drawing.Point(24, 1108);
             this.groupBoxPipeConcurrent.Name = "groupBoxPipeConcurrent";
-            this.groupBoxPipeConcurrent.Size = new System.Drawing.Size(998, 89);
+            this.groupBoxPipeConcurrent.Size = new System.Drawing.Size(967, 89);
             this.groupBoxPipeConcurrent.TabIndex = 7;
             this.groupBoxPipeConcurrent.TabStop = false;
             this.groupBoxPipeConcurrent.Text = "流水线并发 参数";
             // 
             // numericUpDownPipeMedia
             // 
-            this.numericUpDownPipeMedia.Location = new System.Drawing.Point(866, 36);
+            this.numericUpDownPipeMedia.Location = new System.Drawing.Point(830, 36);
             this.numericUpDownPipeMedia.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownPipeMedia.Maximum = new decimal(new int[] {
             1000,
@@ -1678,7 +1680,7 @@
             // labelPipeMedia
             // 
             this.labelPipeMedia.AutoSize = true;
-            this.labelPipeMedia.Location = new System.Drawing.Point(667, 41);
+            this.labelPipeMedia.Location = new System.Drawing.Point(633, 41);
             this.labelPipeMedia.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelPipeMedia.Name = "labelPipeMedia";
             this.labelPipeMedia.Size = new System.Drawing.Size(199, 21);
@@ -1687,7 +1689,7 @@
             // 
             // numericUpDownPipeSpeed
             // 
-            this.numericUpDownPipeSpeed.Location = new System.Drawing.Point(534, 36);
+            this.numericUpDownPipeSpeed.Location = new System.Drawing.Point(513, 36);
             this.numericUpDownPipeSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownPipeSpeed.Maximum = new decimal(new int[] {
             500,
@@ -1702,7 +1704,7 @@
             // labelPipeSpeed
             // 
             this.labelPipeSpeed.AutoSize = true;
-            this.labelPipeSpeed.Location = new System.Drawing.Point(400, 41);
+            this.labelPipeSpeed.Location = new System.Drawing.Point(387, 41);
             this.labelPipeSpeed.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelPipeSpeed.Name = "labelPipeSpeed";
             this.labelPipeSpeed.Size = new System.Drawing.Size(136, 21);
@@ -1712,10 +1714,11 @@
             // checkBoxPipeAuto
             // 
             this.checkBoxPipeAuto.AutoSize = true;
+            this.checkBoxPipeAuto.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.checkBoxPipeAuto.Location = new System.Drawing.Point(18, 39);
             this.checkBoxPipeAuto.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBoxPipeAuto.Name = "checkBoxPipeAuto";
-            this.checkBoxPipeAuto.Size = new System.Drawing.Size(99, 25);
+            this.checkBoxPipeAuto.Size = new System.Drawing.Size(102, 25);
             this.checkBoxPipeAuto.TabIndex = 38;
             this.checkBoxPipeAuto.Text = "自适应";
             this.checkBoxPipeAuto.UseVisualStyleBackColor = true;
@@ -1723,7 +1726,7 @@
             // 
             // numericUpDownPipeAlive
             // 
-            this.numericUpDownPipeAlive.Location = new System.Drawing.Point(272, 38);
+            this.numericUpDownPipeAlive.Location = new System.Drawing.Point(264, 36);
             this.numericUpDownPipeAlive.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownPipeAlive.Maximum = new decimal(new int[] {
             5000,
@@ -1750,9 +1753,9 @@
             // 
             this.groupBoxEnhance.Controls.Add(this.checkBoxDropBadCFNodes);
             this.groupBoxEnhance.Controls.Add(this.checkBoxEhanceTag);
-            this.groupBoxEnhance.Location = new System.Drawing.Point(1028, 1108);
+            this.groupBoxEnhance.Location = new System.Drawing.Point(997, 1108);
             this.groupBoxEnhance.Name = "groupBoxEnhance";
-            this.groupBoxEnhance.Size = new System.Drawing.Size(426, 89);
+            this.groupBoxEnhance.Size = new System.Drawing.Size(457, 89);
             this.groupBoxEnhance.TabIndex = 44;
             this.groupBoxEnhance.TabStop = false;
             this.groupBoxEnhance.Text = "Enhance 参数";
@@ -1778,6 +1781,16 @@
             this.checkBoxEhanceTag.TabIndex = 38;
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxKeepSucced
+            // 
+            this.checkBoxKeepSucced.AutoSize = true;
+            this.checkBoxKeepSucced.Location = new System.Drawing.Point(633, 173);
+            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
+            this.checkBoxKeepSucced.Size = new System.Drawing.Size(204, 25);
+            this.checkBoxKeepSucced.TabIndex = 38;
+            this.checkBoxKeepSucced.Text = "保留测试成功节点";
+            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
             // 
             // MainGui
             // 
@@ -1927,6 +1940,7 @@
         private System.Windows.Forms.GroupBox groupBoxEnhance;
         private System.Windows.Forms.CheckBox checkBoxEhanceTag;
         private System.Windows.Forms.CheckBox checkBoxDropBadCFNodes;
+        private System.Windows.Forms.CheckBox checkBoxKeepSucced;
     }
 }
 
