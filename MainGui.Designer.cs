@@ -68,6 +68,7 @@
             this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.labelLogNodeInfo = new System.Windows.Forms.Label();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
+            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
             this.numericUpDownTotalBandwidthLimit = new System.Windows.Forms.NumericUpDown();
             this.checkBoxTotalBandwidthLimit = new System.Windows.Forms.CheckBox();
             this.labelDownloadMb = new System.Windows.Forms.Label();
@@ -121,7 +122,6 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
-            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
@@ -157,7 +157,7 @@
             // 
             this.timerinitial.Enabled = true;
             this.timerinitial.Interval = 1;
-            this.timerinitial.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timerinitial.Tick += new System.EventHandler(this.timerinitial_Tick);
             // 
             // groupBoxComonSettings
             // 
@@ -225,7 +225,7 @@
             0,
             0,
             0});
-            this.numericUpDownConcurrent.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.numericUpDownConcurrent.ValueChanged += new System.EventHandler(this.numericUpDownConcurrent_ValueChanged);
             // 
             // labelInterval
             // 
@@ -294,7 +294,7 @@
             0,
             0,
             0});
-            this.numericUpDownTimeout.ValueChanged += new System.EventHandler(this.numericUpDown3_ValueChanged);
+            this.numericUpDownTimeout.ValueChanged += new System.EventHandler(this.numericUpDownTimeout_ValueChanged);
             // 
             // labelMinSpped
             // 
@@ -328,7 +328,7 @@
             0,
             0,
             0});
-            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDown4_ValueChanged);
+            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDownMinSpeed_ValueChanged);
             // 
             // labelSaveMethod
             // 
@@ -354,7 +354,7 @@
             this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
             this.comboBoxSaveMethod.Size = new System.Drawing.Size(103, 29);
             this.comboBoxSaveMethod.TabIndex = 16;
-            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
+            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBoxSaveMethod_TextChanged);
             // 
             // checkBoxHighConcurrent
             // 
@@ -401,7 +401,7 @@
             this.buttonCopySubscriptionUrl.TabIndex = 18;
             this.buttonCopySubscriptionUrl.Text = "复制订阅";
             this.buttonCopySubscriptionUrl.UseVisualStyleBackColor = true;
-            this.buttonCopySubscriptionUrl.Click += new System.EventHandler(this.button3_Click);
+            this.buttonCopySubscriptionUrl.Click += new System.EventHandler(this.buttonCopySubscriptionUrl_Click);
             // 
             // buttonTriggerCheck
             // 
@@ -413,7 +413,7 @@
             this.buttonTriggerCheck.TabIndex = 30;
             this.buttonTriggerCheck.Text = "🔀未启动";
             this.buttonTriggerCheck.UseVisualStyleBackColor = true;
-            this.buttonTriggerCheck.Click += new System.EventHandler(this.button7_Click);
+            this.buttonTriggerCheck.Click += new System.EventHandler(this.buttonTriggerCheck_Click);
             // 
             // buttonWebUi
             // 
@@ -425,7 +425,7 @@
             this.buttonWebUi.TabIndex = 29;
             this.buttonWebUi.Text = "访问WebUI";
             this.buttonWebUi.UseVisualStyleBackColor = true;
-            this.buttonWebUi.Click += new System.EventHandler(this.button6_Click);
+            this.buttonWebUi.Click += new System.EventHandler(this.buttonWebUi_Click);
             // 
             // checkBoxStartup
             // 
@@ -437,7 +437,7 @@
             this.checkBoxStartup.TabIndex = 30;
             this.checkBoxStartup.Text = "开机自启";
             this.checkBoxStartup.UseVisualStyleBackColor = true;
-            this.checkBoxStartup.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
+            this.checkBoxStartup.CheckedChanged += new System.EventHandler(this.checkBoxStartup_CheckedChanged);
             // 
             // textBoxCron
             // 
@@ -473,7 +473,7 @@
             this.labelSubUrls.Size = new System.Drawing.Size(284, 21);
             this.labelSubUrls.TabIndex = 9;
             this.labelSubUrls.Text = "节点池订阅链接(点击编辑)：";
-            this.labelSubUrls.Click += new System.EventHandler(this.textBox1_DoubleClick);
+            this.labelSubUrls.Click += new System.EventHandler(this.textBoxSubsUrls_DoubleClick);
             // 
             // textBoxSubsUrls
             // 
@@ -487,8 +487,8 @@
             this.textBoxSubsUrls.TabIndex = 17;
             this.textBoxSubsUrls.Text = resources.GetString("textBoxSubsUrls.Text");
             this.textBoxSubsUrls.WordWrap = false;
-            this.textBoxSubsUrls.Click += new System.EventHandler(this.textBox1_DoubleClick);
-            this.textBoxSubsUrls.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
+            this.textBoxSubsUrls.Click += new System.EventHandler(this.textBoxSubsUrls_DoubleClick);
+            this.textBoxSubsUrls.DoubleClick += new System.EventHandler(this.textBoxSubsUrls_DoubleClick);
             // 
             // buttonStartCheck
             // 
@@ -500,7 +500,7 @@
             this.buttonStartCheck.TabIndex = 0;
             this.buttonStartCheck.Text = "▶️ 启动";
             this.buttonStartCheck.UseVisualStyleBackColor = true;
-            this.buttonStartCheck.Click += new System.EventHandler(this.button1_Click);
+            this.buttonStartCheck.Click += new System.EventHandler(this.buttonStartCheck_Click);
             // 
             // buttonAdvanceSettings
             // 
@@ -511,7 +511,7 @@
             this.buttonAdvanceSettings.TabIndex = 1;
             this.buttonAdvanceSettings.Text = "高级设置∧";
             this.buttonAdvanceSettings.UseVisualStyleBackColor = true;
-            this.buttonAdvanceSettings.Click += new System.EventHandler(this.button2_Click);
+            this.buttonAdvanceSettings.Click += new System.EventHandler(this.buttonAdvanceSettings_Click);
             // 
             // numericUpDownWebUIPort
             // 
@@ -535,7 +535,7 @@
             0,
             0,
             0});
-            this.numericUpDownWebUIPort.ValueChanged += new System.EventHandler(this.numericUpDown6_ValueChanged);
+            this.numericUpDownWebUIPort.ValueChanged += new System.EventHandler(this.numericUpDownWebUIPort_ValueChanged);
             // 
             // numericUpDownDLTimehot
             // 
@@ -602,7 +602,7 @@
             0,
             0,
             0});
-            this.numericUpDownSubStorePort.ValueChanged += new System.EventHandler(this.numericUpDown6_ValueChanged);
+            this.numericUpDownSubStorePort.ValueChanged += new System.EventHandler(this.numericUpDownWebUIPort_ValueChanged);
             // 
             // labelSubstorePort
             // 
@@ -639,7 +639,7 @@
             this.linkLabelAbout.TabIndex = 21;
             this.linkLabelAbout.TabStop = true;
             this.linkLabelAbout.Text = "关于 SubsCheck Win GUI";
-            this.linkLabelAbout.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.linkLabelAbout.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelAbout_LinkClicked);
             // 
             // buttonUpdateKernel
             // 
@@ -651,7 +651,7 @@
             this.buttonUpdateKernel.Text = "更新内核";
             this.buttonUpdateKernel.UseVisualStyleBackColor = true;
             this.buttonUpdateKernel.Visible = false;
-            this.buttonUpdateKernel.Click += new System.EventHandler(this.button5_Click);
+            this.buttonUpdateKernel.Click += new System.EventHandler(this.buttonUpdateKernel_Click);
             // 
             // richTextBoxAllLog
             // 
@@ -666,7 +666,7 @@
             this.richTextBoxAllLog.Size = new System.Drawing.Size(1088, 813);
             this.richTextBoxAllLog.TabIndex = 0;
             this.richTextBoxAllLog.Text = "";
-            this.richTextBoxAllLog.DoubleClick += new System.EventHandler(this.richTextBox1_DoubleClick);
+            this.richTextBoxAllLog.DoubleClick += new System.EventHandler(this.richTextBoxAllLog_DoubleClick);
             // 
             // labelLogNodeInfo
             // 
@@ -714,6 +714,16 @@
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
             // 
+            // checkBoxKeepSucced
+            // 
+            this.checkBoxKeepSucced.AutoSize = true;
+            this.checkBoxKeepSucced.Location = new System.Drawing.Point(633, 173);
+            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
+            this.checkBoxKeepSucced.Size = new System.Drawing.Size(204, 25);
+            this.checkBoxKeepSucced.TabIndex = 38;
+            this.checkBoxKeepSucced.Text = "保留测试成功节点";
+            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
+            // 
             // numericUpDownTotalBandwidthLimit
             // 
             this.numericUpDownTotalBandwidthLimit.Enabled = false;
@@ -744,7 +754,7 @@
             this.checkBoxTotalBandwidthLimit.TabIndex = 36;
             this.checkBoxTotalBandwidthLimit.Text = "带宽限制(MB/s)：";
             this.checkBoxTotalBandwidthLimit.UseVisualStyleBackColor = true;
-            this.checkBoxTotalBandwidthLimit.CheckedChanged += new System.EventHandler(this.checkBox6_CheckedChanged);
+            this.checkBoxTotalBandwidthLimit.CheckedChanged += new System.EventHandler(this.checkBoxTotalBandwidthLimit_CheckedChanged);
             // 
             // labelDownloadMb
             // 
@@ -784,7 +794,7 @@
             this.buttonMoreSettings.TabIndex = 29;
             this.buttonMoreSettings.Text = "补充参数";
             this.buttonMoreSettings.UseVisualStyleBackColor = true;
-            this.buttonMoreSettings.Click += new System.EventHandler(this.button8_Click);
+            this.buttonMoreSettings.Click += new System.EventHandler(this.buttonMoreSettings_Click);
             // 
             // textBoxWebUiAPIKey
             // 
@@ -797,8 +807,8 @@
             this.textBoxWebUiAPIKey.Size = new System.Drawing.Size(363, 31);
             this.textBoxWebUiAPIKey.TabIndex = 6;
             this.textBoxWebUiAPIKey.Text = "admin";
-            this.textBoxWebUiAPIKey.Enter += new System.EventHandler(this.textBox10_Enter);
-            this.textBoxWebUiAPIKey.Leave += new System.EventHandler(this.textBox10_Leave);
+            this.textBoxWebUiAPIKey.Enter += new System.EventHandler(this.textBoxWebUiAPIKey_Enter);
+            this.textBoxWebUiAPIKey.Leave += new System.EventHandler(this.textBoxWebUiAPIKey_Leave);
             // 
             // checkBoxEnableWebUI
             // 
@@ -810,7 +820,7 @@
             this.checkBoxEnableWebUI.TabIndex = 28;
             this.checkBoxEnableWebUI.Text = "启用WebUI API密钥：";
             this.checkBoxEnableWebUI.UseVisualStyleBackColor = true;
-            this.checkBoxEnableWebUI.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
+            this.checkBoxEnableWebUI.CheckedChanged += new System.EventHandler(this.checkBoxEnableWebUI_CheckedChanged);
             // 
             // numericUpDownSuccessLimit
             // 
@@ -846,22 +856,22 @@
             this.checkBoxEnableSuccessLimit.TabIndex = 27;
             this.checkBoxEnableSuccessLimit.Text = "节点保存数目：";
             this.checkBoxEnableSuccessLimit.UseVisualStyleBackColor = true;
-            this.checkBoxEnableSuccessLimit.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            this.checkBoxEnableSuccessLimit.CheckedChanged += new System.EventHandler(this.checkBoxEnableSuccessLimit_CheckedChanged);
             // 
             // buttonCheckUpdate
             // 
-            this.buttonCheckUpdate.BackColor = System.Drawing.Color.LimeGreen;
+            this.buttonCheckUpdate.BackColor = System.Drawing.SystemColors.Control;
             this.buttonCheckUpdate.FlatAppearance.BorderSize = 0;
             this.buttonCheckUpdate.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonCheckUpdate.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.buttonCheckUpdate.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonCheckUpdate.Location = new System.Drawing.Point(1276, 165);
             this.buttonCheckUpdate.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonCheckUpdate.Name = "buttonCheckUpdate";
             this.buttonCheckUpdate.Size = new System.Drawing.Size(138, 40);
             this.buttonCheckUpdate.TabIndex = 26;
             this.buttonCheckUpdate.Text = "检查更新";
-            this.buttonCheckUpdate.UseVisualStyleBackColor = false;
-            this.buttonCheckUpdate.Click += new System.EventHandler(this.button4_Click);
+            this.buttonCheckUpdate.UseVisualStyleBackColor = true;
+            this.buttonCheckUpdate.Click += new System.EventHandler(this.buttonCheckUpdate_Click);
             // 
             // checkBoxEnableRenameNode
             // 
@@ -875,7 +885,7 @@
             this.checkBoxEnableRenameNode.TabIndex = 22;
             this.checkBoxEnableRenameNode.Text = "节点地址查询";
             this.checkBoxEnableRenameNode.UseVisualStyleBackColor = true;
-            this.checkBoxEnableRenameNode.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBoxEnableRenameNode.CheckedChanged += new System.EventHandler(this.checkBoxEnableRenameNode_CheckedChanged);
             // 
             // checkBoxEnableMediaCheck
             // 
@@ -887,7 +897,7 @@
             this.checkBoxEnableMediaCheck.TabIndex = 25;
             this.checkBoxEnableMediaCheck.Text = "流媒体检测";
             this.checkBoxEnableMediaCheck.UseVisualStyleBackColor = true;
-            this.checkBoxEnableMediaCheck.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            this.checkBoxEnableMediaCheck.CheckedChanged += new System.EventHandler(this.checkBoxEnableMediaCheck_CheckedChanged);
             // 
             // comboBoxOverwriteUrls
             // 
@@ -916,7 +926,7 @@
             this.comboBoxOverwriteUrls.Name = "comboBoxOverwriteUrls";
             this.comboBoxOverwriteUrls.Size = new System.Drawing.Size(517, 29);
             this.comboBoxOverwriteUrls.TabIndex = 24;
-            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBox5_SelectedIndexChanged);
+            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBoxOverwriteUrls_SelectedIndexChanged);
             // 
             // labelOverwriteUrls
             // 
@@ -1363,7 +1373,7 @@
             this.comboBoxGithubProxyUrl.Name = "comboBoxGithubProxyUrl";
             this.comboBoxGithubProxyUrl.Size = new System.Drawing.Size(308, 29);
             this.comboBoxGithubProxyUrl.TabIndex = 21;
-            this.comboBoxGithubProxyUrl.Leave += new System.EventHandler(this.comboBox3_Leave);
+            this.comboBoxGithubProxyUrl.Leave += new System.EventHandler(this.comboBoxGithubProxyUrl_Leave);
             // 
             // labelGithubProxyUrl
             // 
@@ -1418,7 +1428,7 @@
             // timerCopySubscriptionUrl
             // 
             this.timerCopySubscriptionUrl.Interval = 2000;
-            this.timerCopySubscriptionUrl.Tick += new System.EventHandler(this.timer2_Tick);
+            this.timerCopySubscriptionUrl.Tick += new System.EventHandler(this.timerCopySubscriptionUrl_Tick);
             // 
             // groupBoxGist
             // 
@@ -1641,11 +1651,11 @@
             // timerRestartSchedule
             // 
             this.timerRestartSchedule.Interval = 86400000;
-            this.timerRestartSchedule.Tick += new System.EventHandler(this.timer3_Tick);
+            this.timerRestartSchedule.Tick += new System.EventHandler(this.timerRestartSchedule_Tick);
             // 
             // timerRefresh
             // 
-            this.timerRefresh.Tick += new System.EventHandler(this.timer4_Tick);
+            this.timerRefresh.Tick += new System.EventHandler(this.timerRefresh_Tick);
             // 
             // groupBoxPipeConcurrent
             // 
@@ -1781,16 +1791,6 @@
             this.checkBoxEhanceTag.TabIndex = 38;
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxKeepSucced
-            // 
-            this.checkBoxKeepSucced.AutoSize = true;
-            this.checkBoxKeepSucced.Location = new System.Drawing.Point(633, 173);
-            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
-            this.checkBoxKeepSucced.Size = new System.Drawing.Size(204, 25);
-            this.checkBoxKeepSucced.TabIndex = 38;
-            this.checkBoxKeepSucced.Text = "保留测试成功节点";
-            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
             // 
             // MainGui
             // 

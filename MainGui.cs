@@ -64,6 +64,10 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBoxHighConcurrent, "启用流水线分段高并发版本内核。");
             toolTip1.SetToolTip(checkBoxSwitchArch64, "启用64位版本内核。");
 
+            toolTip1.SetToolTip(buttonTriggerCheck, "⏯️开始检测：发送开始检测信号，开始检测；\n⏸️结束检测：发送停止信号，内核保持后台运行。");
+
+            toolTip1.SetToolTip(buttonStartCheck, "启动内核检测进程。");
+
             toolTip1.SetToolTip(checkBoxPipeAuto, "auto: 切换自适应流水线分段并发模式。");
             toolTip1.SetToolTip(numericUpDownPipeAlive, "测活任务并发数：\n取决于CPU和路由器芯片性能，建议设置 100-1000。\n\n量力而行！");
             toolTip1.SetToolTip(numericUpDownPipeSpeed, "测速任务并发数。\n建议设置 10-32。");
@@ -143,7 +147,8 @@ namespace subs_check.win.gui
             {
                 if (buttonStartCheck.Text == "▶️ 启动")
                 {
-                    button1_Click(sender, e);
+                    buttonStartCheck.ForeColor = Color.Black;
+                    buttonStartCheck_Click(sender, e);
                 }
             };
 
@@ -153,7 +158,8 @@ namespace subs_check.win.gui
             {
                 if (buttonStartCheck.Text == "⏹️ 停止")
                 {
-                    button1_Click(sender, e);
+                    buttonStartCheck.ForeColor = Color.Red;
+                    buttonStartCheck_Click(sender, e);
                 }
             };
             stopMenuItem.Enabled = false; // 初始状态下禁用
@@ -211,10 +217,10 @@ namespace subs_check.win.gui
             }
         }
 
-        private async void timer1_Tick(object sender, EventArgs e)//初始化
+        private async void timerinitial_Tick(object sender, EventArgs e)//初始化
         {
             timerinitial.Enabled = false;
-            if (buttonAdvanceSettings.Text == "高级设置∧") button2_Click(sender, e);
+            if (buttonAdvanceSettings.Text == "高级设置∧") buttonAdvanceSettings_Click(sender, e);
             // 检查并创建config文件夹
             string executablePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
             string configFolderPath = System.IO.Path.Combine(executablePath, "config");
@@ -252,7 +258,7 @@ namespace subs_check.win.gui
             if (CheckCommandLineParameter("-auto"))
             {
                 Log("检测到开机启动，准备执行任务...");
-                button1_Click(this, EventArgs.Empty);
+                buttonStartCheck_Click(this, EventArgs.Empty);
                 this.Hide();
                 notifyIcon1.Visible = true;
             }
@@ -303,7 +309,7 @@ namespace subs_check.win.gui
 
         private async void ReadConfig()//读取配置文件
         {
-            checkBoxStartup.CheckedChanged -= checkBox5_CheckedChanged;// 临时移除事件处理器，防止触发事件
+            checkBoxStartup.CheckedChanged -= checkBoxStartup_CheckedChanged;// 临时移除事件处理器，防止触发事件
             try
             {
                 string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
@@ -325,6 +331,11 @@ namespace subs_check.win.gui
 
                     string subscheckKernel = 读取config字符串(config, "subscheck-kernel");
                     if (!string.IsNullOrWhiteSpace(subscheckKernel)) currentKernel = subscheckKernel;
+
+                    string githubproxy = 读取config字符串(config, "githubproxy");
+                    if (githubproxy != null) comboBoxGithubProxyUrl.Text = githubproxy;
+
+                    const string githubRawPrefix = "https://raw.githubusercontent.com/";
 
                     // 使用新函数获取整数值并设置UI控件
                     int? concurrentValue = 读取config整数(config, "concurrent");
@@ -379,16 +390,11 @@ namespace subs_check.win.gui
                         bool.TryParse(enableHighConcurrentRaw.Trim(), out enableHighConcurrentFlag);
                     }
 
-                    // 从控件读取最终并发数（确保不会访问 Nullable.Value）
-                    int alive = (int)numericUpDownPipeAlive.Value;
-                    int speed = (int)numericUpDownPipeSpeed.Value;
-                    int media = (int)numericUpDownPipeMedia.Value;
-
                     // 决定是否启用高并发：只要显式开启 或 drop/enhance 为 true 或 三阶段并发均 > 0
                     bool needHighConcurrent = enableHighConcurrentFlag
                                             || dropBadCFFlag
                                             || enhanceTagFlag
-                                            || (alive > 0 && speed > 0 && media > 0);
+                                            || (aliveConcurrentValue > 0 && speedConcurrentValue > 0 && mediaConcurrentValue > 0);
 
                     checkBoxHighConcurrent.Checked = needHighConcurrent;
 
@@ -458,11 +464,6 @@ namespace subs_check.win.gui
                             }
                         }
                     }
-
-                    string githubproxy = 读取config字符串(config, "githubproxy");
-                    if (githubproxy != null) comboBoxGithubProxyUrl.Text = githubproxy;
-
-                    const string githubRawPrefix = "https://raw.githubusercontent.com/";
 
                     string mihomoOverwriteUrl = 读取config字符串(config, "mihomo-overwrite-url");
                     int mihomoOverwriteUrlIndex = mihomoOverwriteUrl.IndexOf(githubRawPrefix);
@@ -649,7 +650,7 @@ namespace subs_check.win.gui
                 MessageBox.Show($"读取配置文件时发生错误: {ex.Message}", "错误",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            checkBoxStartup.CheckedChanged += checkBox5_CheckedChanged;// 重新绑定事件处理器
+            checkBoxStartup.CheckedChanged += checkBoxStartup_CheckedChanged;// 重新绑定事件处理器
         }
 
         private int? 读取config整数(Dictionary<string, object> config, string fieldName)
@@ -772,14 +773,20 @@ namespace subs_check.win.gui
                 config["githubproxy"] = comboBoxGithubProxyUrl.Text;
                 config["github-proxy"] = githubProxyURL;
 
-                // 保存sub-urls列表        
+                // 保存订阅列表
                 List<string> subUrls = new List<string>();
+                // 使用 HashSet 来快速判重（不区分大小写），只比较主干部分（去掉 fragment）
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
                 string allyamlFilePath = System.IO.Path.Combine(executablePath, "output", "all.yaml");
-                if (System.IO.File.Exists(allyamlFilePath))
+                if (System.IO.File.Exists(allyamlFilePath) && checkBoxEnableWebUI.Checked)
                 {
-
-                    subUrls.Add($"http://127.0.0.1:{numericUpDownWebUIPort.Value}/all.yaml#KeepSucced");
-
+                    string succedProxiesUrl = $"http://127.0.0.1:{Convert.ToInt32(numericUpDownWebUIPort.Value)}/all.yaml#KeepSucced";
+                    string succedProxiesUrlKey = succedProxiesUrl.Split('#')[0];
+                    if (seen.Add(succedProxiesUrlKey))
+                    {
+                        subUrls.Add(succedProxiesUrl);
+                    }
                     Log("已加载上次测试结果。");
                     checkBoxKeepSucced.Visible = false;
                 }
@@ -790,19 +797,28 @@ namespace subs_check.win.gui
                     Log("将于第二次自动运行时加载上次测试结果。");
                 }
 
-
-                if (!string.IsNullOrEmpty(textBoxSubsUrls.Text))
+                if (!string.IsNullOrWhiteSpace(textBoxSubsUrls.Text))
                 {
-                    subUrls.AddRange(textBoxSubsUrls.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList());
-                    // 处理URLs
+                    var lines = textBoxSubsUrls.Text
+                        .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim())
+                        .Where(s => !string.IsNullOrEmpty(s));
+
+                    foreach (var line in lines)
+                    {
+                        string key = line.Split('#')[0];
+                        if (seen.Add(key))
+                        {
+                            subUrls.Add(line);
+                        }
+                    }
+
                     for (int i = 0; i < subUrls.Count; i++)
                     {
-                        if (subUrls[i].StartsWith(githubRawPrefix) && !string.IsNullOrEmpty(githubProxyURL))
+                        var url = subUrls[i];
+                        if (url.StartsWith(githubRawPrefix, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(githubProxyURL))
                         {
-                            // 替换为代理 URL 格式
-                            //subUrls[i] = githubProxyURL + githubRawPrefix + subUrls[i].Substring(githubRawPrefix.Length);
-                            // 使用subs-check内置github-proxy参数
-                            subUrls[i] = githubRawPrefix + subUrls[i].Substring(githubRawPrefix.Length);
+                            subUrls[i] = githubRawPrefix + url.Substring(githubRawPrefix.Length);
                         }
                     }
                 }
@@ -941,7 +957,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonAdvanceSettings_Click(object sender, EventArgs e)
         {
             if (!_originalLocationSaved)
             {
@@ -993,11 +1009,13 @@ namespace subs_check.win.gui
             判断保存类型();
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void buttonStartCheck_Click(object sender, EventArgs e)
         {
             buttonStartCheck.Enabled = false;
             if (buttonStartCheck.Text == "▶️ 启动")
             {
+                toolTip1.SetToolTip(buttonStartCheck, "启动检测流程!");
+                buttonStartCheck.ForeColor = Color.Black;
                 if (checkBoxEnableWebUI.Checked && textBoxWebUiAPIKey.Text == "请输入密钥")
                 {
                     MessageBox.Show("您已启用WebUI，请设置WebUI API密钥！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1035,7 +1053,9 @@ namespace subs_check.win.gui
                 groupBoxR2.Enabled = false;
                 groupBoxWebdav.Enabled = false;
                 if (checkBoxEnableWebUI.Checked) buttonWebUi.Enabled = true;
-                buttonStartCheck.Text = "⏹️ 停止";
+                buttonStartCheck.Text = "⌛检测代理";
+                toolTip1.SetToolTip(buttonStartCheck, "正在检测可用github代理");
+
                 //timer3.Enabled = true;
                 // 清空 richTextBox1
                 richTextBoxAllLog.Clear();
@@ -1054,6 +1074,9 @@ namespace subs_check.win.gui
                     notifyIcon1.Text = "SubsCheck: 已就绪";
 
                     // 启动 subs-check.exe 程序
+                    buttonStartCheck.ForeColor = Color.Red;
+                    buttonStartCheck.Text = "⏹️ 停止";
+                    toolTip1.SetToolTip(buttonStartCheck, "停止内核检测进程!");
                     StartSubsCheckProcess();
                 }
             }
@@ -1095,6 +1118,8 @@ namespace subs_check.win.gui
                 groupBoxWebdav.Enabled = true;
                 buttonWebUi.Enabled = false;
                 buttonStartCheck.Text = "▶️ 启动";
+                buttonStartCheck.ForeColor = Color.Black;
+                toolTip1.SetToolTip(buttonStartCheck, "启动检测流程!");
                 //timer3.Enabled = false;
                 // 更新菜单项的启用状态
                 startMenuItem.Enabled = true;
@@ -1605,6 +1630,7 @@ namespace subs_check.win.gui
             {
                 Log($"启动 subs-check.exe 时出错: {ex.Message}", true);
                 buttonStartCheck.Text = "▶️ 启动";
+                buttonStartCheck.ForeColor = Color.Black;
             }
         }
 
@@ -1826,6 +1852,7 @@ namespace subs_check.win.gui
             {
                 Log("subs-check.exe 已退出");
                 buttonStartCheck.Text = "▶️ 启动";
+                buttonStartCheck.ForeColor = Color.Black;
 
                 // 更新菜单项的启用状态
                 startMenuItem.Enabled = true;
@@ -1996,7 +2023,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void buttonCopySubscriptionUrl_Click(object sender, EventArgs e)
         {
             string 本地IP = GetLocalLANIP();
             try
@@ -2018,7 +2045,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void timerCopySubscriptionUrl_Tick(object sender, EventArgs e)
         {
             buttonCopySubscriptionUrl.Text = "复制订阅";
         }
@@ -2037,7 +2064,7 @@ namespace subs_check.win.gui
             comboBoxSpeedtestUrl.Items.Add(input);
             comboBoxSpeedtestUrl.Text = input;
         }
-        private void comboBox3_Leave(object sender, EventArgs e)
+        private void comboBoxGithubProxyUrl_Leave(object sender, EventArgs e)
         {
             // 检查是否有内容
             if (string.IsNullOrWhiteSpace(comboBoxGithubProxyUrl.Text))
@@ -2114,10 +2141,10 @@ namespace subs_check.win.gui
             }
         }
 
-        private void comboBox1_TextChanged(object sender, EventArgs e)
+        private void comboBoxSaveMethod_TextChanged(object sender, EventArgs e)
         {
             判断保存类型();
-            if (!(comboBoxSaveMethod.Text == "本地" || comboBoxSaveMethod.Text == "") && buttonAdvanceSettings.Text == "高级设置∨") button2_Click(sender, e);
+            if (!(comboBoxSaveMethod.Text == "本地" || comboBoxSaveMethod.Text == "") && buttonAdvanceSettings.Text == "高级设置∨") buttonAdvanceSettings_Click(sender, e);
         }
 
         private void textBox3_Enter(object sender, EventArgs e)
@@ -2134,7 +2161,7 @@ namespace subs_check.win.gui
             textBox8.PasswordChar = '*';
         }
 
-        private void textBox10_Enter(object sender, EventArgs e)
+        private void textBoxWebUiAPIKey_Enter(object sender, EventArgs e)
         {
             textBoxWebUiAPIKey.PasswordChar = '\0';
             if (textBoxWebUiAPIKey.Text == "请输入密钥")
@@ -2144,7 +2171,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void textBox10_Leave(object sender, EventArgs e)
+        private void textBoxWebUiAPIKey_Leave(object sender, EventArgs e)
         {
 
             if (textBoxWebUiAPIKey.Text == "")
@@ -2323,7 +2350,7 @@ namespace subs_check.win.gui
             return detectedProxyURL;
         }
 
-        private async void button5_Click(object sender, EventArgs e)
+        private async void buttonUpdateKernel_Click(object sender, EventArgs e)
         {
             try
             {
@@ -2408,7 +2435,7 @@ namespace subs_check.win.gui
 
         private decimal 订阅端口;
         private decimal SubStore端口;
-        private void numericUpDown6_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownWebUIPort_ValueChanged(object sender, EventArgs e)
         {
             // 检查numericUpDown7是否存在并且与numericUpDown6的值相等
             if (numericUpDownWebUIPort.Value == numericUpDownSubStorePort.Value)
@@ -2513,7 +2540,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private async void textBox1_DoubleClick(object sender, EventArgs e)
+        private async void textBoxSubsUrls_DoubleClick(object sender, EventArgs e)
         {
             if (textBoxSubsUrls.Enabled)
             {
@@ -2553,20 +2580,21 @@ namespace subs_check.win.gui
 
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxEnableRenameNode_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxEnableRenameNode.Checked == false) checkBoxEnableMediaCheck.Checked = false;
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxEnableMediaCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxEnableMediaCheck.Checked == true) checkBoxEnableRenameNode.Checked = true;
         }
 
-        private async void timer3_Tick(object sender, EventArgs e)
+        private async void timerRestartSchedule_Tick(object sender, EventArgs e)
         {
             if (buttonStartCheck.Text == "⏹️ 停止")
             {
+                buttonStartCheck.ForeColor = Color.Red;
                 Log("subs-check.exe 运行时满24小时，自动重启清理内存占用。");
                 // 停止 subs-check.exe 程序
                 StopSubsCheckProcess();
@@ -2590,10 +2618,11 @@ namespace subs_check.win.gui
                 groupBoxR2.Enabled = false;
                 groupBoxWebdav.Enabled = false;
                 buttonStartCheck.Text = "⏹️ 停止";
+                buttonStartCheck.ForeColor = Color.Red;
             }
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void buttonCheckUpdate_Click(object sender, EventArgs e)
         {
             // 创建 CheckUpdates 窗口实例
             CheckUpdates checkUpdatesForm = new CheckUpdates();
@@ -2617,7 +2646,7 @@ namespace subs_check.win.gui
                 if (checkUpdatesForm.DialogResult == DialogResult.OK)
                 {
                     // 如果返回OK结果，表示按钮被点击并需要更新内核
-                    button5_Click(this, EventArgs.Empty);
+                    buttonUpdateKernel_Click(this, EventArgs.Empty);
                 }
             };
 
@@ -2628,13 +2657,13 @@ namespace subs_check.win.gui
             checkUpdatesForm.ShowDialog();
         }
 
-        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxEnableSuccessLimit_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxEnableSuccessLimit.Checked) numericUpDownSuccessLimit.Enabled = true;
             else numericUpDownSuccessLimit.Enabled = false;
         }
 
-        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxTotalBandwidthLimit_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxTotalBandwidthLimit.Checked) numericUpDownTotalBandwidthLimit.Enabled = true;
             else
@@ -2644,7 +2673,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private async void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBoxOverwriteUrls_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBoxOverwriteUrls.Text.Contains("[内置]")) await ProcessComboBox5Selection(true);
         }
@@ -2765,7 +2794,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownConcurrent_ValueChanged(object sender, EventArgs e)
         {
             if (checkBoxHighConcurrent.Checked)
             {
@@ -2791,13 +2820,13 @@ namespace subs_check.win.gui
             }
         }
 
-        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxEnableWebUI_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxEnableWebUI.Checked) textBoxWebUiAPIKey.Enabled = true;
             else textBoxWebUiAPIKey.Enabled = false;
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void buttonWebUi_Click(object sender, EventArgs e)
         {
             string 本地IP = GetLocalLANIP();
             try
@@ -2913,7 +2942,7 @@ namespace subs_check.win.gui
             return resultArray;
         }
 
-        private async void timer4_Tick(object sender, EventArgs e)
+        private async void timerRefresh_Tick(object sender, EventArgs e)
         {
             //if (!button7.Enabled) button7.Enabled = true;
             string[] subscheck状态 = await GetApiStatusAsync();
@@ -2927,7 +2956,8 @@ namespace subs_check.win.gui
 
             if (状态类型 == "checking")
             {
-                buttonTriggerCheck.Text = buttonTriggerCheck.Text == "⏸️ 暂停" ? buttonTriggerCheck.Text : "⏸️ 暂停";
+                buttonTriggerCheck.Text = buttonTriggerCheck.Text == "⌛获取订阅" ? buttonTriggerCheck.Text : "⌛获取订阅";
+                labelLogNodeInfo.ForeColor = Color.Black;
                 nodeInfo = $"({进度百分比}/{节点总数}) 可用: {可用节点数量}";
 
                 int.TryParse(节点总数, out int nodeTotal);
@@ -2942,6 +2972,9 @@ namespace subs_check.win.gui
                     progressBarAll.Value = 进度条百分比;
 
                     if (!buttonTriggerCheck.Enabled) buttonTriggerCheck.Enabled = true;
+                    buttonTriggerCheck.Text = "⏸️结束检测";
+                    buttonTriggerCheck.ForeColor = HexToRgbColor("#6633f4");
+                    labelLogNodeInfo.ForeColor = Color.Black;
                 }
 
                 // 仅在文本变化时更新 NotifyIcon，避免频繁重绘
@@ -2957,7 +2990,10 @@ namespace subs_check.win.gui
             }
             else if (状态类型 == "idle")
             {
-                if (buttonTriggerCheck.Text != "⏯️ 开始") buttonTriggerCheck.Text = "⏯️ 开始";
+                if (buttonTriggerCheck.Text != "⏯️开始检测") buttonTriggerCheck.Text = "⏯️开始检测";
+                buttonTriggerCheck.ForeColor = HexToRgbColor("#35bc00");
+                labelLogNodeInfo.Text = "空闲";
+                labelLogNodeInfo.ForeColor = Color.Green;
 
                 progressBarAll.Value = 100;
 
@@ -2975,6 +3011,8 @@ namespace subs_check.win.gui
             {
                 if (buttonTriggerCheck.Text != "🔀 未知") buttonTriggerCheck.Text = "🔀 未知";
                 nodeInfo = 状态文本;
+                labelLogNodeInfo.Text = "实时日志";
+                labelLogNodeInfo.ForeColor = Color.Black;
             }
 
             // 仅在标题文字确实变化时更新，避免父容器反复重绘引起的闪烁
@@ -2986,7 +3024,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private async void button7_Click(object sender, EventArgs e)
+        private async void buttonTriggerCheck_Click(object sender, EventArgs e)
         {
             buttonTriggerCheck.Enabled = false;
             timerRefresh.Enabled = false;
@@ -2995,22 +3033,30 @@ namespace subs_check.win.gui
             {
                 bool isSuccess;
 
-                if (buttonTriggerCheck.Text == "⏯️ 开始")
+                if (buttonTriggerCheck.Text == "⏯️开始检测")
                 {
-                    isSuccess = await SendApiRequestAsync("/api/trigger-check", "节点检查");
+                    buttonTriggerCheck.ForeColor = HexToRgbColor("#00BFFF");
+                    labelLogNodeInfo.Text = "空闲";
+                    labelLogNodeInfo.ForeColor = Color.Green;
+                    isSuccess = await SendApiRequestAsync("/api/trigger-check", "发送手动检查信号");
                     if (isSuccess)
                     {
-                        buttonTriggerCheck.Text = "⏸️ 暂停";
+                        buttonTriggerCheck.Text = "⏸️结束检测";
+                        buttonTriggerCheck.Enabled = false;
+                        labelLogNodeInfo.ForeColor = Color.Black;
                         textBoxSubsUrls.Enabled = false; // 检查开始后禁用订阅编辑
                     }
                 }
-                else // "⏸️ 暂停"
+                else // "⏸️结束检测"
                 {
-                    isSuccess = await SendApiRequestAsync("/api/force-close", "强制关闭");
+                    labelLogNodeInfo.ForeColor = Color.Black;
+                    isSuccess = await SendApiRequestAsync("/api/force-close", "发送提前结束检测信号");
                 }
 
                 // 如果请求失败，更新按钮状态为未知
                 if (!isSuccess) buttonTriggerCheck.Text = "🔀 未知";
+                buttonTriggerCheck.ForeColor = Color.Gray;
+                labelLogNodeInfo.ForeColor = Color.Black;
             }
             finally
             {
@@ -3398,7 +3444,7 @@ namespace subs_check.win.gui
         }
 
         private static about aboutWindow = null;
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void linkLabelAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             // 检查窗口是否已经打开
             if (aboutWindow != null && !aboutWindow.IsDisposed)
@@ -3429,7 +3475,7 @@ namespace subs_check.win.gui
             }));
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void buttonMoreSettings_Click(object sender, EventArgs e)
         {
             try
             {
@@ -3454,7 +3500,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private async void checkBox5_CheckedChanged(object sender, EventArgs e)
+        private async void checkBoxStartup_CheckedChanged(object sender, EventArgs e)
         {
             checkBoxStartup.Enabled = false;
             try
@@ -3498,9 +3544,9 @@ namespace subs_check.win.gui
                 MessageBox.Show($"设置开机启动项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 // 恢复CheckBox状态，避免UI状态与实际状态不一致
-                checkBoxStartup.CheckedChanged -= checkBox5_CheckedChanged;
+                checkBoxStartup.CheckedChanged -= checkBoxStartup_CheckedChanged;
                 checkBoxStartup.Checked = !checkBoxStartup.Checked;
-                checkBoxStartup.CheckedChanged += checkBox5_CheckedChanged;
+                checkBoxStartup.CheckedChanged += checkBoxStartup_CheckedChanged;
             }
             checkBoxStartup.Enabled = true;
             await SaveConfig(false);
@@ -3559,7 +3605,7 @@ namespace subs_check.win.gui
             return false;
         }
 
-        private void richTextBox1_DoubleClick(object sender, EventArgs e)
+        private void richTextBoxAllLog_DoubleClick(object sender, EventArgs e)
         {
             // 检查是否有日志内容
             if (richTextBoxAllLog.TextLength > 0)
@@ -3582,7 +3628,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void numericUpDown4_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownMinSpeed_ValueChanged(object sender, EventArgs e)
         {
             if (numericUpDownMinSpeed.Value > 4096)
             {
@@ -3600,7 +3646,7 @@ namespace subs_check.win.gui
             }
         }
 
-        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        private void numericUpDownTimeout_ValueChanged(object sender, EventArgs e)
         {
             if (numericUpDownTimeout.Value < 5000)
             {
@@ -3666,8 +3712,9 @@ namespace subs_check.win.gui
                 {
                     groupBoxPipeConcurrent.Location = _pipeOriginalLocation;
                     groupBoxEnhance.Location = _enhanceOriginalLocation;
-                    groupBoxGist.Location = new Point(groupBoxGist.Location.X, groupBoxGist.Location.Y + groupBoxPipeConcurrent.Height);
-                    groupBoxR2.Location = groupBoxGist.Location; groupBoxWebdav.Location = groupBoxGist.Location;
+                    groupBoxGist.Location = new Point(groupBoxGist.Location.X, _pipeOriginalLocation.Y + groupBoxPipeConcurrent.Height);
+                    groupBoxR2.Location = groupBoxGist.Location; 
+                    groupBoxWebdav.Location = groupBoxGist.Location;
                 }
                 else
                 {
@@ -3694,6 +3741,10 @@ namespace subs_check.win.gui
                 Log(EnableHighConcurrent ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核");
                 await DownloadSubsCheckEXE();// 若要后台并行改为 _ = DownloadSubsCheckEXE();
                 currentKernel = want;
+                if (!EnableHighConcurrent)
+                {
+                    numericUpDownPipeAlive.Value = 0; numericUpDownPipeSpeed.Value = 0; numericUpDownPipeMedia.Value = 0;
+                }
                 checkBoxSwitchArch64.Enabled = true;
                 checkBoxHighConcurrent.Enabled = true;
                 buttonCheckUpdate.Enabled = true;
@@ -3887,5 +3938,19 @@ namespace subs_check.win.gui
                 toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, $"总下载速度限制(MB/s)：\n建议设置为 <=带宽/8, \n比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20。\n\n当前设置下载速度对应带宽 {calcBandWidth}");
             }
         }
+        public static Color HexToRgbColor(String hexColour)
+        {
+            Color colour = new Color();
+            try
+            {
+                colour = ColorTranslator.FromHtml(hexColour);
+            }
+            catch (System.Exception)
+            {
+                return Color.Empty;
+            }
+            return colour;
+        }
+
     }
 }
