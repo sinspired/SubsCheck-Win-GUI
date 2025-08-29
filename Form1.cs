@@ -78,7 +78,9 @@ namespace subs_check.win.gui
 
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
-            toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加一下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
+            toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
+
+            toolTip1.SetToolTip(checkBoxSwitchArch64, "使用 x64 架构内核，CPU占用更低，内存占用可能更高。");
 
             toolTip1.SetToolTip(checkBox5, "开机启动：勾选后，程序将在Windows启动时自动运行");
             // 设置通知图标的上下文菜单
