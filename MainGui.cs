@@ -1046,6 +1046,8 @@ namespace subs_check.win.gui
                 // 运行时禁用流水线并发和增强标签相关设置项
                 groupBoxPipeConcurrent.Enabled = false;
                 groupBoxEnhance.Enabled = false;
+                checkBoxHighConcurrent.Enabled = false;
+                checkBoxSwitchArch64.Enabled = false;
 
                 comboBoxSaveMethod.Enabled = false;
                 textBoxSubsUrls.Enabled = false;
@@ -1110,6 +1112,8 @@ namespace subs_check.win.gui
                 // 重新启用
                 groupBoxPipeConcurrent.Enabled = true;
                 groupBoxEnhance.Enabled = true;
+                checkBoxHighConcurrent.Enabled = true;
+                checkBoxSwitchArch64.Enabled = true;
 
                 comboBoxSaveMethod.Enabled = true;
                 textBoxSubsUrls.Enabled = true;
@@ -1141,6 +1145,10 @@ namespace subs_check.win.gui
                 string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
                 string apiUrl = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
                 string releasesPageUrl = $"https://github.com/{repoOwner}/subs-check/releases";
+                // 决定目标资源名称：64位优先 (amd64)，否则 i386
+                string desiredArchToken = checkBoxSwitchArch64.Checked ? "x86_64" : "i386";
+                string desiredKernel = checkBoxHighConcurrent.Checked ? "高并发内核" : "原版内核";
+                string desiredAssetName = $"subs-check_Windows_{desiredArchToken}.zip";
 
                 // 首先检查是否有网络连接
                 if (!IsNetworkAvailable())
@@ -1160,11 +1168,6 @@ namespace subs_check.win.gui
                     // 无版本信息
                     return;
                 }
-
-                // 决定目标资源名称：64位优先 (amd64)，否则 i386
-                string desiredArchToken = checkBoxSwitchArch64.Checked ? "x86_64" : "i386";
-                string desiredKernel = checkBoxHighConcurrent.Checked ? "高并发内核" : "原版内核";
-                string desiredAssetName = $"subs-check_Windows_{desiredArchToken}.zip";
 
                 // 创建不使用系统代理的 HttpClientHandler
                 HttpClientHandler handler = new HttpClientHandler
@@ -1873,6 +1876,8 @@ namespace subs_check.win.gui
                 // 重新启用
                 groupBoxPipeConcurrent.Enabled = true;
                 groupBoxEnhance.Enabled = true;
+                checkBoxHighConcurrent.Enabled = true;
+                checkBoxSwitchArch64.Enabled = true;
             }));
         }
 
@@ -2993,15 +2998,16 @@ namespace subs_check.win.gui
             {
                 if (buttonTriggerCheck.Text != "⏯️开始检测") buttonTriggerCheck.Text = "⏯️开始检测";
                 buttonTriggerCheck.ForeColor = HexToRgbColor("#35bc00");
-                labelLogNodeInfo.Text = "空闲";
-                labelLogNodeInfo.ForeColor = Color.Green;
+                //labelLogNodeInfo.Text = $"{nextCheckTime}";
+                //labelLogNodeInfo.ForeColor = Color.Green;
 
                 progressBarAll.Value = 100;
 
-                nodeInfo = $"等待{nextCheckTime}";
+                
                 string idleNotify = "SubsCheck: 已就绪\n" + nextCheckTime;
                 if (_lastNotifyText != idleNotify)
                 {
+                    nodeInfo = $"{nextCheckTime}";
                     _lastNotifyText = idleNotify;
                     notifyIcon1.Text = idleNotify;
                 }
@@ -3037,8 +3043,8 @@ namespace subs_check.win.gui
                 if (buttonTriggerCheck.Text == "⏯️开始检测")
                 {
                     buttonTriggerCheck.ForeColor = HexToRgbColor("#00BFFF");
-                    labelLogNodeInfo.Text = "空闲";
-                    labelLogNodeInfo.ForeColor = Color.Green;
+                    //labelLogNodeInfo.Text = $"启动检测";
+                    labelLogNodeInfo.ForeColor = Color.Black;
                     isSuccess = await SendApiRequestAsync("/api/trigger-check", "发送手动检查信号");
                     if (isSuccess)
                     {
@@ -3714,7 +3720,7 @@ namespace subs_check.win.gui
                     groupBoxPipeConcurrent.Location = _pipeOriginalLocation;
                     groupBoxEnhance.Location = _enhanceOriginalLocation;
                     groupBoxGist.Location = new Point(groupBoxGist.Location.X, _pipeOriginalLocation.Y + groupBoxPipeConcurrent.Height);
-                    groupBoxR2.Location = groupBoxGist.Location; 
+                    groupBoxR2.Location = groupBoxGist.Location;
                     groupBoxWebdav.Location = groupBoxGist.Location;
                 }
                 else
