@@ -161,6 +161,7 @@
             // 
             // groupBoxComonSettings
             // 
+            this.groupBoxComonSettings.Controls.Add(this.textBoxCron);
             this.groupBoxComonSettings.Controls.Add(this.labelConcurrent);
             this.groupBoxComonSettings.Controls.Add(this.numericUpDownConcurrent);
             this.groupBoxComonSettings.Controls.Add(this.labelInterval);
@@ -178,7 +179,6 @@
             this.groupBoxComonSettings.Controls.Add(this.buttonTriggerCheck);
             this.groupBoxComonSettings.Controls.Add(this.buttonWebUi);
             this.groupBoxComonSettings.Controls.Add(this.checkBoxStartup);
-            this.groupBoxComonSettings.Controls.Add(this.textBoxCron);
             this.groupBoxComonSettings.Controls.Add(this.labelCron);
             this.groupBoxComonSettings.Controls.Add(this.labelSubUrls);
             this.groupBoxComonSettings.Controls.Add(this.textBoxSubsUrls);
@@ -441,11 +441,14 @@
             // 
             // textBoxCron
             // 
+            this.textBoxCron.AcceptsReturn = true;
+            this.textBoxCron.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.textBoxCron.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.textBoxCron.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCron.Location = new System.Drawing.Point(79, 562);
-            this.textBoxCron.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBoxCron.Location = new System.Drawing.Point(84, 562);
+            this.textBoxCron.Margin = new System.Windows.Forms.Padding(5);
             this.textBoxCron.Name = "textBoxCron";
-            this.textBoxCron.Size = new System.Drawing.Size(219, 31);
+            this.textBoxCron.Size = new System.Drawing.Size(214, 31);
             this.textBoxCron.TabIndex = 21;
             this.textBoxCron.Text = "0 */2 * * *";
             this.textBoxCron.Visible = false;

@@ -789,11 +789,9 @@ namespace subs_check.win.gui
                         subUrls.Add(succedProxiesUrl);
                     }
                     Log("已加载上次测试结果。");
-                    checkBoxKeepSucced.Visible = false;
                 }
                 else
                 {
-                    checkBoxKeepSucced.Visible = true;
                     checkBoxKeepSucced.Checked = true;
                     Log("将于第二次自动运行时加载上次测试结果。");
                 }
