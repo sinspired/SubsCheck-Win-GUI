@@ -28,7 +28,7 @@ jobs:
 
     - name: Package artifact
       run: |
-        mkdir release
+        mkdir -p release
         cp -r bin/Release/*.exe bin/Release/*.dll release/
       shell: bash
 
