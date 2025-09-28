@@ -755,7 +755,7 @@ namespace subs_check.win.gui
                 else
                 {
                     WebUIapiKey = GetComputerNameMD5();
-                    config["listen-port"] = $@"127.0.0.1:{numericUpDownWebUIPort.Value}";
+                    config["listen-port"] = $@":{numericUpDownWebUIPort.Value}";
                     if (textBoxWebUiAPIKey.Text != "请输入密钥") config["old-api-key"] = textBoxWebUiAPIKey.Text;
                 }
                 config["api-key"] = WebUIapiKey;
