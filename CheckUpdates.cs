@@ -34,36 +34,36 @@ namespace subs_check.win.gui
         {
             InitializeComponent();
             //注册自动更新订阅事件
-            AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
+            //AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
         }
 
-        //自定义检查更新事件
-        private void AutoUpdaterOnCheckForUpdateEvent(UpdateInfoEventArgs args)
-        {
-            if (args.Error == null)
-            {
-                if (args.IsUpdateAvailable)
-                {
-                    // 如果你想显示标准更新窗口，请取消下面这行的注释
-                    AutoUpdater.ShowUpdateForm(args);
-                }
-            }
-            else
-            {
-                if (args.Error is WebException)
-                {
-                    MessageBox.Show(
-                        @"无法连接到更新服务器。请检查您的网络连接并稍后重试。",
-                        @"更新检查失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    MessageBox.Show(args.Error.Message,
-                        args.Error.GetType().ToString(), MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
-            }
-        }
+        ////自定义检查更新事件
+        //private void AutoUpdaterOnCheckForUpdateEvent(UpdateInfoEventArgs args)
+        //{
+        //    if (args.Error == null)
+        //    {
+        //        if (args.IsUpdateAvailable)
+        //        {
+        //            // 如果你想显示标准更新窗口，请取消下面这行的注释
+        //            AutoUpdater.ShowUpdateForm(args);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (args.Error is WebException)
+        //        {
+        //            MessageBox.Show(
+        //                @"无法连接到更新服务器。请检查您的网络连接并稍后重试。",
+        //                @"更新检查失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show(args.Error.Message,
+        //                args.Error.GetType().ToString(), MessageBoxButtons.OK,
+        //                MessageBoxIcon.Error);
+        //        }
+        //    }
+        //}
 
         protected override void OnLoad(EventArgs e)
         {
@@ -90,6 +90,15 @@ namespace subs_check.win.gui
 
             label5.Text = 当前subsCheck版本号;
 
+            if (EnableHighConcurrent)
+            {
+                groupBox2.Text = "Subs-Check 性能内核";
+            }
+            else
+            {
+                groupBox2.Text = "Subs-Check 原版内核";
+            }
+
             var mainForm = Application.OpenForms["MainGui"] as MainGui;
             if (mainForm != null)
             {
@@ -102,28 +111,21 @@ namespace subs_check.win.gui
                 string upgradeExePath = System.IO.Path.Combine(Application.StartupPath, "Upgrade.exe");
                 if (System.IO.File.Exists(upgradeExePath))
                 {
-                    button1.Text = "立即更新";
-                    button1.Enabled = true;
+                    buttonUpdateGUI.Text = "立即更新";
+                    buttonUpdateGUI.Enabled = true;
                 }
                 else
                 {
-                    button1.Text = "AutoUpdate";
-                    button1.Enabled = false;
-                    // 使用AutoUpdater进行更新检查
-                    //AutoUpdater.Mandatory = true;
-                    //AutoUpdater.UpdateMode = Mode.Forced;
-                    AutoUpdater.SetOwner(CheckUpdates.ActiveForm);
-                    AutoUpdater.Icon = Resources.download;
-                    AutoUpdater.ShowRemindLaterButton = false;
-                    AutoUpdater.ReportErrors = true;
-                    AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-                    AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+                    buttonUpdateGUI.Text = "立即更新 GUI";
+                    buttonUpdateGUI.Enabled = true;
+                    buttonUpdateGUI.ForeColor = System.Drawing.Color.Green;
+
                 }
             }
             else
             {
-                button1.Text = "已是最新版本";
-                button1.Enabled = false;
+                buttonUpdateGUI.Text = "已是最新版本";
+                buttonUpdateGUI.Enabled = false;
             }
 
             // 根据并发参数选择仓库
@@ -249,14 +251,14 @@ namespace subs_check.win.gui
                         label6.Text = latestVersion;
                         if (当前subsCheck版本号 != latestVersion)
                         {
-                            button2.ForeColor = System.Drawing.Color.Green;
-                            button2.Text = "立即更新";
-                            button2.Enabled = true;
+                            buttonUpdateCore.ForeColor = System.Drawing.Color.Green;
+                            buttonUpdateCore.Text = "立即更新";
+                            buttonUpdateCore.Enabled = true;
                         }
                         else
                         {
-                            button2.Text = "已是最新版本";
-                            button2.Enabled = false;
+                            buttonUpdateCore.Text = "已是最新版本";
+                            buttonUpdateCore.Enabled = false;
                         }
                     }
 
@@ -317,6 +319,19 @@ namespace subs_check.win.gui
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (buttonUpdateGUI.Text == "立即更新 GUI")
+            {
+                // 使用AutoUpdater进行更新检查
+                //AutoUpdater.Mandatory = true;
+                //AutoUpdater.UpdateMode = Mode.Forced;
+                AutoUpdater.SetOwner(CheckUpdates.ActiveForm);
+                AutoUpdater.Icon = Resources.download;
+                AutoUpdater.ShowRemindLaterButton = false;
+                AutoUpdater.ReportErrors = true;
+                AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+                AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+                return;
+            }
             //下载链接
             string downloadURL = $"{githubProxyURL}https://github.com/cmliu/SubsCheck-Win-GUI/releases/download/{最新GUI版本号}/SubsCheck_Win_GUI.zip";
             //目标文件

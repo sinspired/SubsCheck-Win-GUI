@@ -28,9 +28,10 @@ jobs:
 
     - name: Package artifact
       run: |
+        shopt -s extglob
         mkdir -p release
-        cp -r bin/Release/*.exe bin/Release/*.dll release/
-        # 由于使用了 AutoUpdater, 故需要将 runtimes 和 zh 目录也打包
+        cp -r bin/Release/*.exe release/
+        cp -r bin/Release/!(*.Wpf).dll release/
         cp -r bin/Release/runtimes release/
         cp -r bin/Release/zh release/
       shell: bash
