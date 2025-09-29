@@ -93,11 +93,12 @@ jobs:
     - name: Generate update.xml
       run: |
         CURRENT_TAG="${{ steps.tags.outputs.current_tag }}"
+        VERSION="${CURRENT_TAG#v}"   # 去掉开头的 v
 
         cat > update.xml <<EOF
         <?xml version="1.0" encoding="utf-8"?>
         <item>
-            <version>${CURRENT_TAG}</version>
+            <version>${VERSION}</version>
             <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/${CURRENT_TAG}/subs-check-win.zip</url>
             <changelog>https://gh.39.al/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
             <mandatory>false</mandatory>

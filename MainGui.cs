@@ -124,6 +124,8 @@ namespace subs_check.win.gui
             AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
             AutoUpdater.ApplicationExitEvent += AutoUpdater_ApplicationExitEvent;
 
+            // AutoUpdater.Mandatory = true;
+            // AutoUpdater.UpdateMode = Mode.Forced;
             AutoUpdater.Icon = Properties.Resources.download;
             AutoUpdater.ShowRemindLaterButton = false;
             AutoUpdater.ReportErrors = true;
