@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-  <version>2.0.0.0</version>
+  <version>2.3.0.0</version>
   <url>https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/v2.3.0.0/subs-check-win.zip</url>
   <changelog>https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/tmp/CHANGELOG.md</changelog>
-  <mandatory>true</mandatory>
+  <mandatory>false</mandatory>
   <!-- <executable>subs-check.win.gui.exe</executable> -->
 </item>
