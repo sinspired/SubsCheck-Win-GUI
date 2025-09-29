@@ -130,7 +130,7 @@ namespace subs_check.win.gui
             AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
             // 注意：这里不需要 SetOwner(MainGui.ActiveForm)，因为当前窗体就是 Owner
-            AutoUpdater.Start("https://gh.39.al/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+            AutoUpdater.Start("https://raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/tmp/update.xml");
         }
 
         // 更新程序退出事件处理器
