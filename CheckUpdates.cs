@@ -90,9 +90,11 @@ namespace subs_check.win.gui
 
             label5.Text = 当前subsCheck版本号;
 
-            MainGui mainForm = new MainGui();
-
-            githubProxyURL = await mainForm.GetGithubProxyUrlAsync();
+            var mainForm = Application.OpenForms["MainGui"] as MainGui;
+            if (mainForm != null)
+            {
+                githubProxyURL = await mainForm.GetGithubProxyUrlAsync();
+            }
 
             if (最新GUI版本号 != 当前GUI版本号)
             {
