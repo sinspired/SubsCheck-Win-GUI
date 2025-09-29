@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+
+using subs_check.win.gui.Properties;
 
 namespace subs_check.win.gui
 {
@@ -26,6 +29,16 @@ namespace subs_check.win.gui
                 MessageBox.Show("应用程序已经在运行中。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            ////启动时检查更新
+            ////AutoUpdater.Mandatory = true;
+            ////AutoUpdater.UpdateMode = Mode.Forced;
+            //AutoUpdater.SetOwner(MainGui.ActiveForm);
+            //AutoUpdater.Icon = Resources.download;
+            //AutoUpdater.ShowRemindLaterButton = false;
+            //AutoUpdater.ReportErrors = true;
+            //AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+            //AutoUpdater.Start("https://gh.39.al/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
 
             try
             {

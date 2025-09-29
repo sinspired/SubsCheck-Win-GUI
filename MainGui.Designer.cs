@@ -33,19 +33,19 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.timerinitial = new System.Windows.Forms.Timer(this.components);
             this.groupBoxComonSettings = new System.Windows.Forms.GroupBox();
+            this.numericUpDownMinSpeed = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownTimeout = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownInterval = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownConcurrent = new System.Windows.Forms.NumericUpDown();
+            this.comboBoxSaveMethod = new System.Windows.Forms.ComboBox();
+            this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
             this.textBoxCron = new System.Windows.Forms.TextBox();
             this.labelConcurrent = new System.Windows.Forms.Label();
-            this.numericUpDownConcurrent = new System.Windows.Forms.NumericUpDown();
             this.labelInterval = new System.Windows.Forms.Label();
-            this.numericUpDownInterval = new System.Windows.Forms.NumericUpDown();
             this.labelTimeout = new System.Windows.Forms.Label();
-            this.numericUpDownTimeout = new System.Windows.Forms.NumericUpDown();
             this.labelMinSpped = new System.Windows.Forms.Label();
-            this.numericUpDownMinSpeed = new System.Windows.Forms.NumericUpDown();
             this.labelSaveMethod = new System.Windows.Forms.Label();
-            this.comboBoxSaveMethod = new System.Windows.Forms.ComboBox();
             this.checkBoxHighConcurrent = new System.Windows.Forms.CheckBox();
-            this.checkBoxSwitchArch64 = new System.Windows.Forms.CheckBox();
             this.comboBoxSubscriptionType = new System.Windows.Forms.ComboBox();
             this.buttonCopySubscriptionUrl = new System.Windows.Forms.Button();
             this.buttonTriggerCheck = new System.Windows.Forms.Button();
@@ -123,10 +123,10 @@
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWebUIPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDLTimehot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSubStorePort)).BeginInit();
@@ -193,6 +193,129 @@
             this.groupBoxComonSettings.TabStop = false;
             this.groupBoxComonSettings.Text = "参数设置";
             // 
+            // numericUpDownMinSpeed
+            // 
+            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 180);
+            this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
+            20480,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.Name = "numericUpDownMinSpeed";
+            this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownMinSpeed.TabIndex = 13;
+            this.numericUpDownMinSpeed.Value = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDownMinSpeed_ValueChanged);
+            // 
+            // numericUpDownTimeout
+            // 
+            this.numericUpDownTimeout.Location = new System.Drawing.Point(192, 131);
+            this.numericUpDownTimeout.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownTimeout.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownTimeout.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownTimeout.Name = "numericUpDownTimeout";
+            this.numericUpDownTimeout.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownTimeout.TabIndex = 12;
+            this.numericUpDownTimeout.Value = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            this.numericUpDownTimeout.ValueChanged += new System.EventHandler(this.numericUpDownTimeout_ValueChanged);
+            // 
+            // numericUpDownInterval
+            // 
+            this.numericUpDownInterval.Location = new System.Drawing.Point(192, 82);
+            this.numericUpDownInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownInterval.Maximum = new decimal(new int[] {
+            1440,
+            0,
+            0,
+            0});
+            this.numericUpDownInterval.Minimum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.numericUpDownInterval.Name = "numericUpDownInterval";
+            this.numericUpDownInterval.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownInterval.TabIndex = 11;
+            this.numericUpDownInterval.Value = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
+            this.numericUpDownInterval.DoubleClick += new System.EventHandler(this.切换cron表达式);
+            // 
+            // numericUpDownConcurrent
+            // 
+            this.numericUpDownConcurrent.Location = new System.Drawing.Point(192, 33);
+            this.numericUpDownConcurrent.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownConcurrent.Maximum = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            this.numericUpDownConcurrent.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownConcurrent.Name = "numericUpDownConcurrent";
+            this.numericUpDownConcurrent.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownConcurrent.TabIndex = 10;
+            this.numericUpDownConcurrent.Value = new decimal(new int[] {
+            32,
+            0,
+            0,
+            0});
+            this.numericUpDownConcurrent.ValueChanged += new System.EventHandler(this.numericUpDownConcurrent_ValueChanged);
+            // 
+            // comboBoxSaveMethod
+            // 
+            this.comboBoxSaveMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSaveMethod.FormattingEnabled = true;
+            this.comboBoxSaveMethod.Items.AddRange(new object[] {
+            "本地",
+            "gist",
+            "r2",
+            "webdav"});
+            this.comboBoxSaveMethod.Location = new System.Drawing.Point(192, 230);
+            this.comboBoxSaveMethod.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
+            this.comboBoxSaveMethod.Size = new System.Drawing.Size(106, 29);
+            this.comboBoxSaveMethod.TabIndex = 16;
+            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBoxSaveMethod_TextChanged);
+            // 
+            // checkBoxSwitchArch64
+            // 
+            this.checkBoxSwitchArch64.AutoSize = true;
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 539);
+            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
+            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
+            this.checkBoxSwitchArch64.TabIndex = 38;
+            this.checkBoxSwitchArch64.Text = "x64内核";
+            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
+            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
+            // 
             // textBoxCron
             // 
             this.textBoxCron.AcceptsReturn = true;
@@ -219,30 +342,6 @@
             this.labelConcurrent.TabIndex = 2;
             this.labelConcurrent.Text = "并发线程数：";
             // 
-            // numericUpDownConcurrent
-            // 
-            this.numericUpDownConcurrent.Location = new System.Drawing.Point(192, 33);
-            this.numericUpDownConcurrent.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownConcurrent.Maximum = new decimal(new int[] {
-            1024,
-            0,
-            0,
-            0});
-            this.numericUpDownConcurrent.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDownConcurrent.Name = "numericUpDownConcurrent";
-            this.numericUpDownConcurrent.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownConcurrent.TabIndex = 10;
-            this.numericUpDownConcurrent.Value = new decimal(new int[] {
-            32,
-            0,
-            0,
-            0});
-            this.numericUpDownConcurrent.ValueChanged += new System.EventHandler(this.numericUpDownConcurrent_ValueChanged);
-            // 
             // labelInterval
             // 
             this.labelInterval.AutoSize = true;
@@ -254,30 +353,6 @@
             this.labelInterval.Text = "检查间隔(分钟)：";
             this.labelInterval.DoubleClick += new System.EventHandler(this.切换cron表达式);
             // 
-            // numericUpDownInterval
-            // 
-            this.numericUpDownInterval.Location = new System.Drawing.Point(192, 82);
-            this.numericUpDownInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownInterval.Maximum = new decimal(new int[] {
-            1440,
-            0,
-            0,
-            0});
-            this.numericUpDownInterval.Minimum = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            this.numericUpDownInterval.Name = "numericUpDownInterval";
-            this.numericUpDownInterval.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownInterval.TabIndex = 11;
-            this.numericUpDownInterval.Value = new decimal(new int[] {
-            120,
-            0,
-            0,
-            0});
-            this.numericUpDownInterval.DoubleClick += new System.EventHandler(this.切换cron表达式);
-            // 
             // labelTimeout
             // 
             this.labelTimeout.AutoSize = true;
@@ -287,30 +362,6 @@
             this.labelTimeout.Size = new System.Drawing.Size(179, 21);
             this.labelTimeout.TabIndex = 4;
             this.labelTimeout.Text = "超时时间(毫秒)：";
-            // 
-            // numericUpDownTimeout
-            // 
-            this.numericUpDownTimeout.Location = new System.Drawing.Point(192, 131);
-            this.numericUpDownTimeout.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownTimeout.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDownTimeout.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.numericUpDownTimeout.Name = "numericUpDownTimeout";
-            this.numericUpDownTimeout.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownTimeout.TabIndex = 12;
-            this.numericUpDownTimeout.Value = new decimal(new int[] {
-            5000,
-            0,
-            0,
-            0});
-            this.numericUpDownTimeout.ValueChanged += new System.EventHandler(this.numericUpDownTimeout_ValueChanged);
             // 
             // labelMinSpped
             // 
@@ -322,30 +373,6 @@
             this.labelMinSpped.TabIndex = 5;
             this.labelMinSpped.Text = "测速下限(KB/s)：";
             // 
-            // numericUpDownMinSpeed
-            // 
-            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 180);
-            this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
-            20480,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.Minimum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.Name = "numericUpDownMinSpeed";
-            this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownMinSpeed.TabIndex = 13;
-            this.numericUpDownMinSpeed.Value = new decimal(new int[] {
-            1024,
-            0,
-            0,
-            0});
-            this.numericUpDownMinSpeed.ValueChanged += new System.EventHandler(this.numericUpDownMinSpeed_ValueChanged);
-            // 
             // labelSaveMethod
             // 
             this.labelSaveMethod.AutoSize = true;
@@ -355,22 +382,6 @@
             this.labelSaveMethod.Size = new System.Drawing.Size(115, 21);
             this.labelSaveMethod.TabIndex = 8;
             this.labelSaveMethod.Text = "保存方法：";
-            // 
-            // comboBoxSaveMethod
-            // 
-            this.comboBoxSaveMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSaveMethod.FormattingEnabled = true;
-            this.comboBoxSaveMethod.Items.AddRange(new object[] {
-            "本地",
-            "gist",
-            "r2",
-            "webdav"});
-            this.comboBoxSaveMethod.Location = new System.Drawing.Point(192, 230);
-            this.comboBoxSaveMethod.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
-            this.comboBoxSaveMethod.Size = new System.Drawing.Size(106, 29);
-            this.comboBoxSaveMethod.TabIndex = 16;
-            this.comboBoxSaveMethod.TextChanged += new System.EventHandler(this.comboBoxSaveMethod_TextChanged);
             // 
             // checkBoxHighConcurrent
             // 
@@ -382,17 +393,6 @@
             this.checkBoxHighConcurrent.Text = "高并发模式";
             this.checkBoxHighConcurrent.UseVisualStyleBackColor = true;
             this.checkBoxHighConcurrent.CheckedChanged += new System.EventHandler(this.checkBoxHighConcurrent_CheckedChanged);
-            // 
-            // checkBoxSwitchArch64
-            // 
-            this.checkBoxSwitchArch64.AutoSize = true;
-            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 539);
-            this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
-            this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
-            this.checkBoxSwitchArch64.TabIndex = 38;
-            this.checkBoxSwitchArch64.Text = "x64内核";
-            this.checkBoxSwitchArch64.UseVisualStyleBackColor = true;
-            this.checkBoxSwitchArch64.CheckedChanged += new System.EventHandler(this.checkBoxSwitchArch64_CheckedChanged);
             // 
             // comboBoxSubscriptionType
             // 
@@ -1819,10 +1819,10 @@
             this.Text = "SubsCheck Win GUI";
             this.groupBoxComonSettings.ResumeLayout(false);
             this.groupBoxComonSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownConcurrent)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWebUIPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDLTimehot)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSubStorePort)).EndInit();

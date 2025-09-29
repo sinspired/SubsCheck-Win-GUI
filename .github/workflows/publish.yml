@@ -30,6 +30,9 @@ jobs:
       run: |
         mkdir -p release
         cp -r bin/Release/*.exe bin/Release/*.dll release/
+        # 由于使用了 AutoUpdater, 故需要将 runtimes 和 zh 目录也打包
+        cp -r bin/Release/runtimes release/
+        cp -r bin/Release/zh release/
       shell: bash
 
     - name: Upload artifact
@@ -48,6 +51,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: master
 
     - name: Download artifact
       uses: actions/download-artifact@v4
@@ -58,61 +62,67 @@ jobs:
     - name: Prepare tags (delete local tags then fetch remote tags cleanly)
       id: tags
       run: |
-        # current tag 从触发环境取
         CURRENT_TAG="${GITHUB_REF#refs/tags/}"
         echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
-
-        # 找到上一个 tag（按创建时间倒序，排除当前）
         PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${CURRENT_TAG}$" | head -n1 || true)
         echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Generate changelog (no file, put into step output)
-      id: changelog
-      run: |
-        CURRENT="${{ steps.tags.outputs.current_tag }}"
-        PREV="${{ steps.tags.outputs.prev_tag }}"
-
-        if [ -z "$CURRENT" ]; then
-          echo "No current tag detected from GITHUB_REF; aborting changelog generation." >&2
-          printf '%s\n' "body<<EOF" >> $GITHUB_OUTPUT
-          printf '%s\n' "## Changelog" >> $GITHUB_OUTPUT
-          printf '%s\n' "- Unable to determine current tag from environment." >> $GITHUB_OUTPUT
-          printf '%s\n' "EOF" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-
-        # 尝试获取 tag 的日期（短格式），失败则忽略
-        TAG_DATE=$(git log -1 --format=%ad --date=short "$CURRENT" 2>/dev/null || true)
-
-        if [ -z "$PREV" ]; then
-          # 首次发布或没有上一个 tag：取最近 20 条提交（短哈希 + 标题 + 作者）
-          LOG=$(git log --pretty=format:'- %h %s (%an)' --no-merges -n 20)
-        else
-          LOG=$(git log --pretty=format:'- %h %s (%an)' --no-merges "$PREV".."$CURRENT")
-        fi
-
-        if [ -z "$LOG" ]; then
-          LOG="- No notable changes found (commits may be merge/empty or follow a different convention)."
-        fi
-
-        HEADER="## Changelog"
-        printf '%s\n' "body<<EOF" >> $GITHUB_OUTPUT
-        printf '%s\n' "$HEADER" >> $GITHUB_OUTPUT
-        printf '%s\n' "$LOG" >> $GITHUB_OUTPUT
-        printf '%s\n' "EOF" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Create ZIP archive
       run: |
         cd release
         zip -r subs-check-win.zip .
-      shell: bash # Zip the contents of the release directory
+      shell: bash
+
+    # 用 git-cliff 生成并更新 CHANGELOG.md（范围：PREV_TAG..CURRENT_TAG）
+    - name: Generate changelog with git-cliff
+      uses: orhun/git-cliff-action@v4
+      id: git-cliff
+      with:
+        config: cliff.toml
+        args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }} -o CHANGELOG.md
+
+    # 用 git-cliff 生成 Release body（范围：PREV_TAG..CURRENT_TAG）
+    - name: Generate changelog with git-cliff (release body)
+      uses: orhun/git-cliff-action@v4
+      id: git-cliff-release
+      with:
+        config: cliff-release.toml
+        args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }}
+
+    - name: Generate update.xml
+      run: |
+        CURRENT_TAG="${{ steps.tags.outputs.current_tag }}"
+
+        cat > update.xml <<EOF
+        <?xml version="1.0" encoding="utf-8"?>
+        <item>
+            <version>${CURRENT_TAG}</version>
+            <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/${CURRENT_TAG}/subs-check-win.zip</url>
+            <changelog>https://gh.39.al/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
+            <mandatory>false</mandatory>
+            <executable>subs-check.win.gui.exe</executable>
+        </item>
+        EOF
+
+    - name: Commit changelog and update.xml
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        git add CHANGELOG.md update.xml
+        if git diff --cached --quiet; then
+          echo "No changes in CHANGELOG.md or update.xml"
+          exit 0
+        fi
+
+        git commit -m "chore(release): update CHANGELOG.md and update.xml for ${{ steps.tags.outputs.current_tag }}"
+        git push
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        body: ${{ steps.changelog.outputs.body }}
+        body: ${{ steps.git-cliff-release.outputs.content }}
         files: release/subs-check-win.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

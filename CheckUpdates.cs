@@ -1,11 +1,18 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using AutoUpdaterDotNET;
+
+using Newtonsoft.Json.Linq;
+
+using subs_check.win.gui.Properties;
+
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace subs_check.win.gui
@@ -26,6 +33,36 @@ namespace subs_check.win.gui
         public CheckUpdates()
         {
             InitializeComponent();
+            //注册自动更新订阅事件
+            AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
+        }
+
+        //自定义检查更新事件
+        private void AutoUpdaterOnCheckForUpdateEvent(UpdateInfoEventArgs args)
+        {
+            if (args.Error == null)
+            {
+                if (args.IsUpdateAvailable)
+                {
+                    // 如果你想显示标准更新窗口，请取消下面这行的注释
+                    AutoUpdater.ShowUpdateForm(args);
+                }
+            }
+            else
+            {
+                if (args.Error is WebException)
+                {
+                    MessageBox.Show(
+                        @"无法连接到更新服务器。请检查您的网络连接并稍后重试。",
+                        @"更新检查失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    MessageBox.Show(args.Error.Message,
+                        args.Error.GetType().ToString(), MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -68,8 +105,17 @@ namespace subs_check.win.gui
                 }
                 else
                 {
-                    button1.Text = "缺少更新程序";
+                    button1.Text = "AutoUpdate";
                     button1.Enabled = false;
+                    // 使用AutoUpdater进行更新检查
+                    //AutoUpdater.Mandatory = true;
+                    //AutoUpdater.UpdateMode = Mode.Forced;
+                    AutoUpdater.SetOwner(CheckUpdates.ActiveForm);
+                    AutoUpdater.Icon = Resources.download;
+                    AutoUpdater.ShowRemindLaterButton = false;
+                    AutoUpdater.ReportErrors = true;
+                    AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+                    AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
                 }
             }
             else
@@ -201,6 +247,7 @@ namespace subs_check.win.gui
                         label6.Text = latestVersion;
                         if (当前subsCheck版本号 != latestVersion)
                         {
+                            button2.ForeColor = System.Drawing.Color.Green;
                             button2.Text = "立即更新";
                             button2.Enabled = true;
                         }

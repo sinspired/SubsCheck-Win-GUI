@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -8,11 +6,17 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using AutoUpdaterDotNET;
+
+using Newtonsoft.Json.Linq;
 
 namespace subs_check.win.gui
 {
@@ -45,11 +49,11 @@ namespace subs_check.win.gui
         private Point _enhanceOriginalLocation;
         private bool _originalLocationSaved = false;
 
-
-
         public MainGui()
         {
             InitializeComponent();
+            this.Shown += MainGui_Shown;
+            
             originalNotifyIcon = notifyIcon1.Icon;
 
             toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高并发而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高并发后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
@@ -113,6 +117,56 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
+        }
+
+        private void MainGui_Shown(object sender, EventArgs e)
+        {
+            AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
+            AutoUpdater.ApplicationExitEvent += AutoUpdater_ApplicationExitEvent;
+
+            AutoUpdater.Icon = Properties.Resources.download;
+            AutoUpdater.ShowRemindLaterButton = false;
+            AutoUpdater.ReportErrors = true;
+            AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+            // 注意：这里不需要 SetOwner(MainGui.ActiveForm)，因为当前窗体就是 Owner
+            AutoUpdater.Start("https://gh.39.al/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+        }
+
+        // 更新程序退出事件处理器
+        private async void AutoUpdater_ApplicationExitEvent()
+        {
+            StopSubsCheckProcess();
+            await KillNodeProcessAsync();
+            Application.Exit();
+        }
+
+        //自定义检查更新事件
+        private void AutoUpdaterOnCheckForUpdateEvent(UpdateInfoEventArgs args)
+        {
+            if (args.Error == null)
+            {
+                if (args.IsUpdateAvailable)
+                {
+                    // 如果你想显示标准更新窗口，请取消下面这行的注释
+                    AutoUpdater.ShowUpdateForm(args);
+                }
+            }
+            else
+            {
+                if (args.Error is WebException)
+                {
+                    MessageBox.Show(
+                        @"无法连接到更新服务器。请检查您的网络连接并稍后重试。",
+                        @"更新检查失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    MessageBox.Show(args.Error.Message,
+                        args.Error.GetType().ToString(), MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
         }
 
         //临时禁用/恢复控件重绘
@@ -258,7 +312,7 @@ namespace subs_check.win.gui
 
             if (CheckCommandLineParameter("-auto"))
             {
-                Log("检测到开机启动，准备执行任务...");
+                Log("检测到开机启动，准备执行任务...", GetRichTextBoxAllLog());
                 buttonStartCheck_Click(this, EventArgs.Empty);
                 this.Hide();
                 notifyIcon1.Visible = true;
@@ -788,12 +842,12 @@ namespace subs_check.win.gui
                     {
                         subUrls.Add(succedProxiesUrl);
                     }
-                    Log("已加载上次测试结果。");
+                    Log("已加载上次测试结果。", GetRichTextBoxAllLog());
                 }
                 else
                 {
                     checkBoxKeepSucced.Checked = true;
-                    Log("将于第二次自动运行时加载上次测试结果。");
+                    Log("将于第二次自动运行时加载上次测试结果。", GetRichTextBoxAllLog());
                 }
 
                 if (!string.IsNullOrWhiteSpace(textBoxSubsUrls.Text))
@@ -860,12 +914,12 @@ namespace subs_check.win.gui
                     // 检查文件是否存在
                     if (!File.Exists(downloadFilePath))
                     {
-                        Log($"{displayName} 覆写配置文件 未找到，将使用在线版本。");
+                        Log($"{displayName} 覆写配置文件 未找到，将使用在线版本。", GetRichTextBoxAllLog());
                         config["mihomo-overwrite-url"] = githubProxyURL + downloadUrl;
                     }
                     else
                     {
-                        Log($"{displayName} 覆写配置文件 加载成功。");
+                        Log($"{displayName} 覆写配置文件 加载成功。", GetRichTextBoxAllLog());
                         config["mihomo-overwrite-url"] = $"http://127.0.0.1:{numericUpDownWebUIPort.Value}/{fileName}";
                     }
                 }
@@ -931,7 +985,7 @@ namespace subs_check.win.gui
                         if (Config.ContainsKey(kvp.Key))
                         {
                             conflictKeys.Add(kvp.Key);
-                            Log($"发现重复键 '{kvp.Key}'，使用GUI配置");
+                            Log($"发现重复键 '{kvp.Key}'，使用GUI配置", GetRichTextBoxAllLog());
                         }
                         else
                         {
@@ -944,7 +998,7 @@ namespace subs_check.win.gui
                     yamlContent = serializer.Serialize(Config);
 
 
-                    Log($"已将补充参数配置 more.yaml 内容追加到配置文件");
+                    Log($"已将补充参数配置 more.yaml 内容追加到配置文件", GetRichTextBoxAllLog());
                 }
                 // 写入YAML文件
                 File.WriteAllText(configFilePath, yamlContent);
@@ -1084,7 +1138,7 @@ namespace subs_check.win.gui
             else
             {
                 run = 0;
-                Log("任务停止");
+                Log("任务停止", GetRichTextBoxAllLog());
                 progressBarAll.Value = 0;
                 progressBarAll.Visible = false;
                 labelLogNodeInfo.Text = "实时日志";
@@ -1137,7 +1191,7 @@ namespace subs_check.win.gui
             downloading = 1;
             try
             {
-                Log("正在检查网络连接...");
+                Log("正在检查网络连接...", GetRichTextBoxAllLog());
 
                 // 动态决定使用哪个仓库（checkBoxHighConcurrent 为 true 时使用 sinspired，否则使用 beck-8）
                 string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
@@ -1151,7 +1205,7 @@ namespace subs_check.win.gui
                 // 首先检查是否有网络连接
                 if (!IsNetworkAvailable())
                 {
-                    Log("网络连接不可用，无法下载核心文件。", true);
+                    Log("网络连接不可用，无法下载核心文件。", GetRichTextBoxAllLog(), true);
                     MessageBox.Show($"缺少 subs-check.exe 核心文件。\n\n您可以前往 {releasesPageUrl} 自行下载！",
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -1181,7 +1235,7 @@ namespace subs_check.win.gui
                     {
                         string latestVersion = result.Item1;
                         JArray assets = result.Item2;
-                        Log($"subs-check.exe 最新版本为: {latestVersion} ");
+                        Log($"subs-check.exe 最新版本为: {latestVersion} ", GetRichTextBoxAllLog());
 
                         // 先尝试精确匹配期望文件名；找不到则回退为任意包含 "Windows" 且包含 arch token 的条目；
                         // 若仍找不到，再回退为任意包含 "Windows" 的资源。
@@ -1225,7 +1279,7 @@ namespace subs_check.win.gui
 
                         if (downloadUrl == null)
                         {
-                            Log("无法找到适用于 Windows 的下载链接。", true);
+                            Log("无法找到适用于 Windows 的下载链接。", GetRichTextBoxAllLog(), true);
                             MessageBox.Show($"未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return;
@@ -1255,7 +1309,7 @@ namespace subs_check.win.gui
 
                         string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
                         // 创建下载请求 - 优化的多级尝试下载逻辑
-                        Log("开始下载文件...");
+                        Log("开始下载文件...", GetRichTextBoxAllLog());
                         bool downloadSuccess = false;
                         string zipFilePath = Path.Combine(executablePath, desiredAssetName);
                         string failureReason = "";
@@ -1266,12 +1320,12 @@ namespace subs_check.win.gui
                         // 第一次尝试：使用代理下载链接 + 当前HttpClient(不使用系统代理)
                         try
                         {
-                            Log($"[尝试1/4] 使用代理下载链接：{代理下载链接}");
+                            Log($"[尝试1/4] 使用代理下载链接：{代理下载链接}", GetRichTextBoxAllLog());
                             downloadSuccess = await DownloadFileAsync(client, 代理下载链接, zipFilePath);
                         }
                         catch (Exception ex)
                         {
-                            Log($"[尝试1/4] 失败: {ex.Message}", true);
+                            Log($"[尝试1/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                             failureReason = ex.Message;
                         }
 
@@ -1280,12 +1334,12 @@ namespace subs_check.win.gui
                         {
                             try
                             {
-                                Log($"[尝试2/4] 使用原生下载链接：{原生下载链接}");
+                                Log($"[尝试2/4] 使用原生下载链接：{原生下载链接}", GetRichTextBoxAllLog());
                                 downloadSuccess = await DownloadFileAsync(client, 原生下载链接, zipFilePath);
                             }
                             catch (Exception ex)
                             {
-                                Log($"[尝试2/4] 失败: {ex.Message}", true);
+                                Log($"[尝试2/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                                 failureReason = ex.Message;
                             }
                         }
@@ -1295,7 +1349,7 @@ namespace subs_check.win.gui
                         {
                             try
                             {
-                                Log("[尝试3/4] 使用系统代理 + 代理下载链接");
+                                Log("[尝试3/4] 使用系统代理 + 代理下载链接", GetRichTextBoxAllLog());
                                 using (HttpClient proxyClient = new HttpClient())
                                 {
                                     proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
@@ -1306,7 +1360,7 @@ namespace subs_check.win.gui
                             }
                             catch (Exception ex)
                             {
-                                Log($"[尝试3/4] 失败: {ex.Message}", true);
+                                Log($"[尝试3/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                                 failureReason = ex.Message;
                             }
 
@@ -1315,7 +1369,7 @@ namespace subs_check.win.gui
                             {
                                 try
                                 {
-                                    Log("[尝试4/4] 使用系统代理 + 原生下载链接");
+                                    Log("[尝试4/4] 使用系统代理 + 原生下载链接", GetRichTextBoxAllLog());
                                     using (HttpClient proxyClient = new HttpClient())
                                     {
                                         proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
@@ -1326,7 +1380,7 @@ namespace subs_check.win.gui
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log($"[尝试4/4] 失败: {ex.Message}", true);
+                                    Log($"[尝试4/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                                     failureReason = ex.Message;
                                 }
                             }
@@ -1334,7 +1388,7 @@ namespace subs_check.win.gui
 
                         if (!downloadSuccess)
                         {
-                            Log($"所有下载尝试均失败，最后错误: {failureReason}", true);
+                            Log($"所有下载尝试均失败，最后错误: {failureReason}", GetRichTextBoxAllLog(), true);
                             MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             progressBarAll.Value = 0;
@@ -1343,7 +1397,7 @@ namespace subs_check.win.gui
                         }
 
                         // 下载成功 -> 解压并查找 subs-check.exe
-                        Log("下载完成，正在解压文件...");
+                        Log("下载完成，正在解压文件...", GetRichTextBoxAllLog());
                         // 解压文件
                         using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(zipFilePath))
                         {
@@ -1364,7 +1418,7 @@ namespace subs_check.win.gui
 
                                 当前subsCheck版本号 = $"{latestVersion}";
 
-                                Log($"{currentKernel}({currentArch}): subs-check.exe {当前subsCheck版本号} 已就绪！");
+                                Log($"{currentKernel}({currentArch}): subs-check.exe {当前subsCheck版本号} 已就绪！", GetRichTextBoxAllLog());
 
                                 await SaveConfig(false);
 
@@ -1373,13 +1427,13 @@ namespace subs_check.win.gui
                             }
                             else
                             {
-                                Log("无法在压缩包中找到 subs-check.exe 文件。", true);
+                                Log("无法在压缩包中找到 subs-check.exe 文件。", GetRichTextBoxAllLog(), true);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Log($"下载过程中出错: {ex.Message}", true);
+                        Log($"下载过程中出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                         MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                             "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -1387,7 +1441,7 @@ namespace subs_check.win.gui
             }
             catch (Exception ex)
             {
-                Log($"初始化下载过程出错: {ex.Message}", true);
+                Log($"初始化下载过程出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 MessageBox.Show($"下载准备过程出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -1422,7 +1476,7 @@ namespace subs_check.win.gui
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
                 client.Timeout = TimeSpan.FromSeconds(30); // 增加超时时间以适应下载需求
 
-                if (是否输出log) Log("正在获取最新版本 subs-check.exe 内核下载地址...");
+                if (是否输出log) Log("正在获取最新版本 subs-check.exe 内核下载地址...", GetRichTextBoxAllLog());
                 string url = 版本号URL;
                 string 备用url = 版本号URL.Replace("api.github.com", "api.github.cmliussss.net");
 
@@ -1440,23 +1494,23 @@ namespace subs_check.win.gui
                     {
                         responseBody = await response.Content.ReadAsStringAsync();
                         json = JObject.Parse(responseBody);
-                        if (是否输出log) Log("成功从主API获取版本信息");
+                        if (是否输出log) Log("成功从主API获取版本信息", GetRichTextBoxAllLog());
                     }
                     // 如果主URL请求不成功但没有抛出异常
                     else
                     {
-                        if (是否输出log) Log($"主API请求失败 HTTP {(int)response.StatusCode}，尝试备用API...");
+                        if (是否输出log) Log($"主API请求失败 HTTP {(int)response.StatusCode}，尝试备用API...", GetRichTextBoxAllLog());
                         response = await client.GetAsync(备用url);
 
                         if (response.IsSuccessStatusCode)
                         {
                             responseBody = await response.Content.ReadAsStringAsync();
                             json = JObject.Parse(responseBody);
-                            if (是否输出log) Log("成功从备用API获取版本信息");
+                            if (是否输出log) Log("成功从备用API获取版本信息", GetRichTextBoxAllLog());
                         }
                         else
                         {
-                            if (是否输出log) Log($"备用API也请求失败: HTTP {(int)response.StatusCode}", true);
+                            if (是否输出log) Log($"备用API也请求失败: HTTP {(int)response.StatusCode}", GetRichTextBoxAllLog(), true);
                             return (latestVersion, assets); // 两个URL都失败，提前退出
                         }
                     }
@@ -1464,7 +1518,7 @@ namespace subs_check.win.gui
                 // 捕获网络请求异常（如连接超时、无法解析域名等）
                 catch (HttpRequestException ex)
                 {
-                    if (是否输出log) Log($"主API请求出错: {ex.Message}，尝试备用API...");
+                    if (是否输出log) Log($"主API请求出错: {ex.Message}，尝试备用API...", GetRichTextBoxAllLog());
                     try
                     {
                         response = await client.GetAsync(备用url);
@@ -1472,24 +1526,24 @@ namespace subs_check.win.gui
                         {
                             responseBody = await response.Content.ReadAsStringAsync();
                             json = JObject.Parse(responseBody);
-                            if (是否输出log) Log("成功从备用API获取版本信息");
+                            if (是否输出log) Log("成功从备用API获取版本信息", GetRichTextBoxAllLog());
                         }
                         else
                         {
-                            if (是否输出log) Log($"备用API也请求失败: HTTP {(int)response.StatusCode}", true);
+                            if (是否输出log) Log($"备用API也请求失败: HTTP {(int)response.StatusCode}", GetRichTextBoxAllLog(), true);
                             return (latestVersion, assets); // 备用URL也失败，提前退出
                         }
                     }
                     catch (Exception backupEx)
                     {
-                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", true);
+                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", GetRichTextBoxAllLog(), true);
                         return (latestVersion, assets); // 连备用URL也异常，提前退出
                     }
                 }
                 // 捕获JSON解析异常
                 catch (Newtonsoft.Json.JsonException ex)
                 {
-                    if (是否输出log) Log($"解析JSON数据出错: {ex.Message}", true);
+                    if (是否输出log) Log($"解析JSON数据出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                     try
                     {
                         response = await client.GetAsync(备用url);
@@ -1497,19 +1551,19 @@ namespace subs_check.win.gui
                         {
                             responseBody = await response.Content.ReadAsStringAsync();
                             json = JObject.Parse(responseBody);
-                            if (是否输出log) Log("成功从备用API获取版本信息");
+                            if (是否输出log) Log("成功从备用API获取版本信息", GetRichTextBoxAllLog());
                         }
                     }
                     catch (Exception backupEx)
                     {
-                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", true);
+                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", GetRichTextBoxAllLog(), true);
                         return (latestVersion, assets); // 连备用URL也有问题，提前退出
                     }
                 }
                 // 捕获其他所有异常
                 catch (Exception ex)
                 {
-                    if (是否输出log) Log($"获取版本信息时出现未预期的错误: {ex.Message}", true);
+                    if (是否输出log) Log($"获取版本信息时出现未预期的错误: {ex.Message}", GetRichTextBoxAllLog(), true);
                     try
                     {
                         response = await client.GetAsync(备用url);
@@ -1517,12 +1571,12 @@ namespace subs_check.win.gui
                         {
                             responseBody = await response.Content.ReadAsStringAsync();
                             json = JObject.Parse(responseBody);
-                            if (是否输出log) Log("成功从备用URL获取版本信息");
+                            if (是否输出log) Log("成功从备用URL获取版本信息", GetRichTextBoxAllLog());
                         }
                     }
                     catch (Exception backupEx)
                     {
-                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", true);
+                        if (是否输出log) Log($"备用API请求也出错: {backupEx.Message}", GetRichTextBoxAllLog(), true);
                         return (latestVersion, assets); // 连备用URL也有问题，提前退出
                     }
                 }
@@ -1562,7 +1616,7 @@ namespace subs_check.win.gui
                     Process[] processes = Process.GetProcessesByName("subs-check");
                     if (processes.Length > 0)
                     {
-                        Log("发现正在运行的subs-check.exe进程，正在强制结束...");
+                        Log("发现正在运行的subs-check.exe进程，正在强制结束...", GetRichTextBoxAllLog());
                         foreach (Process process in processes)
                         {
                             // 确保不是当前应用程序的进程
@@ -1572,11 +1626,11 @@ namespace subs_check.win.gui
                                 {
                                     process.Kill();
                                     process.WaitForExit();
-                                    Log($"成功结束subs-check.exe进程(ID: {process.Id})");
+                                    Log($"成功结束subs-check.exe进程(ID: {process.Id})", GetRichTextBoxAllLog());
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log($"结束subs-check.exe进程时出错(ID: {process.Id}): {ex.Message}", true);
+                                    Log($"结束subs-check.exe进程时出错(ID: {process.Id}): {ex.Message}", GetRichTextBoxAllLog(), true);
                                 }
                             }
                         }
@@ -1584,13 +1638,13 @@ namespace subs_check.win.gui
                 }
                 catch (Exception ex)
                 {
-                    Log($"检查运行中的subs-check.exe进程时出错: {ex.Message}", true);
+                    Log($"检查运行中的subs-check.exe进程时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
 
                 // 检查文件是否存在
                 if (!File.Exists(subsCheckPath))
                 {
-                    Log("没有找到 subs-check.exe 文件。", true);
+                    Log("没有找到 subs-check.exe 文件。", GetRichTextBoxAllLog(), true);
                     await DownloadSubsCheckEXE(); // 使用异步等待
                 }
 
@@ -1625,12 +1679,12 @@ namespace subs_check.win.gui
                 subsCheckProcess.EnableRaisingEvents = true;
                 subsCheckProcess.Exited += SubsCheckProcess_Exited;
 
-                Log($"subs-check.exe {当前subsCheck版本号} 已启动...");
+                Log($"subs-check.exe {当前subsCheck版本号} 已启动...", GetRichTextBoxAllLog());
                 timerRefresh.Enabled = true;
             }
             catch (Exception ex)
             {
-                Log($"启动 subs-check.exe 时出错: {ex.Message}", true);
+                Log($"启动 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 buttonStartCheck.Text = "▶️ 启动";
                 buttonStartCheck.ForeColor = Color.Black;
             }
@@ -1647,14 +1701,14 @@ namespace subs_check.win.gui
                     // 尝试正常关闭进程
                     subsCheckProcess.Kill();
                     subsCheckProcess.WaitForExit();
-                    Log("subs-check.exe 已停止");
+                    Log("subs-check.exe 已停止", GetRichTextBoxAllLog());
                     notifyIcon1.Icon = originalNotifyIcon;
                     buttonTriggerCheck.Enabled = false;
                     buttonTriggerCheck.Text = "🔀未启动";
                 }
                 catch (Exception ex)
                 {
-                    Log($"停止 subs-check.exe 时出错: {ex.Message}", true);
+                    Log($"停止 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
                 finally
                 {
@@ -1768,7 +1822,7 @@ namespace subs_check.win.gui
             // 确保定时器正在运行（使用 BeginInvoke 在 UI 线程安全地检查/启动）
             BeginInvoke(new Action(() =>
             {
-                Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, Timer> st = this.Tag as Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer>;
+                Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer> st = this.Tag as Tuple<System.Collections.Concurrent.ConcurrentQueue<string>, System.Windows.Forms.Timer>;
                 if (st != null && !st.Item2.Enabled)
                 {
                     st.Item2.Start();
@@ -1852,7 +1906,7 @@ namespace subs_check.win.gui
             // 进程退出时，在 UI 线程上更新控件
             BeginInvoke(new Action(() =>
             {
-                Log("subs-check.exe 已退出");
+                Log("subs-check.exe 已退出", GetRichTextBoxAllLog());
                 buttonStartCheck.Text = "▶️ 启动";
                 buttonStartCheck.ForeColor = Color.Black;
 
@@ -2227,7 +2281,12 @@ namespace subs_check.win.gui
             }
         }
 
-        private void Log(string message, bool isError = false)
+        private RichTextBox GetRichTextBoxAllLog()
+        {
+            return richTextBoxAllLog;
+        }
+
+        private void Log(string message, RichTextBox richTextBoxAllLog, bool isError = false)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string logType = isError ? "ERR" : "INF";
@@ -2304,13 +2363,13 @@ namespace subs_check.win.gui
             bool proxyFound = false;
             string detectedProxyURL = "";
 
-            Log("检测可用 GitHub 代理...");
+            Log("检测可用 GitHub 代理...", GetRichTextBoxAllLog());
 
             // 遍历随机排序后的代理列表
             foreach (string proxyItem in proxyItems)
             {
                 string checkUrl = $"https://{proxyItem}/https://raw.githubusercontent.com/cmliu/SubsCheck-Win-GUI/master/packages.config";
-                Log($"正在测试 GitHub 代理: {proxyItem}");
+                Log($"正在测试 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                 richTextBoxAllLog.Refresh();
 
                 try
@@ -2327,7 +2386,7 @@ namespace subs_check.win.gui
                         {
                             // 找到可用代理
                             detectedProxyURL = $"https://{proxyItem}/";
-                            Log($"找到可用 GitHub 代理: {proxyItem}");
+                            Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                             proxyFound = true;
                             break;
                         }
@@ -2336,7 +2395,7 @@ namespace subs_check.win.gui
                 catch (Exception ex)
                 {
                     // 记录错误但继续尝试下一个
-                    Log($"代理 {proxyItem} 测试失败: {ex.Message}", true);
+                    Log($"代理 {proxyItem} 测试失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                     richTextBoxAllLog.Refresh();
                 }
             }
@@ -2344,7 +2403,7 @@ namespace subs_check.win.gui
             // 如果没有找到可用的代理
             if (!proxyFound)
             {
-                Log("未找到可用的 GitHub 代理，请在高级设置中手动设置。", true);
+                Log("未找到可用的 GitHub 代理，请在高级设置中手动设置。", GetRichTextBoxAllLog(), true);
                 MessageBox.Show("未找到可用的 GitHub 代理。\n\n请打开高级设置手动填入一个可用的Github Proxy，或检查您的网络连接。",
                     "代理检测失败",
                     MessageBoxButtons.OK,
@@ -2362,7 +2421,7 @@ namespace subs_check.win.gui
                 buttonStartCheck.Enabled = false;
                 // 清空日志
                 richTextBoxAllLog.Clear();
-                Log("开始检查和下载最新版本的 subs-check.exe...");
+                Log("开始检查和下载最新版本的 subs-check.exe...", GetRichTextBoxAllLog());
 
                 // 获取当前应用程序目录
                 string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
@@ -2371,7 +2430,7 @@ namespace subs_check.win.gui
                 // 检查文件是否存在
                 if (File.Exists(subsCheckPath))
                 {
-                    Log($"发现 subs-check.exe，正在删除...");
+                    Log($"发现 subs-check.exe，正在删除...", GetRichTextBoxAllLog());
 
                     try
                     {
@@ -2379,29 +2438,29 @@ namespace subs_check.win.gui
                         Process[] processes = Process.GetProcessesByName("subs-check");
                         if (processes.Length > 0)
                         {
-                            Log("发现正在运行的 subs-check.exe 进程，正在强制结束...");
+                            Log("发现正在运行的 subs-check.exe 进程，正在强制结束...", GetRichTextBoxAllLog());
                             foreach (Process process in processes)
                             {
                                 try
                                 {
                                     process.Kill();
                                     process.WaitForExit();
-                                    Log($"成功结束 subs-check.exe 进程(ID: {process.Id})");
+                                    Log($"成功结束 subs-check.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log($"结束进程时出错(ID: {process.Id}): {ex.Message}", true);
+                                    Log($"结束进程时出错(ID: {process.Id}): {ex.Message}", GetRichTextBoxAllLog(), true);
                                 }
                             }
                         }
 
                         // 删除文件
                         File.Delete(subsCheckPath);
-                        Log("成功删除旧版本 subs-check.exe");
+                        Log("成功删除旧版本 subs-check.exe", GetRichTextBoxAllLog());
                     }
                     catch (Exception ex)
                     {
-                        Log($"删除 subs-check.exe 时出错: {ex.Message}", true);
+                        Log($"删除 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                         MessageBox.Show($"无法删除现有的 subs-check.exe 文件: {ex.Message}\n\n请手动删除后重试，或者检查文件是否被其他程序占用。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         buttonUpdateKernel.Enabled = true;
                         return;
@@ -2409,25 +2468,25 @@ namespace subs_check.win.gui
                 }
                 else
                 {
-                    Log("未找到现有的 subs-check.exe 文件，将直接下载最新版本");
+                    Log("未找到现有的 subs-check.exe 文件，将直接下载最新版本", GetRichTextBoxAllLog());
                 }
 
                 // 检测可用的 GitHub 代理
                 githubProxyURL = await GetGithubProxyUrlAsync();
                 if (githubProxyURL == "")
                 {
-                    Log("未设置 GitHub 代理，将尝试直接下载", true);
+                    Log("未设置 GitHub 代理，将尝试直接下载", GetRichTextBoxAllLog(), true);
                 }
 
                 // 下载最新版本的 subs-check.exe
                 await DownloadSubsCheckEXE();
 
                 // 完成
-                Log("内核更新完成！");
+                Log("内核更新完成！", GetRichTextBoxAllLog());
             }
             catch (Exception ex)
             {
-                Log($"操作过程中出错: {ex.Message}", true);
+                Log($"操作过程中出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 MessageBox.Show($"处理过程中出现错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -2469,7 +2528,7 @@ namespace subs_check.win.gui
         {
             try
             {
-                Log("检查 node.exe 进程状态...");
+                Log("检查 node.exe 进程状态...", GetRichTextBoxAllLog());
 
                 // 获取当前应用程序的执行目录
                 string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
@@ -2480,11 +2539,11 @@ namespace subs_check.win.gui
 
                 if (nodeProcesses.Length == 0)
                 {
-                    Log("未发现运行中的 node.exe 进程");
+                    Log("未发现运行中的 node.exe 进程", GetRichTextBoxAllLog());
                     return;
                 }
 
-                Log($"发现 {nodeProcesses.Length} 个 node.exe 进程，开始检查并终止匹配路径的进程...");
+                Log($"发现 {nodeProcesses.Length} 个 node.exe 进程，开始检查并终止匹配路径的进程...", GetRichTextBoxAllLog());
 
                 int terminatedCount = 0;
 
@@ -2510,7 +2569,7 @@ namespace subs_check.win.gui
                             processPath.Equals(nodeExePath, StringComparison.OrdinalIgnoreCase))
                         {
                             // 找到匹配的进程，终止它
-                            Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...");
+                            Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...", GetRichTextBoxAllLog());
 
                             await Task.Run(() =>
                             {
@@ -2518,29 +2577,29 @@ namespace subs_check.win.gui
                                 process.WaitForExit();
                             });
 
-                            Log($"成功结束 node.exe 进程(ID: {process.Id})");
+                            Log($"成功结束 node.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
                             terminatedCount++;
                         }
                     }
                     catch (Exception ex)
                     {
                         // 访问进程信息时可能会因为权限问题抛出异常
-                        Log($"访问或终止进程(ID: {process.Id})时出错: {ex.Message}", true);
+                        Log($"访问或终止进程(ID: {process.Id})时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                     }
                 }
 
                 if (terminatedCount > 0)
                 {
-                    Log($"总共终止了 {terminatedCount} 个匹配路径的 node.exe 进程");
+                    Log($"总共终止了 {terminatedCount} 个匹配路径的 node.exe 进程", GetRichTextBoxAllLog());
                 }
                 else
                 {
-                    Log("未发现需要终止的 node.exe 进程");
+                    Log("未发现需要终止的 node.exe 进程", GetRichTextBoxAllLog());
                 }
             }
             catch (Exception ex)
             {
-                Log($"检查或终止 node.exe 进程时出错: {ex.Message}", true);
+                Log($"检查或终止 node.exe 进程时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
             }
         }
 
@@ -2578,7 +2637,7 @@ namespace subs_check.win.gui
                     // 将处理后的内容更新到Form1的textBox1
                     textBoxSubsUrls.Text = string.Join(Environment.NewLine, lines);
                     await SaveConfig(false);
-                    Log("已保存订阅地址列表。");
+                    Log("已保存订阅地址列表。", GetRichTextBoxAllLog());
                 }
             }
 
@@ -2599,7 +2658,7 @@ namespace subs_check.win.gui
             if (buttonStartCheck.Text == "⏹️ 停止")
             {
                 buttonStartCheck.ForeColor = Color.Red;
-                Log("subs-check.exe 运行时满24小时，自动重启清理内存占用。");
+                Log("subs-check.exe 运行时满24小时，自动重启清理内存占用。", GetRichTextBoxAllLog());
                 // 停止 subs-check.exe 程序
                 StopSubsCheckProcess();
                 // 结束 Sub-Store
@@ -2716,13 +2775,14 @@ namespace subs_check.win.gui
             // 检查文件是否存在
             if (!File.Exists(downloadFilePath))
             {
-                Log($"{displayName} 覆写配置文件 未找到，正在下载...");
+                Log($"{displayName} 覆写配置文件 未找到，正在下载...", GetRichTextBoxAllLog());
 
                 // 重置进度条
                 progressBarAll.Value = 0;
                 progressBarAll.Visible = true;
 
                 // 添加GitHub代理前缀如果有
+                githubProxyURL = await GetGithubProxyUrlAsync();
                 string fullDownloadUrl = githubProxyURL + downloadUrl;
 
                 try
@@ -2774,19 +2834,20 @@ namespace subs_check.win.gui
                                     // 确保进度条显示100%
                                     progressBarAll.Value = 100;
                                 }
-
-                                Log($"{displayName} 覆写配置文件 下载成功");
+                                progressBarAll.Visible = false;
+                                Log($"{displayName} 覆写配置文件 下载成功", GetRichTextBoxAllLog());
                             }
                             else
                             {
-                                Log($"{displayName} 覆写配置文件 下载失败: HTTP {(int)response.StatusCode} {response.ReasonPhrase}", true);
+                                progressBarAll.Visible = false;
+                                Log($"{displayName} 覆写配置文件 下载失败: HTTP {(int)response.StatusCode} {response.ReasonPhrase}", GetRichTextBoxAllLog(), true);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log($"{displayName} 覆写配置文件 下载失败: {ex.Message}", true);
+                    Log($"{displayName} 覆写配置文件 下载失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                     // 出错时重置进度条
                     progressBarAll.Value = 0;
                     progressBarAll.Visible = false;
@@ -2794,7 +2855,7 @@ namespace subs_check.win.gui
             }
             else
             {
-                if (汇报Log) Log($"{displayName} 覆写配置文件 已就绪。");
+                if (汇报Log) Log($"{displayName} 覆写配置文件 已就绪。", GetRichTextBoxAllLog());
             }
         }
 
@@ -2802,7 +2863,7 @@ namespace subs_check.win.gui
         {
             if (checkBoxHighConcurrent.Checked)
             {
-                Log("已启用流水线高并发模式✨\n- 此值将作为计算测活-测速-流媒体检测各阶段并发数的基准.\n- 内核已启用衰减算法,可放心设置");
+                Log("已启用流水线高并发模式✨\n- 此值将作为计算测活-测速-流媒体检测各阶段并发数的基准.\n- 内核已启用衰减算法,可放心设置", GetRichTextBoxAllLog());
             }
             else
             {
@@ -2819,7 +2880,7 @@ namespace subs_check.win.gui
                         "• 宽带峰值/25Mbps：可能会影响同网络下载任务\n" +
                         "• 宽带峰值/10Mbps：可能会影响同网络下其他设备的上网体验\n";
 
-                    Log(warningMessage);
+                    Log(warningMessage, GetRichTextBoxAllLog());
                 }
             }
         }
@@ -2841,11 +2902,11 @@ namespace subs_check.win.gui
                 // 使用系统默认浏览器打开URL
                 System.Diagnostics.Process.Start(url);
 
-                Log($"正在浏览器中打开 Subs-Check 配置管理: {url}");
+                Log($"正在浏览器中打开 Subs-Check 配置管理: {url}", GetRichTextBoxAllLog());
             }
             catch (Exception ex)
             {
-                Log($"打开浏览器失败: {ex.Message}", true);
+                Log($"打开浏览器失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                 MessageBox.Show($"打开浏览器时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -2940,7 +3001,7 @@ namespace subs_check.win.gui
                 resultArray[5] = "N/A";
 
                 // 可选：记录错误到日志
-                Log($"获取API状态失败: {ex.Message}", true);
+                Log($"获取API状态失败: {ex.Message}", GetRichTextBoxAllLog(), true);
             }
 
             return resultArray;
@@ -3001,7 +3062,7 @@ namespace subs_check.win.gui
 
                 progressBarAll.Value = 100;
 
-                
+
                 string idleNotify = "SubsCheck: 已就绪\n" + nextCheckTime;
                 if (_lastNotifyText != idleNotify)
                 {
@@ -3097,20 +3158,20 @@ namespace subs_check.win.gui
                     // 检查响应状态
                     if (response.IsSuccessStatusCode)
                     {
-                        Log($"成功{operationName}");
+                        Log($"成功{operationName}", GetRichTextBoxAllLog());
                         return true;
                     }
                     else
                     {
                         string errorContent = await response.Content.ReadAsStringAsync();
-                        Log($"{operationName}失败: HTTP {(int)response.StatusCode} {response.ReasonPhrase}\n{errorContent}", true);
+                        Log($"{operationName}失败: HTTP {(int)response.StatusCode} {response.ReasonPhrase}\n{errorContent}", GetRichTextBoxAllLog(), true);
                         return false;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log($"{operationName}时发生错误: {ex.Message}", true);
+                Log($"{operationName}时发生错误: {ex.Message}", GetRichTextBoxAllLog(), true);
                 return false;
             }
         }
@@ -3123,7 +3184,7 @@ namespace subs_check.win.gui
                 string cronDescription = GetCronExpressionDescription(textBoxCron.Text);
                 // 可以用工具提示或者消息框显示，这里使用消息框
                 //MessageBox.Show(cronDescription, "Cron表达式说明", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Log($"Cron表达式说明 {cronDescription}");
+                Log($"Cron表达式说明 {cronDescription}", GetRichTextBoxAllLog());
             }
             else
             {
@@ -3351,7 +3412,7 @@ namespace subs_check.win.gui
                 textBoxCron.Visible = false;
                 labelInterval.Visible = true;
                 numericUpDownInterval.Visible = true;
-                Log("下次检查时间间隔 使用分钟倒计时");
+                Log("下次检查时间间隔 使用分钟倒计时", GetRichTextBoxAllLog());
             }
             else
             {
@@ -3361,7 +3422,7 @@ namespace subs_check.win.gui
                 textBoxCron.Visible = true;
                 labelInterval.Visible = false;
                 numericUpDownInterval.Visible = false;
-                Log("下次检查时间间隔 使用cron表达式");
+                Log("下次检查时间间隔 使用cron表达式", GetRichTextBoxAllLog());
             }
         }
 
@@ -3397,7 +3458,7 @@ namespace subs_check.win.gui
             }
             catch (Exception ex)
             {
-                Log($"计算计算机名MD5时出错: {ex.Message}", true);
+                Log($"计算计算机名MD5时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 return "CMLiussss";
             }
         }
@@ -3434,12 +3495,14 @@ namespace subs_check.win.gui
                             {
                                 int progressPercentage = (int)((totalBytesRead * 100) / totalBytes);
                                 progressPercentage = Math.Min(100, Math.Max(0, progressPercentage));
+                                progressBarAll.Visible = true;
                                 progressBarAll.Value = progressPercentage;
                             }
                         }
                     }
                 }
-
+                progressBarAll.Value = 0;
+                progressBarAll.Visible = false;
                 return true; // 下载成功
             }
             catch
@@ -3494,12 +3557,12 @@ namespace subs_check.win.gui
                 if (result == DialogResult.OK)
                 {
                     // 用户点击了"确定"或某种完成操作的按钮
-                    Log("补充参数配置已成功保存到 more.yaml 文件！设置已应用");
+                    Log("补充参数配置已成功保存到 more.yaml 文件！设置已应用", GetRichTextBoxAllLog());
                 }
             }
             catch (Exception ex)
             {
-                Log($"打开MoreYAML窗口时出错: {ex.Message}", true);
+                Log($"打开MoreYAML窗口时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 MessageBox.Show($"打开MoreYAML窗口时出错: {ex.Message}", "错误",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -3524,13 +3587,13 @@ namespace subs_check.win.gui
                     // 检查启动文件夹中是否已存在该快捷方式
                     if (File.Exists(shortcutPath))
                     {
-                        Log("开机启动项已存在，无需重复创建");
+                        Log("开机启动项已存在，无需重复创建", GetRichTextBoxAllLog());
                     }
                     else
                     {
                         // 创建快捷方式
                         CreateShortcut(appPath, shortcutPath, "-auto");
-                        Log("已成功创建开机启动项，下次电脑启动时将自动运行程序");
+                        Log("已成功创建开机启动项，下次电脑启动时将自动运行程序", GetRichTextBoxAllLog());
                     }
                 }
                 else
@@ -3539,13 +3602,13 @@ namespace subs_check.win.gui
                     if (File.Exists(shortcutPath))
                     {
                         File.Delete(shortcutPath);
-                        Log("已移除开机启动项，下次开机将不会自动启动");
+                        Log("已移除开机启动项，下次开机将不会自动启动", GetRichTextBoxAllLog());
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log($"设置开机启动项时出错: {ex.Message}", true);
+                Log($"设置开机启动项时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 MessageBox.Show($"设置开机启动项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 // 恢复CheckBox状态，避免UI状态与实际状态不一致
@@ -3628,7 +3691,7 @@ namespace subs_check.win.gui
                     // 清空richTextBox1内容
                     richTextBoxAllLog.Clear();
                     // 记录一条清空日志的操作信息
-                    Log("日志已清空");
+                    Log("日志已清空", GetRichTextBoxAllLog());
                 }
             }
         }
@@ -3647,7 +3710,7 @@ namespace subs_check.win.gui
                     "• 视频观看：1024-2048 KB/s\n" +
                     "• 大文件下载：根据实际需求设置\n";
 
-                Log(warningMessage);
+                Log(warningMessage, GetRichTextBoxAllLog());
             }
         }
 
@@ -3665,7 +3728,7 @@ namespace subs_check.win.gui
                     "• 普通网络环境：5000± ms\n" +
                     "• 极好网络环境：3000± ms\n";
 
-                Log(warningMessage);
+                Log(warningMessage, GetRichTextBoxAllLog());
             }
 
         }
@@ -3732,6 +3795,7 @@ namespace subs_check.win.gui
         private async void checkBoxHighConcurrent_CheckedChanged(object sender, EventArgs e)
         {
             bool EnableHighConcurrent = checkBoxHighConcurrent.Checked;
+           
 
             // 先进行控件切换
             SwitchHighConcurrentLayout(EnableHighConcurrent);
@@ -3740,10 +3804,39 @@ namespace subs_check.win.gui
             string want = EnableHighConcurrent ? "高并发内核" : "原版内核";
             if (currentKernel != want)
             {
+                if (EnableHighConcurrent && !checkBoxSwitchArch64.Checked)
+                {
+                    DialogResult result = MessageBox.Show(
+                        $"建议使用现代的 x64 架构，以实现更高性能\n\n" +
+                        "· 点击【确定】将使用 x64 内核\n\n" +
+                        "· 点击【取消】将使用 i386 内核\n\n",
+                        "内核架构选择",
+                        MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Information);
+
+                    if (result == DialogResult.OK)
+                    {
+                        //临时禁用事件
+                        checkBoxSwitchArch64.CheckedChanged -= checkBoxSwitchArch64_CheckedChanged;
+                        checkBoxSwitchArch64.Checked = true;
+                        // 恢复事件
+                        checkBoxSwitchArch64.CheckedChanged += checkBoxSwitchArch64_CheckedChanged;
+                    }
+                    else
+                    {
+                        //临时禁用事件
+                        checkBoxSwitchArch64.CheckedChanged -= checkBoxSwitchArch64_CheckedChanged;
+                        checkBoxSwitchArch64.Checked = false;
+                        // 恢复事件
+                        checkBoxSwitchArch64.CheckedChanged += checkBoxSwitchArch64_CheckedChanged;
+                    }
+                }
+
                 checkBoxSwitchArch64.Enabled = false;
                 checkBoxHighConcurrent.Enabled = false;
                 buttonCheckUpdate.Enabled = false;
-                Log(EnableHighConcurrent ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核");
+
+                Log(EnableHighConcurrent ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核", GetRichTextBoxAllLog());
                 await DownloadSubsCheckEXE();// 若要后台并行改为 _ = DownloadSubsCheckEXE();
                 currentKernel = want;
                 if (!EnableHighConcurrent)
@@ -3754,7 +3847,7 @@ namespace subs_check.win.gui
                 checkBoxHighConcurrent.Enabled = true;
                 buttonCheckUpdate.Enabled = true;
             }
-            Log(EnableHighConcurrent ? "已切换高并发内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。");
+            Log(EnableHighConcurrent ? "已切换高并发内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。", GetRichTextBoxAllLog());
         }
 
         // x64 按钮切换事件
@@ -3768,14 +3861,14 @@ namespace subs_check.win.gui
                 checkBoxHighConcurrent.Enabled = false;
                 buttonCheckUpdate.Enabled = false;
                 githubProxyURL = await GetGithubProxyUrlAsync();
-                Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高");
+                Log(useX64 ? "切换为 x64 内核,内存占用更高,但CPU占用可能较低" : "切换为 i386 内核,内存占用更低,但CPU占用可能更高", GetRichTextBoxAllLog());
                 await DownloadSubsCheckEXE();
                 currentArch = want;
                 checkBoxSwitchArch64.Enabled = true;
                 checkBoxHighConcurrent.Enabled = true;
                 buttonCheckUpdate.Enabled = true;
             }
-            Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换");
+            Log(useX64 ? "使用64位内核,如内存占用较高,可在[高级设置]切换" : "使用32位内核,如CPU占用较高,可在[高级设置]切换", GetRichTextBoxAllLog());
         }
 
         // 计算一个推荐并发参数
@@ -3891,7 +3984,7 @@ namespace subs_check.win.gui
                     SetNumericUpDownValueSafe(numericUpDownPipeAlive, 0);
                     SetNumericUpDownValueSafe(numericUpDownPipeSpeed, 0);
                     SetNumericUpDownValueSafe(numericUpDownPipeMedia, 0);
-                    Log("并发检测模式: 自适应分段流水线(内核自带衰减算法)");
+                    Log("并发检测模式: 自适应分段流水线(内核自带衰减算法)", GetRichTextBoxAllLog());
                 }
                 else
                 {
@@ -3905,7 +3998,7 @@ namespace subs_check.win.gui
                     SetNumericUpDownValueSafe(numericUpDownPipeAlive, alive);
                     SetNumericUpDownValueSafe(numericUpDownPipeSpeed, speed);
                     SetNumericUpDownValueSafe(numericUpDownPipeMedia, media);
-                    Log($"默认并发参数: 测活: {alive}, 测速: {speed}, 流媒体: {media} [根据并发数 {numericUpDownConcurrent.Value} 计算]");
+                    Log($"默认并发参数: 测活: {alive}, 测速: {speed}, 流媒体: {media} [根据并发数 {numericUpDownConcurrent.Value} 计算]", GetRichTextBoxAllLog());
                 }
             }
             finally
@@ -3919,19 +4012,19 @@ namespace subs_check.win.gui
         {
             if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
-            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}", GetRichTextBoxAllLog());
         }
         private void numericUpDownPipeSpeed_ValueChanged(object sender, EventArgs e)
         {
             if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
-            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}", GetRichTextBoxAllLog());
         }
         private void numericUpDownPipeMedia_ValueChanged(object sender, EventArgs e)
         {
             if (_inProgrammaticChange) return;
             switchPipeAutoConcurrent();
-            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}");
+            Log($"已设置流水线并发检测参数: Alive: {numericUpDownPipeAlive.Value}, Speed: {numericUpDownPipeSpeed.Value}, Media: {numericUpDownPipeMedia.Value}", GetRichTextBoxAllLog());
         }
 
         private void NumericUpDownTotalBandwidthLimit_ValueChanged(object sender, EventArgs e)
@@ -3939,7 +4032,7 @@ namespace subs_check.win.gui
             float calcBandWidth = (float)numericUpDownTotalBandwidthLimit.Value * 8;
             if (calcBandWidth > 0)
             {
-                Log($"当前设置下载速度限制带宽 {calcBandWidth} 兆。");
+                Log($"当前设置下载速度限制带宽 {calcBandWidth} 兆。", GetRichTextBoxAllLog());
                 toolTip1.SetToolTip(numericUpDownTotalBandwidthLimit, $"总下载速度限制(MB/s)：\n建议设置为 <=带宽/8, \n比如你是 200 兆的宽带, 支持的最大下载速度 200/8 = 25 MB/s, 可以设置为 20。\n\n当前设置下载速度对应带宽 {calcBandWidth}");
             }
         }
@@ -3956,6 +4049,5 @@ namespace subs_check.win.gui
             }
             return colour;
         }
-
     }
 }
