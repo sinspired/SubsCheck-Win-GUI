@@ -117,7 +117,7 @@ namespace subs_check.win.gui
                     AutoUpdater.ShowRemindLaterButton = false;
                     AutoUpdater.ReportErrors = true;
                     AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-                    AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+                    AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/tmp/update.xml");
                 }
             }
             else
