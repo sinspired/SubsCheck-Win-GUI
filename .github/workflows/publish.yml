@@ -26,21 +26,22 @@ jobs:
     - name: Build project
       run: msbuild subs-check.win.gui.csproj /p:Configuration=Release
 
-    - name: Package artifact
-      run: |
-        shopt -s extglob
-        mkdir -p release
-        cp -r bin/Release/*.exe release/
-        cp -r bin/Release/!(*.Wpf).dll release/
-        cp -r bin/Release/runtimes release/
-        cp -r bin/Release/zh release/
-      shell: bash
+    # 由于 subs-check.win.gui.csproj 的 PostBuildCleanup 目标会删除不必要的文件，因此这里直接打包 bin/Release 目录下的内容即可
+    # - name: Package artifact
+    #   run: |
+    #     shopt -s extglob
+    #     mkdir -p release
+    #     cp -r bin/Release/*.exe release/
+    #     cp -r bin/Release/!(*.Wpf).dll release/
+    #     cp -r bin/Release/runtimes release/
+    #     cp -r bin/Release/zh release/
+    #   shell: bash
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: subs-check-win
-        path: release/
+        path: bin/release/
         if-no-files-found: error # 如果没有文件，报错
 
   release:
