@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using System.Management;
 using AutoUpdaterDotNET;
 
 using Newtonsoft.Json.Linq;
@@ -53,7 +53,7 @@ namespace subs_check.win.gui
         {
             InitializeComponent();
             this.Shown += MainGui_Shown;
-            
+
             originalNotifyIcon = notifyIcon1.Icon;
 
             toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高并发而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高并发后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
@@ -2523,9 +2523,7 @@ namespace subs_check.win.gui
             }
         }
 
-        /// <summary>
-        /// 异步检测并强制终止所有程序目录下的output\node.exe进程
-        /// </summary>
+
         private async Task KillNodeProcessAsync()
         {
             try
@@ -2536,7 +2534,7 @@ namespace subs_check.win.gui
                 string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
                 string nodeExePath = Path.Combine(executablePath, "output", "node.exe");
 
-                // 获取所有node.exe进程
+                // 获取所有 node.exe 进程
                 Process[] nodeProcesses = Process.GetProcessesByName("node");
 
                 if (nodeProcesses.Length == 0)
@@ -2553,24 +2551,13 @@ namespace subs_check.win.gui
                 {
                     try
                     {
-                        // 使用Task.Run将可能耗时的操作放在后台线程执行
-                        string processPath = await Task.Run(() =>
-                        {
-                            try
-                            {
-                                return process.MainModule?.FileName;
-                            }
-                            catch (Exception)
-                            {
-                                return null;
-                            }
-                        });
+                        // 使用 WMI 获取进程路径，避免 32/64 位访问冲突
+                        string processPath = await Task.Run(() => GetProcessPathByWmi(process.Id));
 
-                        // 检查是否匹配我们要查找的node.exe路径
+                        // 检查是否匹配我们要查找的 node.exe 路径
                         if (!string.IsNullOrEmpty(processPath) &&
                             processPath.Equals(nodeExePath, StringComparison.OrdinalIgnoreCase))
                         {
-                            // 找到匹配的进程，终止它
                             Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...", GetRichTextBoxAllLog());
 
                             await Task.Run(() =>
@@ -2585,7 +2572,6 @@ namespace subs_check.win.gui
                     }
                     catch (Exception ex)
                     {
-                        // 访问进程信息时可能会因为权限问题抛出异常
                         Log($"访问或终止进程(ID: {process.Id})时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                     }
                 }
@@ -2603,6 +2589,30 @@ namespace subs_check.win.gui
             {
                 Log($"检查或终止 node.exe 进程时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
             }
+        }
+
+        /// <summary>
+        /// 使用 WMI 获取指定进程的可执行文件路径
+        /// 这样可以避免 32 位进程访问 64 位进程 MainModule 时的异常
+        /// </summary>
+        private string GetProcessPathByWmi(int processId)
+        {
+            try
+            {
+                using (var searcher = new ManagementObjectSearcher(
+                    $"SELECT ExecutablePath FROM Win32_Process WHERE ProcessId = {processId}"))
+                {
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        return obj["ExecutablePath"]?.ToString();
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略异常，返回 null
+            }
+            return null;
         }
 
         private async void textBoxSubsUrls_DoubleClick(object sender, EventArgs e)
@@ -3797,7 +3807,7 @@ namespace subs_check.win.gui
         private async void checkBoxHighConcurrent_CheckedChanged(object sender, EventArgs e)
         {
             bool EnableHighConcurrent = checkBoxHighConcurrent.Checked;
-           
+
 
             // 先进行控件切换
             SwitchHighConcurrentLayout(EnableHighConcurrent);

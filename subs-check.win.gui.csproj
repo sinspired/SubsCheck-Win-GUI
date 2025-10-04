@@ -15,6 +15,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,7 +28,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -40,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -61,28 +62,21 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-
   <Target Name="PostBuildCleanup" AfterTargets="Build">
     <!-- 保留 exe/dll，*.Wpf.dll除外 -->
     <ItemGroup>
-      <FilesToDelete Include="$(OutDir)*.*"
-                    Exclude="$(OutDir)*.exe;$(OutDir)*.dll;$(OutDir)zh\**;$(OutDir)runtimes\**" />
+      <FilesToDelete Include="$(OutDir)*.*" Exclude="$(OutDir)*.exe;$(OutDir)*.dll;$(OutDir)zh\**;$(OutDir)runtimes\**" />
       <FilesToDelete Include="$(OutDir)*.Wpf.dll" />
     </ItemGroup>
     <!-- <Message Text="删除文件: %(FilesToDelete.Identity)" Importance="high" /> -->
     <Delete Files="@(FilesToDelete)" />
-    
     <!-- 删除除 zh 和 runtimes 之外的文件夹 -->
     <ItemGroup>
-      <DirsToDelete Include="$([System.IO.Directory]::GetDirectories('$(OutDir)'))"
-                    Exclude="$([System.IO.Path]::Combine('$(OutDir)','zh'));
-                            $([System.IO.Path]::Combine('$(OutDir)','runtimes'))" />
+      <DirsToDelete Include="$([System.IO.Directory]::GetDirectories('$(OutDir)'))" Exclude="$([System.IO.Path]::Combine('$(OutDir)','zh'));&#xD;&#xA;                            $([System.IO.Path]::Combine('$(OutDir)','runtimes'))" />
     </ItemGroup>
-
     <!-- <Message Text="删除目录: %(DirsToDelete.Identity)" Importance="high" /> -->
     <RemoveDir Directories="@(DirsToDelete)" />
   </Target>
-
   <ItemGroup>
     <Reference Include="AutoUpdater.NET, Version=1.9.2.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
       <HintPath>packages\Autoupdater.NET.Official.1.9.2\lib\net462\AutoUpdater.NET.dll</HintPath>
@@ -104,6 +98,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
