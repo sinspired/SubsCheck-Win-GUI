@@ -836,7 +836,7 @@ namespace subs_check.win.gui
                 var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 string allyamlFilePath = System.IO.Path.Combine(executablePath, "output", "all.yaml");
-                if (System.IO.File.Exists(allyamlFilePath) && checkBoxEnableWebUI.Checked)
+                if (System.IO.File.Exists(allyamlFilePath) && checkBoxKeepSucced.Checked && !checkBoxHighConcurrent.Checked)
                 {
                     string succedProxiesUrl = $"http://127.0.0.1:{Convert.ToInt32(numericUpDownWebUIPort.Value)}/all.yaml#KeepSucced";
                     string succedProxiesUrlKey = succedProxiesUrl.Split('#')[0];
@@ -848,8 +848,7 @@ namespace subs_check.win.gui
                 }
                 else
                 {
-                    checkBoxKeepSucced.Checked = true;
-                    Log("将于第二次自动运行时加载上次测试结果。", GetRichTextBoxAllLog());
+                    Log("不加载上次测试结果。", GetRichTextBoxAllLog());
                 }
 
                 if (!string.IsNullOrWhiteSpace(textBoxSubsUrls.Text))
