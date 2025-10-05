@@ -682,13 +682,13 @@
             // 
             // groupBoxAdvanceSettings
             // 
+            this.groupBoxAdvanceSettings.Controls.Add(this.textBoxWebUiAPIKey);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxKeepSucced);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadMb);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownDownloadMb);
             this.groupBoxAdvanceSettings.Controls.Add(this.buttonMoreSettings);
-            this.groupBoxAdvanceSettings.Controls.Add(this.textBoxWebUiAPIKey);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableWebUI);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSuccessLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableSuccessLimit);
@@ -819,9 +819,9 @@
             this.checkBoxEnableWebUI.Location = new System.Drawing.Point(16, 173);
             this.checkBoxEnableWebUI.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBoxEnableWebUI.Name = "checkBoxEnableWebUI";
-            this.checkBoxEnableWebUI.Size = new System.Drawing.Size(240, 25);
+            this.checkBoxEnableWebUI.Size = new System.Drawing.Size(239, 25);
             this.checkBoxEnableWebUI.TabIndex = 28;
-            this.checkBoxEnableWebUI.Text = "启用WebUI API密钥：";
+            this.checkBoxEnableWebUI.Text = "自定义 WebUI 密钥：";
             this.checkBoxEnableWebUI.UseVisualStyleBackColor = true;
             this.checkBoxEnableWebUI.CheckedChanged += new System.EventHandler(this.checkBoxEnableWebUI_CheckedChanged);
             // 
