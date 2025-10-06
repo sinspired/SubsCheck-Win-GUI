@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -13,10 +14,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Management;
+
 using AutoUpdaterDotNET;
 
 using Newtonsoft.Json.Linq;
+
+using static subs_check.win.gui.Proxy;
 
 namespace subs_check.win.gui
 {
@@ -30,6 +33,7 @@ namespace subs_check.win.gui
         private ToolStripMenuItem startMenuItem;
         private ToolStripMenuItem stopMenuItem;
         string githubProxyURL = "";
+        string sysProxyURL = "";
         int run = 0;
         string 当前subsCheck版本号 = "未知版本";
         string currentKernel = "原版内核";
@@ -56,6 +60,7 @@ namespace subs_check.win.gui
 
             originalNotifyIcon = notifyIcon1.Icon;
 
+            // 设置提示信息
             toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高并发而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高并发后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
             toolTip1.SetToolTip(numericUpDownInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
             toolTip1.SetToolTip(labelInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
@@ -96,6 +101,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBoxSubsUrls, "节点池订阅地址：支持 Link、Base64、Clash 格式的订阅链接。");
             toolTip1.SetToolTip(checkBoxEnableRenameNode, "以节点IP查询位置重命名节点。\n质量差的节点可能造成IP查询失败，造成整体检查速度稍微变慢。");
             toolTip1.SetToolTip(checkBoxEnableMediaCheck, "是否开启流媒体检测，其中IP欺诈依赖'节点地址查询'，内核版本需要 v2.0.8 以上\n\n示例：美国1 | ⬇️ 5.6MB/s |0%|Netflix|Disney|Openai\n风控值：0% (使用ping0.cc标准)\n流媒体解锁：Netflix、Disney、Openai");
+            toolTip1.SetToolTip(comboBoxSysProxy, "系统代理设置: 适用于拉取代理、消息推送、文件上传等等。");
             toolTip1.SetToolTip(comboBoxGithubProxyUrl, "GitHub 代理：代理订阅 GitHub raw 节点池。");
             toolTip1.SetToolTip(comboBoxSpeedtestUrl, "测速地址：注意 并发数*节点速度<最大网速 否则测速结果不准确\n尽量不要使用Speedtest，Cloudflare提供的下载链接，因为很多节点屏蔽测速网站。");
             toolTip1.SetToolTip(textBox7, "将测速结果推送到Worker的地址。");
@@ -305,6 +311,46 @@ namespace subs_check.win.gui
             comboBoxSubscriptionType.Text = "通用订阅";
             ReadConfig();
 
+            //自动检测系统代理
+            string configProxy = comboBoxSysProxy.Text;
+            SysProxyResult sysProxy = await Proxy.GetSysProxyAsync(configProxy);
+
+            if (sysProxy.IsAvailable)
+            {
+                if (comboBoxSysProxy.Text == sysProxy.Address)
+                {
+                    Log("设置系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
+                }
+                else
+                {
+                    string input = sysProxy.Address.Trim();
+
+                    // 检查是否存在 "://" 协议部分
+                    int protocolIndex = input.IndexOf("://");
+                    if (protocolIndex >= 0)
+                    {
+                        // 保留 "://" 之后的内容
+                        input = input.Substring(protocolIndex + 3);
+                    }
+
+                    // 检查是否存在 "/" 路径部分
+                    int pathIndex = input.IndexOf('/');
+                    if (pathIndex >= 0)
+                    {
+                        // 只保留 "/" 之前的域名部分
+                        input = input.Substring(0, pathIndex);
+                    }
+
+                    comboBoxSysProxy.Text = input;
+                    Log("检测到系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
+                    await SaveConfig(false);
+                }
+            }
+            else
+            {
+                Log("未发现系统代理", GetRichTextBoxAllLog());
+            }
+
             if (checkBoxHighConcurrent.Checked)
             {
                 groupBoxGist.Location = new Point(groupBoxGist.Location.X, groupBoxGist.Location.Y + groupBoxPipeConcurrent.Height);
@@ -455,6 +501,46 @@ namespace subs_check.win.gui
 
                     checkBoxHighConcurrent.Checked = needHighConcurrent;
 
+                    // 根据是否启用高并发，调整界面布局
+                    string sysproxy;
+                    if (!checkBoxHighConcurrent.Checked)
+                    {
+                        sysproxy = 读取config字符串(config, "proxy");
+                    }
+                    else
+                    {
+                        sysproxy = 读取config字符串(config, "system-proxy");
+                    }
+                    if (sysproxy != null)
+                    {
+                        string input = sysproxy.Trim();
+
+                        // 检查是否存在 "://" 协议部分
+                        int protocolIndex = input.IndexOf("://");
+                        if (protocolIndex >= 0)
+                        {
+                            // 保留 "://" 之后的内容
+                            input = input.Substring(protocolIndex + 3);
+                        }
+
+                        // 检查是否存在 "/" 路径部分
+                        int pathIndex = input.IndexOf('/');
+                        if (pathIndex >= 0)
+                        {
+                            // 只保留 "/" 之前的域名部分
+                            input = input.Substring(0, pathIndex);
+                        }
+
+                        // 更新 comboBox3 的文本
+                        sysproxy = input;
+                        comboBoxSysProxy.Text = sysproxy;
+                    }
+                    else
+                    {
+                        comboBoxSysProxy.Text = "自动检测";
+                    }
+
+
                     string switchX64 = 读取config字符串(config, "switch-x64");
                     if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
                     else checkBoxSwitchArch64.Checked = false;
@@ -521,6 +607,9 @@ namespace subs_check.win.gui
                             }
                         }
                     }
+
+                    // 添加GitHub代理前缀如果有
+                    githubProxyURL = await GetGithubProxyUrlAsync();
 
                     string mihomoOverwriteUrl = 读取config字符串(config, "mihomo-overwrite-url");
                     int mihomoOverwriteUrlIndex = mihomoOverwriteUrl.IndexOf(githubRawPrefix);
@@ -699,7 +788,12 @@ namespace subs_check.win.gui
                 else
                 {
                     comboBoxGithubProxyUrl.Text = "自动选择";
+                    comboBoxSysProxy.Text = "自动检测";
+                    // 添加GitHub代理前缀如果有
+                    githubProxyURL = await GetGithubProxyUrlAsync();
+
                     comboBoxOverwriteUrls.Text = "[内置]布丁狗的订阅转换";
+
                 }
             }
             catch (Exception ex)
@@ -829,6 +923,16 @@ namespace subs_check.win.gui
                 if (comboBoxGithubProxyUrl.Text != "自动选择") githubProxyURL = $"https://{comboBoxGithubProxyUrl.Text}/";
                 config["githubproxy"] = comboBoxGithubProxyUrl.Text;
                 config["github-proxy"] = githubProxyURL;
+
+                if (comboBoxSysProxy.Text != "自动检测") sysProxyURL = $"http://{comboBoxSysProxy.Text}";
+                if (checkBoxHighConcurrent.Checked)
+                {
+                    config["system-proxy"] = sysProxyURL;
+                }
+                else
+                {
+                    config["proxy"] = sysProxyURL;
+                }
 
                 // 保存订阅列表
                 List<string> subUrls = new List<string>();
@@ -1133,6 +1237,47 @@ namespace subs_check.win.gui
                     buttonStartCheck.ForeColor = Color.Red;
                     buttonStartCheck.Text = "⏹️ 停止";
                     toolTip1.SetToolTip(buttonStartCheck, "停止内核检测进程!");
+
+                    // 自动检测系统代理
+                    string configProxy = comboBoxSysProxy.Text;
+                    SysProxyResult sysProxy = await Proxy.GetSysProxyAsync(configProxy);
+
+                    if (sysProxy.IsAvailable)
+                    {
+                        if (comboBoxSysProxy.Text == sysProxy.Address)
+                        {
+                            Log("设置系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
+                        }
+                        else
+                        {
+                            string input = sysProxy.Address.Trim();
+
+                            // 检查是否存在 "://" 协议部分
+                            int protocolIndex = input.IndexOf("://");
+                            if (protocolIndex >= 0)
+                            {
+                                // 保留 "://" 之后的内容
+                                input = input.Substring(protocolIndex + 3);
+                            }
+
+                            // 检查是否存在 "/" 路径部分
+                            int pathIndex = input.IndexOf('/');
+                            if (pathIndex >= 0)
+                            {
+                                // 只保留 "/" 之前的域名部分
+                                input = input.Substring(0, pathIndex);
+                            }
+
+                            comboBoxSysProxy.Text = input;
+                            Log("检测到系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
+                            await SaveConfig(false);
+                        }
+                    }
+                    else
+                    {
+                        Log("未发现系统代理", GetRichTextBoxAllLog());
+                    }
+
                     StartSubsCheckProcess();
                 }
             }
@@ -2123,6 +2268,38 @@ namespace subs_check.win.gui
             comboBoxSpeedtestUrl.Items.Add(input);
             comboBoxSpeedtestUrl.Text = input;
         }
+
+        private void comboBoxSysProxy_Leave(object sender, EventArgs e)
+        {
+            // 检查是否有内容
+            if (string.IsNullOrWhiteSpace(comboBoxSysProxy.Text))
+            {
+                comboBoxSysProxy.Text = "自动检测";
+                return;
+            }
+
+            string input = comboBoxSysProxy.Text.Trim();
+
+            // 检查是否存在 "://" 协议部分
+            int protocolIndex = input.IndexOf("://");
+            if (protocolIndex >= 0)
+            {
+                // 保留 "://" 之后的内容
+                input = input.Substring(protocolIndex + 3);
+            }
+
+            // 检查是否存在 "/" 路径部分
+            int pathIndex = input.IndexOf('/');
+            if (pathIndex >= 0)
+            {
+                // 只保留 "/" 之前的域名部分
+                input = input.Substring(0, pathIndex);
+            }
+
+            // 更新 comboBox3 的文本
+            comboBoxSysProxy.Text = input;
+        }
+
         private void comboBoxGithubProxyUrl_Leave(object sender, EventArgs e)
         {
             // 检查是否有内容
@@ -2387,6 +2564,7 @@ namespace subs_check.win.gui
                         {
                             // 找到可用代理
                             detectedProxyURL = $"https://{proxyItem}/";
+                            richTextBoxAllLog.Clear();
                             Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                             proxyFound = true;
                             break;
@@ -2792,8 +2970,8 @@ namespace subs_check.win.gui
                 progressBarAll.Value = 0;
                 progressBarAll.Visible = true;
 
-                // 添加GitHub代理前缀如果有
-                githubProxyURL = await GetGithubProxyUrlAsync();
+                //// 添加GitHub代理前缀如果有
+                //githubProxyURL = await GetGithubProxyUrlAsync();
                 string fullDownloadUrl = githubProxyURL + downloadUrl;
 
                 try

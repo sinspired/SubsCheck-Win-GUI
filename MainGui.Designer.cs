@@ -65,28 +65,30 @@
             this.groupBoxLog = new System.Windows.Forms.GroupBox();
             this.linkLabelAbout = new System.Windows.Forms.LinkLabel();
             this.buttonUpdateKernel = new System.Windows.Forms.Button();
-            this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.labelLogNodeInfo = new System.Windows.Forms.Label();
+            this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
-            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
             this.numericUpDownTotalBandwidthLimit = new System.Windows.Forms.NumericUpDown();
-            this.checkBoxTotalBandwidthLimit = new System.Windows.Forms.CheckBox();
-            this.labelDownloadMb = new System.Windows.Forms.Label();
-            this.numericUpDownDownloadMb = new System.Windows.Forms.NumericUpDown();
-            this.buttonMoreSettings = new System.Windows.Forms.Button();
-            this.textBoxWebUiAPIKey = new System.Windows.Forms.TextBox();
-            this.checkBoxEnableWebUI = new System.Windows.Forms.CheckBox();
             this.numericUpDownSuccessLimit = new System.Windows.Forms.NumericUpDown();
-            this.checkBoxEnableSuccessLimit = new System.Windows.Forms.CheckBox();
-            this.buttonCheckUpdate = new System.Windows.Forms.Button();
-            this.checkBoxEnableRenameNode = new System.Windows.Forms.CheckBox();
-            this.checkBoxEnableMediaCheck = new System.Windows.Forms.CheckBox();
+            this.numericUpDownDownloadMb = new System.Windows.Forms.NumericUpDown();
+            this.comboBoxSysProxy = new System.Windows.Forms.ComboBox();
+            this.comboBoxSpeedtestUrl = new System.Windows.Forms.ComboBox();
+            this.comboBoxGithubProxyUrl = new System.Windows.Forms.ComboBox();
             this.comboBoxOverwriteUrls = new System.Windows.Forms.ComboBox();
             this.labelOverwriteUrls = new System.Windows.Forms.Label();
-            this.comboBoxGithubProxyUrl = new System.Windows.Forms.ComboBox();
+            this.labelDownloadMb = new System.Windows.Forms.Label();
+            this.textBoxWebUiAPIKey = new System.Windows.Forms.TextBox();
+            this.checkBoxEnableWebUI = new System.Windows.Forms.CheckBox();
+            this.checkBoxEnableRenameNode = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.checkBoxEnableMediaCheck = new System.Windows.Forms.CheckBox();
+            this.checkBoxKeepSucced = new System.Windows.Forms.CheckBox();
+            this.checkBoxTotalBandwidthLimit = new System.Windows.Forms.CheckBox();
+            this.buttonCheckUpdate = new System.Windows.Forms.Button();
+            this.buttonMoreSettings = new System.Windows.Forms.Button();
             this.labelGithubProxyUrl = new System.Windows.Forms.Label();
-            this.comboBoxSpeedtestUrl = new System.Windows.Forms.ComboBox();
             this.labelSpeedtestUrl = new System.Windows.Forms.Label();
+            this.checkBoxEnableSuccessLimit = new System.Windows.Forms.CheckBox();
             this.progressBarAll = new System.Windows.Forms.ProgressBar();
             this.timerCopySubscriptionUrl = new System.Windows.Forms.Timer(this.components);
             this.groupBoxGist = new System.Windows.Forms.GroupBox();
@@ -133,8 +135,8 @@
             this.groupBoxLog.SuspendLayout();
             this.groupBoxAdvanceSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTotalBandwidthLimit)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDownloadMb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSuccessLimit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDownloadMb)).BeginInit();
             this.groupBoxGist.SuspendLayout();
             this.groupBoxR2.SuspendLayout();
             this.groupBoxWebdav.SuspendLayout();
@@ -518,7 +520,7 @@
             // 
             // numericUpDownWebUIPort
             // 
-            this.numericUpDownWebUIPort.Location = new System.Drawing.Point(515, 33);
+            this.numericUpDownWebUIPort.Location = new System.Drawing.Point(632, 127);
             this.numericUpDownWebUIPort.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownWebUIPort.Maximum = new decimal(new int[] {
             65535,
@@ -531,7 +533,7 @@
             0,
             0});
             this.numericUpDownWebUIPort.Name = "numericUpDownWebUIPort";
-            this.numericUpDownWebUIPort.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownWebUIPort.Size = new System.Drawing.Size(87, 31);
             this.numericUpDownWebUIPort.TabIndex = 15;
             this.numericUpDownWebUIPort.Value = new decimal(new int[] {
             8199,
@@ -542,7 +544,7 @@
             // 
             // numericUpDownDLTimehot
             // 
-            this.numericUpDownDLTimehot.Location = new System.Drawing.Point(515, 78);
+            this.numericUpDownDLTimehot.Location = new System.Drawing.Point(632, 79);
             this.numericUpDownDLTimehot.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownDLTimehot.Maximum = new decimal(new int[] {
             10,
@@ -555,7 +557,7 @@
             0,
             0});
             this.numericUpDownDLTimehot.Name = "numericUpDownDLTimehot";
-            this.numericUpDownDLTimehot.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownDLTimehot.Size = new System.Drawing.Size(87, 31);
             this.numericUpDownDLTimehot.TabIndex = 14;
             this.numericUpDownDLTimehot.Value = new decimal(new int[] {
             10,
@@ -566,17 +568,17 @@
             // labelWebUIPort
             // 
             this.labelWebUIPort.AutoSize = true;
-            this.labelWebUIPort.Location = new System.Drawing.Point(350, 37);
+            this.labelWebUIPort.Location = new System.Drawing.Point(465, 132);
             this.labelWebUIPort.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelWebUIPort.Name = "labelWebUIPort";
-            this.labelWebUIPort.Size = new System.Drawing.Size(159, 21);
+            this.labelWebUIPort.Size = new System.Drawing.Size(170, 21);
             this.labelWebUIPort.TabIndex = 7;
-            this.labelWebUIPort.Text = "HTTP服务端口：";
+            this.labelWebUIPort.Text = "HTTP 服务端口：";
             // 
             // labelDownloadTimeout
             // 
             this.labelDownloadTimeout.AutoSize = true;
-            this.labelDownloadTimeout.Location = new System.Drawing.Point(350, 83);
+            this.labelDownloadTimeout.Location = new System.Drawing.Point(465, 84);
             this.labelDownloadTimeout.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelDownloadTimeout.Name = "labelDownloadTimeout";
             this.labelDownloadTimeout.Size = new System.Drawing.Size(158, 21);
@@ -585,7 +587,7 @@
             // 
             // numericUpDownSubStorePort
             // 
-            this.numericUpDownSubStorePort.Location = new System.Drawing.Point(808, 33);
+            this.numericUpDownSubStorePort.Location = new System.Drawing.Point(632, 175);
             this.numericUpDownSubStorePort.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownSubStorePort.Maximum = new decimal(new int[] {
             65535,
@@ -598,7 +600,7 @@
             0,
             0});
             this.numericUpDownSubStorePort.Name = "numericUpDownSubStorePort";
-            this.numericUpDownSubStorePort.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownSubStorePort.Size = new System.Drawing.Size(87, 31);
             this.numericUpDownSubStorePort.TabIndex = 21;
             this.numericUpDownSubStorePort.Value = new decimal(new int[] {
             8299,
@@ -610,7 +612,7 @@
             // labelSubstorePort
             // 
             this.labelSubstorePort.AutoSize = true;
-            this.labelSubstorePort.Location = new System.Drawing.Point(632, 37);
+            this.labelSubstorePort.Location = new System.Drawing.Point(465, 180);
             this.labelSubstorePort.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelSubstorePort.Name = "labelSubstorePort";
             this.labelSubstorePort.Size = new System.Drawing.Size(172, 21);
@@ -622,8 +624,8 @@
             this.groupBoxLog.CausesValidation = false;
             this.groupBoxLog.Controls.Add(this.linkLabelAbout);
             this.groupBoxLog.Controls.Add(this.buttonUpdateKernel);
-            this.groupBoxLog.Controls.Add(this.richTextBoxAllLog);
             this.groupBoxLog.Controls.Add(this.labelLogNodeInfo);
+            this.groupBoxLog.Controls.Add(this.richTextBoxAllLog);
             this.groupBoxLog.Location = new System.Drawing.Point(354, 14);
             this.groupBoxLog.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBoxLog.Name = "groupBoxLog";
@@ -656,6 +658,15 @@
             this.buttonUpdateKernel.Visible = false;
             this.buttonUpdateKernel.Click += new System.EventHandler(this.buttonUpdateKernel_Click);
             // 
+            // labelLogNodeInfo
+            // 
+            this.labelLogNodeInfo.AutoSize = true;
+            this.labelLogNodeInfo.Location = new System.Drawing.Point(0, 0);
+            this.labelLogNodeInfo.Name = "labelLogNodeInfo";
+            this.labelLogNodeInfo.Size = new System.Drawing.Size(94, 21);
+            this.labelLogNodeInfo.TabIndex = 22;
+            this.labelLogNodeInfo.Text = "实时日志";
+            // 
             // richTextBoxAllLog
             // 
             this.richTextBoxAllLog.BackColor = System.Drawing.Color.WhiteSmoke;
@@ -671,42 +682,35 @@
             this.richTextBoxAllLog.Text = "";
             this.richTextBoxAllLog.DoubleClick += new System.EventHandler(this.richTextBoxAllLog_DoubleClick);
             // 
-            // labelLogNodeInfo
-            // 
-            this.labelLogNodeInfo.AutoSize = true;
-            this.labelLogNodeInfo.Location = new System.Drawing.Point(0, 0);
-            this.labelLogNodeInfo.Name = "labelLogNodeInfo";
-            this.labelLogNodeInfo.Size = new System.Drawing.Size(94, 21);
-            this.labelLogNodeInfo.TabIndex = 22;
-            this.labelLogNodeInfo.Text = "实时日志";
-            // 
             // groupBoxAdvanceSettings
             // 
-            this.groupBoxAdvanceSettings.Controls.Add(this.textBoxWebUiAPIKey);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxKeepSucced);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownTotalBandwidthLimit);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxTotalBandwidthLimit);
-            this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadMb);
-            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownDownloadMb);
-            this.groupBoxAdvanceSettings.Controls.Add(this.buttonMoreSettings);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableWebUI);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSuccessLimit);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableSuccessLimit);
-            this.groupBoxAdvanceSettings.Controls.Add(this.buttonCheckUpdate);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableRenameNode);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSubStorePort);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownWebUIPort);
-            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableMediaCheck);
+            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownDownloadMb);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownDLTimehot);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxSysProxy);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxSpeedtestUrl);
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxGithubProxyUrl);
+            this.groupBoxAdvanceSettings.Controls.Add(this.labelSubstorePort);
             this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxOverwriteUrls);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelOverwriteUrls);
-            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxGithubProxyUrl);
-            this.groupBoxAdvanceSettings.Controls.Add(this.labelGithubProxyUrl);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelWebUIPort);
-            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxSpeedtestUrl);
-            this.groupBoxAdvanceSettings.Controls.Add(this.labelSpeedtestUrl);
+            this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadMb);
+            this.groupBoxAdvanceSettings.Controls.Add(this.textBoxWebUiAPIKey);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadTimeout);
-            this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSubStorePort);
-            this.groupBoxAdvanceSettings.Controls.Add(this.labelSubstorePort);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableWebUI);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableRenameNode);
+            this.groupBoxAdvanceSettings.Controls.Add(this.label1);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableMediaCheck);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxKeepSucced);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxTotalBandwidthLimit);
+            this.groupBoxAdvanceSettings.Controls.Add(this.buttonCheckUpdate);
+            this.groupBoxAdvanceSettings.Controls.Add(this.buttonMoreSettings);
+            this.groupBoxAdvanceSettings.Controls.Add(this.labelGithubProxyUrl);
+            this.groupBoxAdvanceSettings.Controls.Add(this.labelSpeedtestUrl);
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxEnableSuccessLimit);
             this.groupBoxAdvanceSettings.Location = new System.Drawing.Point(26, 792);
             this.groupBoxAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.groupBoxAdvanceSettings.Name = "groupBoxAdvanceSettings";
@@ -717,20 +721,10 @@
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
             // 
-            // checkBoxKeepSucced
-            // 
-            this.checkBoxKeepSucced.AutoSize = true;
-            this.checkBoxKeepSucced.Location = new System.Drawing.Point(633, 173);
-            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
-            this.checkBoxKeepSucced.Size = new System.Drawing.Size(204, 25);
-            this.checkBoxKeepSucced.TabIndex = 38;
-            this.checkBoxKeepSucced.Text = "保留测试成功节点";
-            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
-            // 
             // numericUpDownTotalBandwidthLimit
             // 
             this.numericUpDownTotalBandwidthLimit.Enabled = false;
-            this.numericUpDownTotalBandwidthLimit.Location = new System.Drawing.Point(224, 124);
+            this.numericUpDownTotalBandwidthLimit.Location = new System.Drawing.Point(365, 79);
             this.numericUpDownTotalBandwidthLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownTotalBandwidthLimit.Maximum = new decimal(new int[] {
             1000,
@@ -738,7 +732,7 @@
             0,
             0});
             this.numericUpDownTotalBandwidthLimit.Name = "numericUpDownTotalBandwidthLimit";
-            this.numericUpDownTotalBandwidthLimit.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownTotalBandwidthLimit.Size = new System.Drawing.Size(87, 31);
             this.numericUpDownTotalBandwidthLimit.TabIndex = 37;
             this.numericUpDownTotalBandwidthLimit.Value = new decimal(new int[] {
             12,
@@ -747,88 +741,10 @@
             0});
             this.numericUpDownTotalBandwidthLimit.ValueChanged += new System.EventHandler(this.NumericUpDownTotalBandwidthLimit_ValueChanged);
             // 
-            // checkBoxTotalBandwidthLimit
-            // 
-            this.checkBoxTotalBandwidthLimit.AutoSize = true;
-            this.checkBoxTotalBandwidthLimit.Location = new System.Drawing.Point(17, 127);
-            this.checkBoxTotalBandwidthLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxTotalBandwidthLimit.Name = "checkBoxTotalBandwidthLimit";
-            this.checkBoxTotalBandwidthLimit.Size = new System.Drawing.Size(207, 25);
-            this.checkBoxTotalBandwidthLimit.TabIndex = 36;
-            this.checkBoxTotalBandwidthLimit.Text = "带宽限制(MB/s)：";
-            this.checkBoxTotalBandwidthLimit.UseVisualStyleBackColor = true;
-            this.checkBoxTotalBandwidthLimit.CheckedChanged += new System.EventHandler(this.checkBoxTotalBandwidthLimit_CheckedChanged);
-            // 
-            // labelDownloadMb
-            // 
-            this.labelDownloadMb.AutoSize = true;
-            this.labelDownloadMb.Location = new System.Drawing.Point(350, 129);
-            this.labelDownloadMb.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.labelDownloadMb.Name = "labelDownloadMb";
-            this.labelDownloadMb.Size = new System.Drawing.Size(159, 21);
-            this.labelDownloadMb.TabIndex = 31;
-            this.labelDownloadMb.Text = "测速大小(MB)：";
-            // 
-            // numericUpDownDownloadMb
-            // 
-            this.numericUpDownDownloadMb.Location = new System.Drawing.Point(515, 124);
-            this.numericUpDownDownloadMb.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.numericUpDownDownloadMb.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDownDownloadMb.Name = "numericUpDownDownloadMb";
-            this.numericUpDownDownloadMb.Size = new System.Drawing.Size(106, 31);
-            this.numericUpDownDownloadMb.TabIndex = 30;
-            this.numericUpDownDownloadMb.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            // 
-            // buttonMoreSettings
-            // 
-            this.buttonMoreSettings.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonMoreSettings.Location = new System.Drawing.Point(1126, 165);
-            this.buttonMoreSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonMoreSettings.Name = "buttonMoreSettings";
-            this.buttonMoreSettings.Size = new System.Drawing.Size(138, 40);
-            this.buttonMoreSettings.TabIndex = 29;
-            this.buttonMoreSettings.Text = "补充参数";
-            this.buttonMoreSettings.UseVisualStyleBackColor = true;
-            this.buttonMoreSettings.Click += new System.EventHandler(this.buttonMoreSettings_Click);
-            // 
-            // textBoxWebUiAPIKey
-            // 
-            this.textBoxWebUiAPIKey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxWebUiAPIKey.Enabled = false;
-            this.textBoxWebUiAPIKey.Location = new System.Drawing.Point(258, 170);
-            this.textBoxWebUiAPIKey.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.textBoxWebUiAPIKey.Name = "textBoxWebUiAPIKey";
-            this.textBoxWebUiAPIKey.PasswordChar = '*';
-            this.textBoxWebUiAPIKey.Size = new System.Drawing.Size(363, 31);
-            this.textBoxWebUiAPIKey.TabIndex = 6;
-            this.textBoxWebUiAPIKey.Text = "admin";
-            this.textBoxWebUiAPIKey.Enter += new System.EventHandler(this.textBoxWebUiAPIKey_Enter);
-            this.textBoxWebUiAPIKey.Leave += new System.EventHandler(this.textBoxWebUiAPIKey_Leave);
-            // 
-            // checkBoxEnableWebUI
-            // 
-            this.checkBoxEnableWebUI.AutoSize = true;
-            this.checkBoxEnableWebUI.Location = new System.Drawing.Point(16, 173);
-            this.checkBoxEnableWebUI.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxEnableWebUI.Name = "checkBoxEnableWebUI";
-            this.checkBoxEnableWebUI.Size = new System.Drawing.Size(239, 25);
-            this.checkBoxEnableWebUI.TabIndex = 28;
-            this.checkBoxEnableWebUI.Text = "自定义 WebUI 密钥：";
-            this.checkBoxEnableWebUI.UseVisualStyleBackColor = true;
-            this.checkBoxEnableWebUI.CheckedChanged += new System.EventHandler(this.checkBoxEnableWebUI_CheckedChanged);
-            // 
             // numericUpDownSuccessLimit
             // 
             this.numericUpDownSuccessLimit.Enabled = false;
-            this.numericUpDownSuccessLimit.Location = new System.Drawing.Point(224, 78);
+            this.numericUpDownSuccessLimit.Location = new System.Drawing.Point(365, 31);
             this.numericUpDownSuccessLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownSuccessLimit.Maximum = new decimal(new int[] {
             65535,
@@ -841,7 +757,7 @@
             0,
             0});
             this.numericUpDownSuccessLimit.Name = "numericUpDownSuccessLimit";
-            this.numericUpDownSuccessLimit.Size = new System.Drawing.Size(106, 31);
+            this.numericUpDownSuccessLimit.Size = new System.Drawing.Size(87, 31);
             this.numericUpDownSuccessLimit.TabIndex = 22;
             this.numericUpDownSuccessLimit.Value = new decimal(new int[] {
             100,
@@ -849,97 +765,70 @@
             0,
             0});
             // 
-            // checkBoxEnableSuccessLimit
+            // numericUpDownDownloadMb
             // 
-            this.checkBoxEnableSuccessLimit.AutoSize = true;
-            this.checkBoxEnableSuccessLimit.Location = new System.Drawing.Point(17, 81);
-            this.checkBoxEnableSuccessLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxEnableSuccessLimit.Name = "checkBoxEnableSuccessLimit";
-            this.checkBoxEnableSuccessLimit.Size = new System.Drawing.Size(183, 25);
-            this.checkBoxEnableSuccessLimit.TabIndex = 27;
-            this.checkBoxEnableSuccessLimit.Text = "节点保存数目：";
-            this.checkBoxEnableSuccessLimit.UseVisualStyleBackColor = true;
-            this.checkBoxEnableSuccessLimit.CheckedChanged += new System.EventHandler(this.checkBoxEnableSuccessLimit_CheckedChanged);
+            this.numericUpDownDownloadMb.Location = new System.Drawing.Point(632, 31);
+            this.numericUpDownDownloadMb.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.numericUpDownDownloadMb.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownDownloadMb.Name = "numericUpDownDownloadMb";
+            this.numericUpDownDownloadMb.Size = new System.Drawing.Size(87, 31);
+            this.numericUpDownDownloadMb.TabIndex = 30;
+            this.numericUpDownDownloadMb.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
             // 
-            // buttonCheckUpdate
+            // comboBoxSysProxy
             // 
-            this.buttonCheckUpdate.BackColor = System.Drawing.SystemColors.Control;
-            this.buttonCheckUpdate.FlatAppearance.BorderSize = 0;
-            this.buttonCheckUpdate.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonCheckUpdate.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonCheckUpdate.Location = new System.Drawing.Point(1276, 165);
-            this.buttonCheckUpdate.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.buttonCheckUpdate.Name = "buttonCheckUpdate";
-            this.buttonCheckUpdate.Size = new System.Drawing.Size(138, 40);
-            this.buttonCheckUpdate.TabIndex = 26;
-            this.buttonCheckUpdate.Text = "检查更新";
-            this.buttonCheckUpdate.UseVisualStyleBackColor = true;
-            this.buttonCheckUpdate.Click += new System.EventHandler(this.buttonCheckUpdate_Click);
+            this.comboBoxSysProxy.AutoCompleteCustomSource.AddRange(new string[] {
+            "127.0.0.1:7890",
+            "127.0.0.1:10808",
+            "127.0.0.1:10809",
+            "127.0.0.1:7891",
+            "127.0.0.1:1080",
+            "127.0.0.1:8080",
+            "127.0.0.1:443"});
+            this.comboBoxSysProxy.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxSysProxy.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
+            this.comboBoxSysProxy.FormattingEnabled = true;
+            this.comboBoxSysProxy.ImeMode = System.Windows.Forms.ImeMode.Close;
+            this.comboBoxSysProxy.Items.AddRange(new object[] {
+            "自动检测",
+            "127.0.0.1:7890",
+            "127.0.0.1:10808",
+            "127.0.0.1:10809",
+            "127.0.0.1:7891",
+            "127.0.0.1:1080",
+            "127.0.0.1:8080",
+            "127.0.0.1:443"});
+            this.comboBoxSysProxy.Location = new System.Drawing.Point(848, 32);
+            this.comboBoxSysProxy.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxSysProxy.Name = "comboBoxSysProxy";
+            this.comboBoxSysProxy.Size = new System.Drawing.Size(210, 29);
+            this.comboBoxSysProxy.TabIndex = 39;
             // 
-            // checkBoxEnableRenameNode
+            // comboBoxSpeedtestUrl
             // 
-            this.checkBoxEnableRenameNode.AutoSize = true;
-            this.checkBoxEnableRenameNode.Checked = true;
-            this.checkBoxEnableRenameNode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxEnableRenameNode.Location = new System.Drawing.Point(17, 35);
-            this.checkBoxEnableRenameNode.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxEnableRenameNode.Name = "checkBoxEnableRenameNode";
-            this.checkBoxEnableRenameNode.Size = new System.Drawing.Size(162, 25);
-            this.checkBoxEnableRenameNode.TabIndex = 22;
-            this.checkBoxEnableRenameNode.Text = "节点地址查询";
-            this.checkBoxEnableRenameNode.UseVisualStyleBackColor = true;
-            this.checkBoxEnableRenameNode.CheckedChanged += new System.EventHandler(this.checkBoxEnableRenameNode_CheckedChanged);
-            // 
-            // checkBoxEnableMediaCheck
-            // 
-            this.checkBoxEnableMediaCheck.AutoSize = true;
-            this.checkBoxEnableMediaCheck.Location = new System.Drawing.Point(198, 35);
-            this.checkBoxEnableMediaCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.checkBoxEnableMediaCheck.Name = "checkBoxEnableMediaCheck";
-            this.checkBoxEnableMediaCheck.Size = new System.Drawing.Size(141, 25);
-            this.checkBoxEnableMediaCheck.TabIndex = 25;
-            this.checkBoxEnableMediaCheck.Text = "流媒体检测";
-            this.checkBoxEnableMediaCheck.UseVisualStyleBackColor = true;
-            this.checkBoxEnableMediaCheck.CheckedChanged += new System.EventHandler(this.checkBoxEnableMediaCheck_CheckedChanged);
-            // 
-            // comboBoxOverwriteUrls
-            // 
-            this.comboBoxOverwriteUrls.FormattingEnabled = true;
-            this.comboBoxOverwriteUrls.Items.AddRange(new object[] {
-            "[内置]布丁狗的订阅转换",
-            "[内置]ACL4SSR_Online_Full",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/布丁狗的订阅转" +
-                "换.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
-                "_Online_Full.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
-                "_Online_Full_WithIcon.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/添加直连规则." +
-                "yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/布丁狗的订阅转换.y" +
-                "aml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
-                "line_Full.yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
-                "line_Full_WithIcon.yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/添加直连规则.yam" +
-                "l"});
-            this.comboBoxOverwriteUrls.Location = new System.Drawing.Point(895, 125);
-            this.comboBoxOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxOverwriteUrls.Name = "comboBoxOverwriteUrls";
-            this.comboBoxOverwriteUrls.Size = new System.Drawing.Size(517, 29);
-            this.comboBoxOverwriteUrls.TabIndex = 24;
-            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBoxOverwriteUrls_SelectedIndexChanged);
-            // 
-            // labelOverwriteUrls
-            // 
-            this.labelOverwriteUrls.AutoSize = true;
-            this.labelOverwriteUrls.Location = new System.Drawing.Point(633, 129);
-            this.labelOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.labelOverwriteUrls.Name = "labelOverwriteUrls";
-            this.labelOverwriteUrls.Size = new System.Drawing.Size(265, 21);
-            this.labelOverwriteUrls.TabIndex = 23;
-            this.labelOverwriteUrls.Text = "Clash订阅 覆写配置文件：";
+            this.comboBoxSpeedtestUrl.FormattingEnabled = true;
+            this.comboBoxSpeedtestUrl.Items.AddRange(new object[] {
+            "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
+                "Waifu2x-Extension-GUI-v2.21.12-Portable.7z",
+            "https://github.com/2dust/v2rayN/releases/download/7.10.4/v2rayN-windows-64-deskto" +
+                "p.zip",
+            "https://github.com/VSCodium/vscodium/releases/download/1.98.0.25067/codium-1.98.0" +
+                ".25067-el9.aarch64.rpm"});
+            this.comboBoxSpeedtestUrl.Location = new System.Drawing.Point(848, 80);
+            this.comboBoxSpeedtestUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxSpeedtestUrl.Name = "comboBoxSpeedtestUrl";
+            this.comboBoxSpeedtestUrl.Size = new System.Drawing.Size(570, 29);
+            this.comboBoxSpeedtestUrl.TabIndex = 19;
+            this.comboBoxSpeedtestUrl.Text = "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
+    "Waifu2x-Extension-GUI-v2.21.12-Portable.7z";
             // 
             // comboBoxGithubProxyUrl
             // 
@@ -1371,50 +1260,204 @@
             "tube.20140301.xyz",
             "vps.pansen626.com",
             "wfgithub.xiaonuomi.ie.eu.org"});
-            this.comboBoxGithubProxyUrl.Location = new System.Drawing.Point(1104, 33);
+            this.comboBoxGithubProxyUrl.Location = new System.Drawing.Point(1231, 32);
             this.comboBoxGithubProxyUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBoxGithubProxyUrl.Name = "comboBoxGithubProxyUrl";
-            this.comboBoxGithubProxyUrl.Size = new System.Drawing.Size(308, 29);
+            this.comboBoxGithubProxyUrl.Size = new System.Drawing.Size(187, 29);
             this.comboBoxGithubProxyUrl.TabIndex = 21;
             this.comboBoxGithubProxyUrl.Leave += new System.EventHandler(this.comboBoxGithubProxyUrl_Leave);
+            // 
+            // comboBoxOverwriteUrls
+            // 
+            this.comboBoxOverwriteUrls.FormattingEnabled = true;
+            this.comboBoxOverwriteUrls.Items.AddRange(new object[] {
+            "[内置]布丁狗的订阅转换",
+            "[内置]ACL4SSR_Online_Full",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/布丁狗的订阅转" +
+                "换.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
+                "_Online_Full.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
+                "_Online_Full_WithIcon.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/添加直连规则." +
+                "yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/布丁狗的订阅转换.y" +
+                "aml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
+                "line_Full.yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
+                "line_Full_WithIcon.yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/添加直连规则.yam" +
+                "l"});
+            this.comboBoxOverwriteUrls.Location = new System.Drawing.Point(901, 128);
+            this.comboBoxOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxOverwriteUrls.Name = "comboBoxOverwriteUrls";
+            this.comboBoxOverwriteUrls.Size = new System.Drawing.Size(517, 29);
+            this.comboBoxOverwriteUrls.TabIndex = 24;
+            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBoxOverwriteUrls_SelectedIndexChanged);
+            // 
+            // labelOverwriteUrls
+            // 
+            this.labelOverwriteUrls.AutoSize = true;
+            this.labelOverwriteUrls.Location = new System.Drawing.Point(735, 132);
+            this.labelOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelOverwriteUrls.Name = "labelOverwriteUrls";
+            this.labelOverwriteUrls.Size = new System.Drawing.Size(170, 21);
+            this.labelOverwriteUrls.TabIndex = 23;
+            this.labelOverwriteUrls.Text = "Clash覆写配置：";
+            // 
+            // labelDownloadMb
+            // 
+            this.labelDownloadMb.AutoSize = true;
+            this.labelDownloadMb.Location = new System.Drawing.Point(465, 36);
+            this.labelDownloadMb.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelDownloadMb.Name = "labelDownloadMb";
+            this.labelDownloadMb.Size = new System.Drawing.Size(159, 21);
+            this.labelDownloadMb.TabIndex = 31;
+            this.labelDownloadMb.Text = "测速大小(MB)：";
+            // 
+            // textBoxWebUiAPIKey
+            // 
+            this.textBoxWebUiAPIKey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxWebUiAPIKey.Enabled = false;
+            this.textBoxWebUiAPIKey.Location = new System.Drawing.Point(255, 175);
+            this.textBoxWebUiAPIKey.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBoxWebUiAPIKey.Name = "textBoxWebUiAPIKey";
+            this.textBoxWebUiAPIKey.PasswordChar = '*';
+            this.textBoxWebUiAPIKey.Size = new System.Drawing.Size(197, 31);
+            this.textBoxWebUiAPIKey.TabIndex = 6;
+            this.textBoxWebUiAPIKey.Text = "admin";
+            this.textBoxWebUiAPIKey.Enter += new System.EventHandler(this.textBoxWebUiAPIKey_Enter);
+            this.textBoxWebUiAPIKey.Leave += new System.EventHandler(this.textBoxWebUiAPIKey_Leave);
+            // 
+            // checkBoxEnableWebUI
+            // 
+            this.checkBoxEnableWebUI.AutoSize = true;
+            this.checkBoxEnableWebUI.Location = new System.Drawing.Point(18, 178);
+            this.checkBoxEnableWebUI.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxEnableWebUI.Name = "checkBoxEnableWebUI";
+            this.checkBoxEnableWebUI.Size = new System.Drawing.Size(239, 25);
+            this.checkBoxEnableWebUI.TabIndex = 28;
+            this.checkBoxEnableWebUI.Text = "自定义 WebUI 密钥：";
+            this.checkBoxEnableWebUI.UseVisualStyleBackColor = true;
+            this.checkBoxEnableWebUI.CheckedChanged += new System.EventHandler(this.checkBoxEnableWebUI_CheckedChanged);
+            // 
+            // checkBoxEnableRenameNode
+            // 
+            this.checkBoxEnableRenameNode.AutoSize = true;
+            this.checkBoxEnableRenameNode.Checked = true;
+            this.checkBoxEnableRenameNode.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxEnableRenameNode.Location = new System.Drawing.Point(18, 34);
+            this.checkBoxEnableRenameNode.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxEnableRenameNode.Name = "checkBoxEnableRenameNode";
+            this.checkBoxEnableRenameNode.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxEnableRenameNode.TabIndex = 22;
+            this.checkBoxEnableRenameNode.Text = "节点地址查询";
+            this.checkBoxEnableRenameNode.UseVisualStyleBackColor = true;
+            this.checkBoxEnableRenameNode.CheckedChanged += new System.EventHandler(this.checkBoxEnableRenameNode_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(735, 36);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(115, 21);
+            this.label1.TabIndex = 40;
+            this.label1.Text = "系统代理：";
+            // 
+            // checkBoxEnableMediaCheck
+            // 
+            this.checkBoxEnableMediaCheck.AutoSize = true;
+            this.checkBoxEnableMediaCheck.Location = new System.Drawing.Point(18, 82);
+            this.checkBoxEnableMediaCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxEnableMediaCheck.Name = "checkBoxEnableMediaCheck";
+            this.checkBoxEnableMediaCheck.Size = new System.Drawing.Size(141, 25);
+            this.checkBoxEnableMediaCheck.TabIndex = 25;
+            this.checkBoxEnableMediaCheck.Text = "流媒体检测";
+            this.checkBoxEnableMediaCheck.UseVisualStyleBackColor = true;
+            this.checkBoxEnableMediaCheck.CheckedChanged += new System.EventHandler(this.checkBoxEnableMediaCheck_CheckedChanged);
+            // 
+            // checkBoxKeepSucced
+            // 
+            this.checkBoxKeepSucced.AutoSize = true;
+            this.checkBoxKeepSucced.Location = new System.Drawing.Point(18, 130);
+            this.checkBoxKeepSucced.Name = "checkBoxKeepSucced";
+            this.checkBoxKeepSucced.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxKeepSucced.TabIndex = 38;
+            this.checkBoxKeepSucced.Text = "保留成功节点";
+            this.checkBoxKeepSucced.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxTotalBandwidthLimit
+            // 
+            this.checkBoxTotalBandwidthLimit.AutoSize = true;
+            this.checkBoxTotalBandwidthLimit.Location = new System.Drawing.Point(192, 82);
+            this.checkBoxTotalBandwidthLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxTotalBandwidthLimit.Name = "checkBoxTotalBandwidthLimit";
+            this.checkBoxTotalBandwidthLimit.Size = new System.Drawing.Size(185, 25);
+            this.checkBoxTotalBandwidthLimit.TabIndex = 36;
+            this.checkBoxTotalBandwidthLimit.Text = "带宽限制MB/s：";
+            this.checkBoxTotalBandwidthLimit.UseVisualStyleBackColor = true;
+            this.checkBoxTotalBandwidthLimit.CheckedChanged += new System.EventHandler(this.checkBoxTotalBandwidthLimit_CheckedChanged);
+            // 
+            // buttonCheckUpdate
+            // 
+            this.buttonCheckUpdate.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonCheckUpdate.FlatAppearance.BorderSize = 0;
+            this.buttonCheckUpdate.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonCheckUpdate.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonCheckUpdate.Location = new System.Drawing.Point(1280, 170);
+            this.buttonCheckUpdate.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonCheckUpdate.Name = "buttonCheckUpdate";
+            this.buttonCheckUpdate.Size = new System.Drawing.Size(138, 40);
+            this.buttonCheckUpdate.TabIndex = 26;
+            this.buttonCheckUpdate.Text = "检查更新";
+            this.buttonCheckUpdate.UseVisualStyleBackColor = true;
+            this.buttonCheckUpdate.Click += new System.EventHandler(this.buttonCheckUpdate_Click);
+            // 
+            // buttonMoreSettings
+            // 
+            this.buttonMoreSettings.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonMoreSettings.Location = new System.Drawing.Point(1130, 170);
+            this.buttonMoreSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.buttonMoreSettings.Name = "buttonMoreSettings";
+            this.buttonMoreSettings.Size = new System.Drawing.Size(138, 40);
+            this.buttonMoreSettings.TabIndex = 29;
+            this.buttonMoreSettings.Text = "补充参数";
+            this.buttonMoreSettings.UseVisualStyleBackColor = true;
+            this.buttonMoreSettings.Click += new System.EventHandler(this.buttonMoreSettings_Click);
             // 
             // labelGithubProxyUrl
             // 
             this.labelGithubProxyUrl.AutoSize = true;
-            this.labelGithubProxyUrl.Location = new System.Drawing.Point(926, 37);
+            this.labelGithubProxyUrl.Location = new System.Drawing.Point(1070, 36);
             this.labelGithubProxyUrl.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelGithubProxyUrl.Name = "labelGithubProxyUrl";
             this.labelGithubProxyUrl.Size = new System.Drawing.Size(163, 21);
             this.labelGithubProxyUrl.TabIndex = 20;
             this.labelGithubProxyUrl.Text = "Github Proxy：";
             // 
-            // comboBoxSpeedtestUrl
-            // 
-            this.comboBoxSpeedtestUrl.FormattingEnabled = true;
-            this.comboBoxSpeedtestUrl.Items.AddRange(new object[] {
-            "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
-                "Waifu2x-Extension-GUI-v2.21.12-Portable.7z",
-            "https://github.com/2dust/v2rayN/releases/download/7.10.4/v2rayN-windows-64-deskto" +
-                "p.zip",
-            "https://github.com/VSCodium/vscodium/releases/download/1.98.0.25067/codium-1.98.0" +
-                ".25067-el9.aarch64.rpm"});
-            this.comboBoxSpeedtestUrl.Location = new System.Drawing.Point(741, 79);
-            this.comboBoxSpeedtestUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxSpeedtestUrl.Name = "comboBoxSpeedtestUrl";
-            this.comboBoxSpeedtestUrl.Size = new System.Drawing.Size(671, 29);
-            this.comboBoxSpeedtestUrl.TabIndex = 19;
-            this.comboBoxSpeedtestUrl.Text = "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
-    "Waifu2x-Extension-GUI-v2.21.12-Portable.7z";
-            // 
             // labelSpeedtestUrl
             // 
             this.labelSpeedtestUrl.AutoSize = true;
-            this.labelSpeedtestUrl.Location = new System.Drawing.Point(631, 83);
+            this.labelSpeedtestUrl.Location = new System.Drawing.Point(735, 84);
             this.labelSpeedtestUrl.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelSpeedtestUrl.Name = "labelSpeedtestUrl";
             this.labelSpeedtestUrl.Size = new System.Drawing.Size(115, 21);
             this.labelSpeedtestUrl.TabIndex = 18;
             this.labelSpeedtestUrl.Text = "测速地址：";
+            // 
+            // checkBoxEnableSuccessLimit
+            // 
+            this.checkBoxEnableSuccessLimit.AutoSize = true;
+            this.checkBoxEnableSuccessLimit.Location = new System.Drawing.Point(192, 34);
+            this.checkBoxEnableSuccessLimit.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.checkBoxEnableSuccessLimit.Name = "checkBoxEnableSuccessLimit";
+            this.checkBoxEnableSuccessLimit.Size = new System.Drawing.Size(183, 25);
+            this.checkBoxEnableSuccessLimit.TabIndex = 27;
+            this.checkBoxEnableSuccessLimit.Text = "节点限制数量：";
+            this.checkBoxEnableSuccessLimit.UseVisualStyleBackColor = true;
+            this.checkBoxEnableSuccessLimit.CheckedChanged += new System.EventHandler(this.checkBoxEnableSuccessLimit_CheckedChanged);
             // 
             // progressBarAll
             // 
@@ -1831,8 +1874,8 @@
             this.groupBoxAdvanceSettings.ResumeLayout(false);
             this.groupBoxAdvanceSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTotalBandwidthLimit)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDownloadMb)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSuccessLimit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDownloadMb)).EndInit();
             this.groupBoxGist.ResumeLayout(false);
             this.groupBoxGist.PerformLayout();
             this.groupBoxR2.ResumeLayout(false);
@@ -1916,7 +1959,6 @@
         private System.Windows.Forms.Timer timerRestartSchedule;
         private System.Windows.Forms.Button buttonCheckUpdate;
         private System.Windows.Forms.NumericUpDown numericUpDownSuccessLimit;
-        private System.Windows.Forms.CheckBox checkBoxEnableSuccessLimit;
         private System.Windows.Forms.TextBox textBoxWebUiAPIKey;
         private System.Windows.Forms.CheckBox checkBoxEnableWebUI;
         private System.Windows.Forms.Button buttonWebUi;
@@ -1944,6 +1986,9 @@
         private System.Windows.Forms.CheckBox checkBoxEhanceTag;
         private System.Windows.Forms.CheckBox checkBoxDropBadCFNodes;
         private System.Windows.Forms.CheckBox checkBoxKeepSucced;
+        private System.Windows.Forms.ComboBox comboBoxSysProxy;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBoxEnableSuccessLimit;
     }
 }
 
