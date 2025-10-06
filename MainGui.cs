@@ -43,7 +43,9 @@ namespace subs_check.win.gui
         private string nextCheckTime = null;// 用于存储下次检查时间
         string WebUIapiKey = "CMLiussss";
         int downloading = 0;
-        private SysProxyResult SysProxySetting;
+        private SysProxyResult SysProxySetting = null;
+
+        private DateTime _lastCheckTime = DateTime.MinValue;
 
         private static DateTime _lastGetGithubProxyRunTime = DateTime.MinValue;
         private static string _lastGithubProxyUrl = null;
@@ -130,10 +132,10 @@ namespace subs_check.win.gui
             SetupNotifyIconContextMenu();
         }
 
-        private void MainGui_Shown(object sender, EventArgs e)
+        private async void MainGui_Shown(object sender, EventArgs e)
         {
             // 先检查系统代理
-            //await AutoCheckSysProxy();
+            await AutoCheckSysProxy();
 
             // 再初始化 AutoUpdater
             AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
@@ -183,8 +185,17 @@ namespace subs_check.win.gui
             }
         }
 
-        public async Task AutoCheckSysProxy(bool lognow = true)
+        public async Task AutoCheckSysProxy(bool noRepeat = true)
         {
+            // 如果10秒内已经执行过，直接返回
+            if ((DateTime.Now - _lastCheckTime).TotalSeconds < 10 && noRepeat)
+            {
+                //Log("10秒内已检测过系统代理，跳过执行", GetRichTextBoxAllLog());
+                return;
+            }
+
+            _lastCheckTime = DateTime.Now; // 更新执行时间
+
             // 自动检测系统代理
             string configProxy = comboBoxSysProxy.Text;
 
@@ -1322,10 +1333,7 @@ namespace subs_check.win.gui
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
-                //检测系统代理
                 await AutoCheckSysProxy();
-
                 var result = await 获取版本号(apiUrl, true);
                 if (result.Item1 == "未知版本")
                 {
@@ -1405,58 +1413,13 @@ namespace subs_check.win.gui
 
                         Log("开始下载内核文件...", GetRichTextBoxAllLog());
 
-                        // 定义策略列表（延迟获取 Proxy URL）
-                        var strategies = new List<Func<Task<(string desc, bool useSysProxy, string url)>>>();
 
-                        // 如果系统代理可用，先加一个策略
-                        if (SysProxySetting.IsAvailable)
-                        {
-                            strategies.Add(() => Task.FromResult(("系统代理 + 原生下载链接", true, downloadUrl)));
-                        }
+                        // 优先尝试 GitHub 代理，再尝试系统代理,最后使用无代理直连
+                        var (downloadSuccess, failureReason) = await TryDownloadWithStrategiesAsync(
+                            downloadUrl,
+                            zipFilePath,
+                            new[] { DownloadStrategy.SystemProxy, DownloadStrategy.GithubProxy, DownloadStrategy.Direct });
 
-                        // 需要异步的才用 async/await
-                        strategies.Add(async () =>
-                        {
-                            githubProxyURL = await GetGithubProxyUrlAsync();
-                            return ("直连 GitHub Proxy 链接", false, githubProxyURL + downloadUrl);
-                        });
-
-                        // 无代理 + 原生链接
-                        strategies.Add(() => Task.FromResult(("无代理 + 原生下载链接", false, downloadUrl)));
-
-                        // 总尝试次数
-                        int totalTries = strategies.Count;
-
-                        bool downloadSuccess = false;
-                        string failureReason = "";
-
-                        for (int i = 0; i < totalTries && !downloadSuccess; i++)
-                        {
-                            var (desc, useSysProxy, url) = await strategies[i]();
-
-                            try
-                            {
-                                Log($"[尝试{i + 1}/{totalTries}] {desc} => {url}", GetRichTextBoxAllLog());
-
-                                using (HttpClient httpClient = new HttpClient(new HttpClientHandler
-                                {
-                                    UseProxy = useSysProxy,
-                                    Proxy = useSysProxy ? WebRequest.DefaultWebProxy : null
-                                }))
-                                {
-                                    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-                                        "Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                                    httpClient.Timeout = TimeSpan.FromSeconds(30);
-
-                                    downloadSuccess = await DownloadFileWithProgressAsync(httpClient, url, zipFilePath);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                failureReason = ex.Message;
-                                Log($"[尝试{i + 1}/{totalTries}] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
-                            }
-                        }
 
                         // 如果所有尝试失败
                         if (!downloadSuccess)
@@ -1499,7 +1462,7 @@ namespace subs_check.win.gui
                                 await SaveConfig(false);
 
                                 // 可选：删除 zip 文件（注释状态保留原样）
-                                // File.Delete(zipFilePath);
+                                File.Delete(zipFilePath);
                             }
                             else
                             {
@@ -2899,7 +2862,8 @@ namespace subs_check.win.gui
             var (success, lastError) = await TryDownloadWithStrategiesAsync(
                 downloadUrl,
                 downloadFilePath,
-                new[] { DownloadStrategy.GithubProxy, DownloadStrategy.SystemProxy, DownloadStrategy.Direct });
+                new[] { DownloadStrategy.GithubProxy, DownloadStrategy.SystemProxy, DownloadStrategy.Direct },
+                false);
 
             if (!success)
             {
@@ -2925,7 +2889,8 @@ namespace subs_check.win.gui
         private async Task<(bool success, string lastError)> TryDownloadWithStrategiesAsync(
             string downloadUrl,
             string downloadFilePath,
-            IEnumerable<DownloadStrategy> strategyOrder)
+            IEnumerable<DownloadStrategy> strategyOrder,
+            bool noRepeat = true)
         {
             bool success = false;
             string lastError = "";
@@ -2944,22 +2909,14 @@ namespace subs_check.win.gui
                 },
                 [DownloadStrategy.SystemProxy] = async () =>
                 {
-                    await AutoCheckSysProxy();
+                    if (SysProxySetting != null)
+                        await AutoCheckSysProxy(noRepeat);
                     return SysProxySetting.IsAvailable ? (true, downloadUrl) : (true, null); // null 表示跳过
                 },
                 [DownloadStrategy.Direct] = () => Task.FromResult((false, downloadUrl))
             };
 
-            var strategies = new List<DownloadStrategy>();
-
-            foreach (var s in strategyOrder)
-            {
-                var (useSysProxy, url) = await strategyFuncs[s]();
-                if (url != null)
-                {
-                    strategies.Add(s);
-                }
-            }
+            var strategies = strategyOrder.ToList();
             int totalTries = strategies.Count;
 
             for (int i = 0; i < totalTries && !success; i++)
@@ -2968,7 +2925,12 @@ namespace subs_check.win.gui
                 try
                 {
                     var (useSysProxy, url) = await strategyFuncs[strategy]();
-                    //Log($"[尝试{i + 1}/{totalTries}] 使用 {strategy} 下载", GetRichTextBoxAllLog(), true);
+
+                    if (url == null)
+                    {
+                        Log($"[尝试{i + 1}/{totalTries}] 策略 {strategy} 不可用,跳过检测。", GetRichTextBoxAllLog(), true);
+                        continue; // 直接跳过
+                    }
 
                     using (HttpClientHandler handler = new HttpClientHandler
                     {
