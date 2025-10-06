@@ -130,10 +130,10 @@ namespace subs_check.win.gui
             SetupNotifyIconContextMenu();
         }
 
-        private async void MainGui_Shown(object sender, EventArgs e)
+        private void MainGui_Shown(object sender, EventArgs e)
         {
             // 先检查系统代理
-            await AutoCheckSysProxy();
+            //await AutoCheckSysProxy();
 
             // 再初始化 AutoUpdater
             AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
@@ -617,10 +617,6 @@ namespace subs_check.win.gui
                         }
                     }
 
-                    //// 添加GitHub代理前缀如果有
-                    //githubProxyURL = await GetGithubProxyUrlAsync();
-                    //await AutoCheckSysProxy();
-
                     string mihomoOverwriteUrl = 读取config字符串(config, "mihomo-overwrite-url");
                     int mihomoOverwriteUrlIndex = mihomoOverwriteUrl.IndexOf(githubRawPrefix);
                     if (mihomoOverwriteUrl != null)
@@ -1019,8 +1015,6 @@ namespace subs_check.win.gui
                     {
                         Directory.CreateDirectory(outputFolderPath);
                     }
-
-                    //await AutoCheckSysProxy();
 
                     // 确定文件完整路径
                     downloadFilePath = Path.Combine(outputFolderPath, fileName);
@@ -2501,7 +2495,7 @@ namespace subs_check.win.gui
                         {
                             // 找到可用代理
                             detectedProxyURL = $"https://{proxyItem}/";
-                            richTextBoxAllLog.Clear();
+                            //richTextBoxAllLog.Clear();
                             Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                             proxyFound = true;
                             break;
@@ -2901,41 +2895,80 @@ namespace subs_check.win.gui
             progressBarAll.Value = 0;
             progressBarAll.Visible = true;
 
+            // 优先尝试 GitHub 带来，再尝试系统代理,最后使用无代理直连
+            var (success, lastError) = await TryDownloadWithStrategiesAsync(
+                downloadUrl,
+                downloadFilePath,
+                new[] { DownloadStrategy.GithubProxy, DownloadStrategy.SystemProxy, DownloadStrategy.Direct });
+
+            if (!success)
+            {
+                Log($"{displayName} 覆写配置文件 下载失败: {lastError}", GetRichTextBoxAllLog(), true);
+            }
+            else
+            {
+                //richTextBoxAllLog.Clear();
+                Log($"{displayName} 覆写配置文件 下载成功", GetRichTextBoxAllLog());
+            }
+        }
+
+        /// <summary>
+        /// 下载策略
+        /// </summary>
+        enum DownloadStrategy
+        {
+            GithubProxy,
+            SystemProxy,
+            Direct
+        }
+
+        private async Task<(bool success, string lastError)> TryDownloadWithStrategiesAsync(
+            string downloadUrl,
+            string downloadFilePath,
+            IEnumerable<DownloadStrategy> strategyOrder)
+        {
             bool success = false;
             string lastError = "";
 
-            // 定义策略列表（延迟获取 Proxy URL）
-            var strategies = new List<Func<Task<(string desc, bool useSysProxy, string url)>>>();
-
-            // 需要异步的才用 async/await
-            strategies.Add(async () =>
+            // 策略映射表
+            var strategyFuncs = new Dictionary<DownloadStrategy, Func<Task<(bool useSysProxy, string url)>>>()
             {
-                githubProxyURL = await GetGithubProxyUrlAsync();
-                return ("直连 GitHub Proxy 链接", false, githubProxyURL + downloadUrl);
-            });
+                [DownloadStrategy.GithubProxy] = async () =>
+                {
+                    string githubProxyURL = await GetGithubProxyUrlAsync();
+                    if (githubProxyURL == "")
+                    {
+                        return (false, null); // null 表示跳过
+                    }
+                    return (false, githubProxyURL + downloadUrl);
+                },
+                [DownloadStrategy.SystemProxy] = async () =>
+                {
+                    await AutoCheckSysProxy();
+                    return SysProxySetting.IsAvailable ? (true, downloadUrl) : (true, null); // null 表示跳过
+                },
+                [DownloadStrategy.Direct] = () => Task.FromResult((false, downloadUrl))
+            };
 
-            await AutoCheckSysProxy();
-            // 如果系统代理可用，先加一个策略
-            if (SysProxySetting.IsAvailable)
+            var strategies = new List<DownloadStrategy>();
+
+            foreach (var s in strategyOrder)
             {
-                strategies.Add(() => Task.FromResult(("系统代理 + 原生下载链接", true, downloadUrl)));
+                var (useSysProxy, url) = await strategyFuncs[s]();
+                if (url != null)
+                {
+                    strategies.Add(s);
+                }
             }
-
-
-
-            // 无代理 + 原生链接
-            strategies.Add(() => Task.FromResult(("无代理 + 原生下载链接", false, downloadUrl)));
-
-
-            // 总尝试次数
             int totalTries = strategies.Count;
 
             for (int i = 0; i < totalTries && !success; i++)
             {
-                var (desc, useSysProxy, url) = await strategies[i]();
+                var strategy = strategies[i];
                 try
                 {
-                    //Log($"[尝试{i + 1}/{totalTries}] {desc} => {url}", GetRichTextBoxAllLog());
+                    var (useSysProxy, url) = await strategyFuncs[strategy]();
+                    //Log($"[尝试{i + 1}/{totalTries}] 使用 {strategy} 下载", GetRichTextBoxAllLog(), true);
 
                     using (HttpClientHandler handler = new HttpClientHandler
                     {
@@ -2953,20 +2986,13 @@ namespace subs_check.win.gui
                 catch (Exception ex)
                 {
                     lastError = ex.Message;
-                    Log($"[尝试{i + 1}/{totalTries}] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
+                    Log($"[尝试{i + 1}/{totalTries}] 使用 {strategy} 下载失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
             }
 
-            progressBarAll.Visible = false;
-            if (!success)
-            {
-                Log($"{displayName} 覆写配置文件 下载失败: {lastError}", GetRichTextBoxAllLog(), true);
-            }
-            else
-            {
-                Log($"{displayName} 覆写配置文件 下载成功", GetRichTextBoxAllLog());
-            }
+            return (success, lastError);
         }
+
 
         /// <summary>
         /// 下载文件并更新进度条
