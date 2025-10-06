@@ -43,6 +43,10 @@ namespace subs_check.win.gui
         private string nextCheckTime = null;// 用于存储下次检查时间
         string WebUIapiKey = "CMLiussss";
         int downloading = 0;
+        private SysProxyResult SysProxySetting;
+
+        private static DateTime _lastGetGithubProxyRunTime = DateTime.MinValue;
+        private static string _lastGithubProxyUrl = null;
 
         // ——用于避免无意义的重复 UI 重绘——
         private string _lastLogLabelNodeInfoText = string.Empty;
@@ -56,6 +60,7 @@ namespace subs_check.win.gui
         public MainGui()
         {
             InitializeComponent();
+
             this.Shown += MainGui_Shown;
 
             originalNotifyIcon = notifyIcon1.Icon;
@@ -125,19 +130,20 @@ namespace subs_check.win.gui
             SetupNotifyIconContextMenu();
         }
 
-        private void MainGui_Shown(object sender, EventArgs e)
+        private async void MainGui_Shown(object sender, EventArgs e)
         {
+            // 先检查系统代理
+            await AutoCheckSysProxy();
+
+            // 再初始化 AutoUpdater
             AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
             AutoUpdater.ApplicationExitEvent += AutoUpdater_ApplicationExitEvent;
 
-            // AutoUpdater.Mandatory = true;
-            // AutoUpdater.UpdateMode = Mode.Forced;
             AutoUpdater.Icon = Properties.Resources.download;
             AutoUpdater.ShowRemindLaterButton = false;
             AutoUpdater.ReportErrors = true;
             AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-            // 注意：这里不需要 SetOwner(MainGui.ActiveForm)，因为当前窗体就是 Owner
             AutoUpdater.Start("https://gh.39.al/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
         }
 
@@ -174,6 +180,49 @@ namespace subs_check.win.gui
                         args.Error.GetType().ToString(), MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        public async Task AutoCheckSysProxy(bool lognow = true)
+        {
+            // 自动检测系统代理
+            string configProxy = comboBoxSysProxy.Text;
+
+            SysProxySetting = await Proxy.GetSysProxyAsync(configProxy);
+
+            if (SysProxySetting != null && SysProxySetting.IsAvailable)
+            {
+                if (comboBoxSysProxy.Text == SysProxySetting.Address)
+                {
+                    Log("设置系统代理: " + SysProxySetting.Address, GetRichTextBoxAllLog());
+                }
+                else
+                {
+                    string input = SysProxySetting.Address?.Trim() ?? string.Empty;
+
+                    // 检查是否存在 "://" 协议部分
+                    int protocolIndex = input.IndexOf("://");
+                    if (protocolIndex >= 0)
+                    {
+                        input = input.Substring(protocolIndex + 3);
+                    }
+
+                    // 检查是否存在 "/" 路径部分
+                    int pathIndex = input.IndexOf('/');
+                    if (pathIndex >= 0)
+                    {
+                        input = input.Substring(0, pathIndex);
+                    }
+
+                    comboBoxSysProxy.Text = input;
+                    Log("检测到系统代理: " + SysProxySetting.Address, GetRichTextBoxAllLog());
+
+                    //await SaveConfig(false);
+                }
+            }
+            else
+            {
+                Log("未发现系统代理", GetRichTextBoxAllLog());
             }
         }
 
@@ -309,47 +358,8 @@ namespace subs_check.win.gui
             this.Text = 标题;// + " TG:CMLiussss BY:CM喂饭 干货满满";
             comboBoxSaveMethod.Text = "本地";
             comboBoxSubscriptionType.Text = "通用订阅";
+
             ReadConfig();
-
-            //自动检测系统代理
-            string configProxy = comboBoxSysProxy.Text;
-            SysProxyResult sysProxy = await Proxy.GetSysProxyAsync(configProxy);
-
-            if (sysProxy.IsAvailable)
-            {
-                if (comboBoxSysProxy.Text == sysProxy.Address)
-                {
-                    Log("设置系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
-                }
-                else
-                {
-                    string input = sysProxy.Address.Trim();
-
-                    // 检查是否存在 "://" 协议部分
-                    int protocolIndex = input.IndexOf("://");
-                    if (protocolIndex >= 0)
-                    {
-                        // 保留 "://" 之后的内容
-                        input = input.Substring(protocolIndex + 3);
-                    }
-
-                    // 检查是否存在 "/" 路径部分
-                    int pathIndex = input.IndexOf('/');
-                    if (pathIndex >= 0)
-                    {
-                        // 只保留 "/" 之前的域名部分
-                        input = input.Substring(0, pathIndex);
-                    }
-
-                    comboBoxSysProxy.Text = input;
-                    Log("检测到系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
-                    await SaveConfig(false);
-                }
-            }
-            else
-            {
-                Log("未发现系统代理", GetRichTextBoxAllLog());
-            }
 
             if (checkBoxHighConcurrent.Checked)
             {
@@ -540,7 +550,6 @@ namespace subs_check.win.gui
                         comboBoxSysProxy.Text = "自动检测";
                     }
 
-
                     string switchX64 = 读取config字符串(config, "switch-x64");
                     if (switchX64 != null && switchX64 == "true") checkBoxSwitchArch64.Checked = true;
                     else checkBoxSwitchArch64.Checked = false;
@@ -608,8 +617,9 @@ namespace subs_check.win.gui
                         }
                     }
 
-                    // 添加GitHub代理前缀如果有
-                    githubProxyURL = await GetGithubProxyUrlAsync();
+                    //// 添加GitHub代理前缀如果有
+                    //githubProxyURL = await GetGithubProxyUrlAsync();
+                    //await AutoCheckSysProxy();
 
                     string mihomoOverwriteUrl = 读取config字符串(config, "mihomo-overwrite-url");
                     int mihomoOverwriteUrlIndex = mihomoOverwriteUrl.IndexOf(githubRawPrefix);
@@ -620,12 +630,12 @@ namespace subs_check.win.gui
                             if (mihomoOverwriteUrl.EndsWith("bdg.yaml", StringComparison.OrdinalIgnoreCase))
                             {
                                 comboBoxOverwriteUrls.Text = "[内置]布丁狗的订阅转换";
-                                await ProcessComboBox5Selection();
+                                await comboBoxOverwriteUrlsSelection();
                             }
                             else if (mihomoOverwriteUrl.EndsWith("ACL4SSR_Online_Full.yaml", StringComparison.OrdinalIgnoreCase))
                             {
                                 comboBoxOverwriteUrls.Text = "[内置]ACL4SSR_Online_Full";
-                                await ProcessComboBox5Selection();
+                                await comboBoxOverwriteUrlsSelection();
                             }
                         }
                         else if (mihomoOverwriteUrlIndex > 0) comboBoxOverwriteUrls.Text = mihomoOverwriteUrl.Substring(mihomoOverwriteUrlIndex);
@@ -789,8 +799,6 @@ namespace subs_check.win.gui
                 {
                     comboBoxGithubProxyUrl.Text = "自动选择";
                     comboBoxSysProxy.Text = "自动检测";
-                    // 添加GitHub代理前缀如果有
-                    githubProxyURL = await GetGithubProxyUrlAsync();
 
                     comboBoxOverwriteUrls.Text = "[内置]布丁狗的订阅转换";
 
@@ -1012,9 +1020,11 @@ namespace subs_check.win.gui
                         Directory.CreateDirectory(outputFolderPath);
                     }
 
+                    //await AutoCheckSysProxy();
+
                     // 确定文件完整路径
                     downloadFilePath = Path.Combine(outputFolderPath, fileName);
-                    if (!File.Exists(downloadFilePath)) await ProcessComboBox5Selection();
+                    if (!File.Exists(downloadFilePath)) await comboBoxOverwriteUrlsSelection();
 
                     // 检查文件是否存在
                     if (!File.Exists(downloadFilePath))
@@ -1027,6 +1037,7 @@ namespace subs_check.win.gui
                         Log($"{displayName} 覆写配置文件 加载成功。", GetRichTextBoxAllLog());
                         config["mihomo-overwrite-url"] = $"http://127.0.0.1:{numericUpDownWebUIPort.Value}/{fileName}";
                     }
+
                 }
                 else if (comboBoxOverwriteUrls.Text.StartsWith(githubRawPrefix)) config["mihomo-overwrite-url"] = githubProxyURL + comboBoxOverwriteUrls.Text;
                 else config["mihomo-overwrite-url"] = comboBoxOverwriteUrls.Text != "" ? comboBoxOverwriteUrls.Text : $"http://127.0.0.1:{numericUpDownWebUIPort.Value}/ACL4SSR_Online_Full.yaml";
@@ -1238,46 +1249,7 @@ namespace subs_check.win.gui
                     buttonStartCheck.Text = "⏹️ 停止";
                     toolTip1.SetToolTip(buttonStartCheck, "停止内核检测进程!");
 
-                    // 自动检测系统代理
-                    string configProxy = comboBoxSysProxy.Text;
-                    SysProxyResult sysProxy = await Proxy.GetSysProxyAsync(configProxy);
-
-                    if (sysProxy.IsAvailable)
-                    {
-                        if (comboBoxSysProxy.Text == sysProxy.Address)
-                        {
-                            Log("设置系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
-                        }
-                        else
-                        {
-                            string input = sysProxy.Address.Trim();
-
-                            // 检查是否存在 "://" 协议部分
-                            int protocolIndex = input.IndexOf("://");
-                            if (protocolIndex >= 0)
-                            {
-                                // 保留 "://" 之后的内容
-                                input = input.Substring(protocolIndex + 3);
-                            }
-
-                            // 检查是否存在 "/" 路径部分
-                            int pathIndex = input.IndexOf('/');
-                            if (pathIndex >= 0)
-                            {
-                                // 只保留 "/" 之前的域名部分
-                                input = input.Substring(0, pathIndex);
-                            }
-
-                            comboBoxSysProxy.Text = input;
-                            Log("检测到系统代理: " + sysProxy.Address, GetRichTextBoxAllLog());
-                            await SaveConfig(false);
-                        }
-                    }
-                    else
-                    {
-                        Log("未发现系统代理", GetRichTextBoxAllLog());
-                    }
-
+                    await AutoCheckSysProxy();
                     StartSubsCheckProcess();
                 }
             }
@@ -1357,8 +1329,8 @@ namespace subs_check.win.gui
                     return;
                 }
 
-                // 每次下载前获取 githubproxy
-                githubProxyURL = await GetGithubProxyUrlAsync();
+                //检测系统代理
+                await AutoCheckSysProxy();
 
                 var result = await 获取版本号(apiUrl, true);
                 if (result.Item1 == "未知版本")
@@ -1431,116 +1403,80 @@ namespace subs_check.win.gui
                             return;
                         }
 
-                        // 处理代理链接里可能嵌套 https:// 的情况
-                        string 代理下载链接 = githubProxyURL + downloadUrl;
-                        string 原生下载链接 = 代理下载链接;
-                        // 计算"https://"在下载链接中出现的次数
-                        int httpsCount = 0;
-                        int lastIndex = -1;
-                        int currentIndex = 0;
-
-                        // 查找所有"https://"出现的位置
-                        while ((currentIndex = 代理下载链接.IndexOf("https://", currentIndex)) != -1)
-                        {
-                            httpsCount++;
-                            lastIndex = currentIndex;
-                            currentIndex += 8; // "https://".Length = 8
-                        }
-
-                        // 如果"https://"出现2次或以上，提取最后一个"https://"之后的内容
-                        if (httpsCount >= 2 && lastIndex != -1)
-                        {
-                            原生下载链接 = 代理下载链接.Substring(lastIndex);
-                        }
-
                         string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
-                        // 创建下载请求 - 优化的多级尝试下载逻辑
-                        Log("开始下载文件...", GetRichTextBoxAllLog());
-                        bool downloadSuccess = false;
                         string zipFilePath = Path.Combine(executablePath, desiredAssetName);
-                        string failureReason = "";
 
                         // 如果文件已存在，先删除
                         if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
 
-                        // 第一次尝试：使用代理下载链接 + 当前HttpClient(不使用系统代理)
-                        try
+                        Log("开始下载内核文件...", GetRichTextBoxAllLog());
+
+                        // 定义策略列表（延迟获取 Proxy URL）
+                        var strategies = new List<Func<Task<(string desc, bool useSysProxy, string url)>>>();
+
+                        // 如果系统代理可用，先加一个策略
+                        if (SysProxySetting.IsAvailable)
                         {
-                            Log($"[尝试1/4] 使用代理下载链接：{代理下载链接}", GetRichTextBoxAllLog());
-                            downloadSuccess = await DownloadFileAsync(client, 代理下载链接, zipFilePath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log($"[尝试1/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
-                            failureReason = ex.Message;
+                            strategies.Add(() => Task.FromResult(("系统代理 + 原生下载链接", true, downloadUrl)));
                         }
 
-                        // 如果第一次尝试失败，且代理链接与原生链接不同，使用原生下载链接尝试
-                        if (!downloadSuccess && 代理下载链接 != 原生下载链接)
+                        // 需要异步的才用 async/await
+                        strategies.Add(async () =>
                         {
+                            githubProxyURL = await GetGithubProxyUrlAsync();
+                            return ("直连 GitHub Proxy 链接", false, githubProxyURL + downloadUrl);
+                        });
+
+                        // 无代理 + 原生链接
+                        strategies.Add(() => Task.FromResult(("无代理 + 原生下载链接", false, downloadUrl)));
+
+                        // 总尝试次数
+                        int totalTries = strategies.Count;
+
+                        bool downloadSuccess = false;
+                        string failureReason = "";
+
+                        for (int i = 0; i < totalTries && !downloadSuccess; i++)
+                        {
+                            var (desc, useSysProxy, url) = await strategies[i]();
+
                             try
                             {
-                                Log($"[尝试2/4] 使用原生下载链接：{原生下载链接}", GetRichTextBoxAllLog());
-                                downloadSuccess = await DownloadFileAsync(client, 原生下载链接, zipFilePath);
+                                Log($"[尝试{i + 1}/{totalTries}] {desc} => {url}", GetRichTextBoxAllLog());
+
+                                using (HttpClient httpClient = new HttpClient(new HttpClientHandler
+                                {
+                                    UseProxy = useSysProxy,
+                                    Proxy = useSysProxy ? WebRequest.DefaultWebProxy : null
+                                }))
+                                {
+                                    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
+                                        "Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
+                                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+
+                                    downloadSuccess = await DownloadFileWithProgressAsync(httpClient, url, zipFilePath);
+                                }
                             }
                             catch (Exception ex)
                             {
-                                Log($"[尝试2/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                                 failureReason = ex.Message;
+                                Log($"[尝试{i + 1}/{totalTries}] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                             }
                         }
 
-                        // 如果前面的尝试都失败，创建使用系统代理的HttpClient再次尝试
-                        if (!downloadSuccess)
-                        {
-                            try
-                            {
-                                Log("[尝试3/4] 使用系统代理 + 代理下载链接", GetRichTextBoxAllLog());
-                                using (HttpClient proxyClient = new HttpClient())
-                                {
-                                    proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                                    proxyClient.Timeout = TimeSpan.FromSeconds(30);
-
-                                    downloadSuccess = await DownloadFileAsync(proxyClient, 代理下载链接, zipFilePath);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Log($"[尝试3/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
-                                failureReason = ex.Message;
-                            }
-
-                            // 最后一次尝试：使用系统代理 + 原生链接（如果不同）
-                            if (!downloadSuccess && 代理下载链接 != 原生下载链接)
-                            {
-                                try
-                                {
-                                    Log("[尝试4/4] 使用系统代理 + 原生下载链接", GetRichTextBoxAllLog());
-                                    using (HttpClient proxyClient = new HttpClient())
-                                    {
-                                        proxyClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                                        proxyClient.Timeout = TimeSpan.FromSeconds(30);
-
-                                        downloadSuccess = await DownloadFileAsync(proxyClient, 原生下载链接, zipFilePath);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log($"[尝试4/4] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
-                                    failureReason = ex.Message;
-                                }
-                            }
-                        }
-
+                        // 如果所有尝试失败
                         if (!downloadSuccess)
                         {
                             Log($"所有下载尝试均失败，最后错误: {failureReason}", GetRichTextBoxAllLog(), true);
-                            MessageBox.Show($"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
+                            MessageBox.Show(
+                                $"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                             progressBarAll.Value = 0;
                             progressBarAll.Visible = false;
                             return;
                         }
+
 
                         // 下载成功 -> 解压并查找 subs-check.exe
                         Log("下载完成，正在解压文件...", GetRichTextBoxAllLog());
@@ -1746,6 +1682,7 @@ namespace subs_check.win.gui
                 // 重置进度条
                 progressBarAll.Value = 0;
                 progressBarAll.Visible = true;
+                progressBarAll.Enabled = true;
                 labelLogNodeInfo.Text = "实时日志";
                 using (MemoryStream ms = new MemoryStream(Properties.Resources.going))
                 {
@@ -2650,12 +2587,12 @@ namespace subs_check.win.gui
                     Log("未找到现有的 subs-check.exe 文件，将直接下载最新版本", GetRichTextBoxAllLog());
                 }
 
-                // 检测可用的 GitHub 代理
-                githubProxyURL = await GetGithubProxyUrlAsync();
-                if (githubProxyURL == "")
-                {
-                    Log("未设置 GitHub 代理，将尝试直接下载", GetRichTextBoxAllLog(), true);
-                }
+                //// 检测可用的 GitHub 代理
+                //githubProxyURL = await GetGithubProxyUrlAsync();
+                //if (githubProxyURL == "")
+                //{
+                //    Log("未设置 GitHub 代理，将尝试直接下载", GetRichTextBoxAllLog(), true);
+                //}
 
                 // 下载最新版本的 subs-check.exe
                 await DownloadSubsCheckEXE();
@@ -2927,126 +2864,161 @@ namespace subs_check.win.gui
 
         private async void comboBoxOverwriteUrls_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBoxOverwriteUrls.Text.Contains("[内置]")) await ProcessComboBox5Selection(true);
+            if (comboBoxOverwriteUrls.Text.Contains("[内置]")) await comboBoxOverwriteUrlsSelection(true);
         }
 
-        private async Task ProcessComboBox5Selection(bool 汇报Log = false)
+        private async Task comboBoxOverwriteUrlsSelection(bool 汇报Log = false)
         {
             // 确定文件名和下载URL
-            string fileName;
-            string downloadFilePath;
-            string downloadUrl;
-            string displayName;
-            string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            string fileName, downloadUrl, displayName;
+            string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
+
             if (comboBoxOverwriteUrls.Text.Contains("[内置]布丁狗"))
             {
                 fileName = "bdg.yaml";
                 displayName = "[内置]布丁狗的订阅转换";
                 downloadUrl = "https://raw.githubusercontent.com/cmliu/ACL4SSR/main/yaml/bdg.yaml";
             }
-            else // [内置]ACL4SSR
+            else
             {
                 fileName = "ACL4SSR_Online_Full.yaml";
                 displayName = "[内置]ACL4SSR_Online_Full";
                 downloadUrl = "https://raw.githubusercontent.com/beck-8/override-hub/main/yaml/ACL4SSR_Online_Full.yaml";
             }
 
-            // 确保output文件夹存在
             string outputFolderPath = Path.Combine(executablePath, "output");
-            if (!Directory.Exists(outputFolderPath))
+            Directory.CreateDirectory(outputFolderPath);
+
+            string downloadFilePath = Path.Combine(outputFolderPath, fileName);
+
+            if (File.Exists(downloadFilePath))
             {
-                Directory.CreateDirectory(outputFolderPath);
+                if (汇报Log) Log($"{displayName} 覆写配置文件 已就绪。", GetRichTextBoxAllLog());
+                return;
             }
 
-            // 确定文件完整路径
-            downloadFilePath = Path.Combine(outputFolderPath, fileName);
+            Log($"{displayName} 覆写配置文件 未找到，正在下载...", GetRichTextBoxAllLog());
+            progressBarAll.Value = 0;
+            progressBarAll.Visible = true;
 
-            // 检查文件是否存在
-            if (!File.Exists(downloadFilePath))
+            bool success = false;
+            string lastError = "";
+
+            // 定义策略列表（延迟获取 Proxy URL）
+            var strategies = new List<Func<Task<(string desc, bool useSysProxy, string url)>>>();
+
+            // 需要异步的才用 async/await
+            strategies.Add(async () =>
             {
-                Log($"{displayName} 覆写配置文件 未找到，正在下载...", GetRichTextBoxAllLog());
+                githubProxyURL = await GetGithubProxyUrlAsync();
+                return ("直连 GitHub Proxy 链接", false, githubProxyURL + downloadUrl);
+            });
 
-                // 重置进度条
-                progressBarAll.Value = 0;
-                progressBarAll.Visible = true;
+            await AutoCheckSysProxy();
+            // 如果系统代理可用，先加一个策略
+            if (SysProxySetting.IsAvailable)
+            {
+                strategies.Add(() => Task.FromResult(("系统代理 + 原生下载链接", true, downloadUrl)));
+            }
 
-                //// 添加GitHub代理前缀如果有
-                //githubProxyURL = await GetGithubProxyUrlAsync();
-                string fullDownloadUrl = githubProxyURL + downloadUrl;
 
+
+            // 无代理 + 原生链接
+            strategies.Add(() => Task.FromResult(("无代理 + 原生下载链接", false, downloadUrl)));
+
+
+            // 总尝试次数
+            int totalTries = strategies.Count;
+
+            for (int i = 0; i < totalTries && !success; i++)
+            {
+                var (desc, useSysProxy, url) = await strategies[i]();
                 try
                 {
-                    // 创建不使用系统代理的HttpClientHandler
-                    using (HttpClientHandler handler = new HttpClientHandler { UseProxy = false, Proxy = null })
+                    //Log($"[尝试{i + 1}/{totalTries}] {desc} => {url}", GetRichTextBoxAllLog());
+
+                    using (HttpClientHandler handler = new HttpClientHandler
+                    {
+                        UseProxy = useSysProxy,
+                        Proxy = useSysProxy ? WebRequest.DefaultWebProxy : null
+                    })
                     using (HttpClient client = new HttpClient(handler))
                     {
-                        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
-                        client.Timeout = TimeSpan.FromSeconds(15); // 设置15秒超时
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86)");
+                        client.Timeout = TimeSpan.FromSeconds(15);
 
-                        // 先获取文件大小
-                        HttpResponseMessage headResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, fullDownloadUrl));
-                        long totalBytes = headResponse.Content.Headers.ContentLength ?? 0;
-
-                        // 如果无法获取文件大小，显示不确定进度
-                        if (totalBytes == 0)
-                        {
-                            Console.WriteLine($"无法获取 {displayName} 文件大小，将显示不确定进度");
-                        }
-
-                        // 创建下载请求并获取响应流
-                        using (var response = await client.GetAsync(fullDownloadUrl, HttpCompletionOption.ResponseHeadersRead))
-                        {
-                            if (response.IsSuccessStatusCode)
-                            {
-                                using (var contentStream = await response.Content.ReadAsStreamAsync())
-                                using (var fileStream = new FileStream(downloadFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
-                                {
-                                    byte[] buffer = new byte[8192];
-                                    long totalBytesRead = 0;
-                                    int bytesRead;
-
-                                    while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                                    {
-                                        await fileStream.WriteAsync(buffer, 0, bytesRead);
-                                        totalBytesRead += bytesRead;
-
-                                        // 更新进度条
-                                        if (totalBytes > 0)
-                                        {
-                                            int progressPercentage = (int)((totalBytesRead * 100) / totalBytes);
-                                            // 确保进度值在有效范围内 (0-100)
-                                            progressPercentage = Math.Min(100, Math.Max(0, progressPercentage));
-                                            progressBarAll.Value = progressPercentage;
-                                        }
-                                    }
-
-                                    // 确保进度条显示100%
-                                    progressBarAll.Value = 100;
-                                }
-                                progressBarAll.Visible = false;
-                                Log($"{displayName} 覆写配置文件 下载成功", GetRichTextBoxAllLog());
-                            }
-                            else
-                            {
-                                progressBarAll.Visible = false;
-                                Log($"{displayName} 覆写配置文件 下载失败: HTTP {(int)response.StatusCode} {response.ReasonPhrase}", GetRichTextBoxAllLog(), true);
-                            }
-                        }
+                        success = await DownloadFileWithProgressAsync(client, url, downloadFilePath);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log($"{displayName} 覆写配置文件 下载失败: {ex.Message}", GetRichTextBoxAllLog(), true);
-                    // 出错时重置进度条
-                    progressBarAll.Value = 0;
-                    progressBarAll.Visible = false;
+                    lastError = ex.Message;
+                    Log($"[尝试{i + 1}/{totalTries}] 失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
+            }
+
+            progressBarAll.Visible = false;
+            if (!success)
+            {
+                Log($"{displayName} 覆写配置文件 下载失败: {lastError}", GetRichTextBoxAllLog(), true);
             }
             else
             {
-                if (汇报Log) Log($"{displayName} 覆写配置文件 已就绪。", GetRichTextBoxAllLog());
+                Log($"{displayName} 覆写配置文件 下载成功", GetRichTextBoxAllLog());
             }
         }
+
+        /// <summary>
+        /// 下载文件并更新进度条
+        /// </summary>
+        private async Task<bool> DownloadFileWithProgressAsync(HttpClient httpClient, string url, string filePath)
+        {
+            try
+            {
+                // 获取文件大小
+                HttpResponseMessage headResponse = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
+                headResponse.EnsureSuccessStatusCode(); // 确保请求成功
+                long totalBytes = headResponse.Content.Headers.ContentLength ?? 0;
+
+                // 下载文件
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                {
+                    response.EnsureSuccessStatusCode(); // 确保请求成功
+
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
+                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                    {
+                        byte[] buffer = new byte[8192];
+                        long totalBytesRead = 0;
+                        int bytesRead;
+
+                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            await fileStream.WriteAsync(buffer, 0, bytesRead);
+                            totalBytesRead += bytesRead;
+
+                            // 更新进度条
+                            if (totalBytes > 0)
+                            {
+                                int progressPercentage = (int)((totalBytesRead * 100) / totalBytes);
+                                progressPercentage = Math.Min(100, Math.Max(0, progressPercentage));
+                                progressBarAll.Enabled = true;
+                                progressBarAll.Visible = true;
+                                progressBarAll.Value = progressPercentage;
+                            }
+                        }
+                    }
+                }
+                progressBarAll.Value = 0;
+                progressBarAll.Visible = false;
+                return true; // 下载成功
+            }
+            catch
+            {
+                throw; // 重新抛出异常，让调用者处理
+            }
+        }
+
 
         private void numericUpDownConcurrent_ValueChanged(object sender, EventArgs e)
         {
@@ -3223,6 +3195,8 @@ namespace subs_check.win.gui
                     if (进度条百分比 < 0) 进度条百分比 = 0;
                     if (进度条百分比 > 100) 进度条百分比 = 100;
 
+                    progressBarAll.Enabled = true;
+                    progressBarAll.Visible = true;
                     progressBarAll.Value = 进度条百分比;
 
                     if (!buttonTriggerCheck.Enabled) buttonTriggerCheck.Enabled = true;
@@ -3249,7 +3223,7 @@ namespace subs_check.win.gui
                 //labelLogNodeInfo.Text = $"{nextCheckTime}";
                 //labelLogNodeInfo.ForeColor = Color.Green;
 
-                progressBarAll.Value = 100;
+                progressBarAll.Visible = false;
 
 
                 string idleNotify = "SubsCheck: 已就绪\n" + nextCheckTime;
@@ -3293,6 +3267,8 @@ namespace subs_check.win.gui
                     buttonTriggerCheck.ForeColor = HexToRgbColor("#00BFFF");
                     //labelLogNodeInfo.Text = $"启动检测";
                     labelLogNodeInfo.ForeColor = Color.Black;
+
+                    await AutoCheckSysProxy();
                     isSuccess = await SendApiRequestAsync("/api/trigger-check", "发送手动检查信号");
                     if (isSuccess)
                     {
@@ -3652,54 +3628,6 @@ namespace subs_check.win.gui
             }
         }
 
-        // 添加辅助下载方法
-        async Task<bool> DownloadFileAsync(HttpClient httpClient, string url, string filePath)
-        {
-            try
-            {
-                // 获取文件大小
-                HttpResponseMessage headResponse = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
-                headResponse.EnsureSuccessStatusCode(); // 确保请求成功
-                long totalBytes = headResponse.Content.Headers.ContentLength ?? 0;
-
-                // 下载文件
-                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
-                {
-                    response.EnsureSuccessStatusCode(); // 确保请求成功
-
-                    using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
-                    {
-                        byte[] buffer = new byte[8192];
-                        long totalBytesRead = 0;
-                        int bytesRead;
-
-                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            await fileStream.WriteAsync(buffer, 0, bytesRead);
-                            totalBytesRead += bytesRead;
-
-                            // 更新进度条
-                            if (totalBytes > 0)
-                            {
-                                int progressPercentage = (int)((totalBytesRead * 100) / totalBytes);
-                                progressPercentage = Math.Min(100, Math.Max(0, progressPercentage));
-                                progressBarAll.Visible = true;
-                                progressBarAll.Value = progressPercentage;
-                            }
-                        }
-                    }
-                }
-                progressBarAll.Value = 0;
-                progressBarAll.Visible = false;
-                return true; // 下载成功
-            }
-            catch
-            {
-                throw; // 重新抛出异常，让调用者处理
-            }
-        }
-
         private static about aboutWindow = null;
         private void linkLabelAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -3922,25 +3850,55 @@ namespace subs_check.win.gui
 
         }
 
-        // 获取 githubproxy 地址
+        // 获取 githubproxy 地址（带 30 分钟间隔限制）
         public async Task<string> GetGithubProxyUrlAsync()
         {
             const string AUTO = "自动选择";
             if (comboBoxGithubProxyUrl == null) return githubProxyURL;
 
-            // 如已指定githubproxy，直接返回结果
-            var text = (comboBoxGithubProxyUrl.Text ?? "");
-            if (text != AUTO && text.Length > 0) return $"https://{text}/";
+            // 如果上次运行时间距今不足 30 分钟，直接返回上次结果（若有）
+            if (_lastGithubProxyUrl != null && (DateTime.Now - _lastGetGithubProxyRunTime).TotalMinutes < 30)
+            {
+                Log($"GitHub Proxy：{_lastGithubProxyUrl}", GetRichTextBoxAllLog());
+                return _lastGithubProxyUrl;
+            }
 
+            // 如已指定 githubproxy，直接返回结果
+            var text = (comboBoxGithubProxyUrl.Text ?? "");
+            if (text != AUTO && text.Length > 0)
+            {
+                _lastGithubProxyUrl = $"https://{text}/";
+                _lastGetGithubProxyRunTime = DateTime.Now;
+                return _lastGithubProxyUrl;
+            }
+
+            // 随机候选列表
             var candidates = comboBoxGithubProxyUrl.Items
                 .OfType<string>()
                 .Where(s => !string.IsNullOrWhiteSpace(s) && s != AUTO)
                 .OrderBy(_ => Guid.NewGuid())
                 .ToList();
 
-            if (!candidates.Any()) return githubProxyURL;
-            try { var detected = await DetectGitHubProxyAsync(candidates); return string.IsNullOrWhiteSpace(detected) ? githubProxyURL : detected; }
-            catch { return githubProxyURL; }
+            if (!candidates.Any())
+            {
+                _lastGithubProxyUrl = githubProxyURL;
+                _lastGetGithubProxyRunTime = DateTime.Now;
+                return _lastGithubProxyUrl;
+            }
+
+            try
+            {
+                var detected = await DetectGitHubProxyAsync(candidates);
+                _lastGithubProxyUrl = string.IsNullOrWhiteSpace(detected) ? githubProxyURL : detected;
+            }
+            catch
+            {
+                _lastGithubProxyUrl = githubProxyURL;
+            }
+
+            // 更新最后运行时间
+            _lastGetGithubProxyRunTime = DateTime.Now;
+            return _lastGithubProxyUrl;
         }
 
         // 切换高并发内核和原版内核设置项
