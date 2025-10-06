@@ -1462,7 +1462,7 @@ namespace subs_check.win.gui
                                 await SaveConfig(false);
 
                                 // 可选：删除 zip 文件（注释状态保留原样）
-                                File.Delete(zipFilePath);
+                                //File.Delete(zipFilePath);
                             }
                             else
                             {
@@ -2458,7 +2458,7 @@ namespace subs_check.win.gui
                         {
                             // 找到可用代理
                             detectedProxyURL = $"https://{proxyItem}/";
-                            //richTextBoxAllLog.Clear();
+                            richTextBoxAllLog.Clear();
                             Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                             proxyFound = true;
                             break;
@@ -2797,7 +2797,7 @@ namespace subs_check.win.gui
             };
 
             // 设置 button2 点击后关闭窗口并返回 DialogResult.OK
-            // 这需要在 CheckUpdates.cs 中修改 button2_Click 方法
+            // 这需要在 CheckUpdates.cs 中修改 buttonUpdateKernel_Click 方法
 
             // 显示 CheckUpdates 窗口
             checkUpdatesForm.ShowDialog();
@@ -3844,8 +3844,8 @@ namespace subs_check.win.gui
             const string AUTO = "自动选择";
             if (comboBoxGithubProxyUrl == null) return githubProxyURL;
 
-            // 如果上次运行时间距今不足 30 分钟，直接返回上次结果（若有）
-            if (_lastGithubProxyUrl != null && (DateTime.Now - _lastGetGithubProxyRunTime).TotalMinutes < 30)
+            // 如果上次运行时间距今不足 1 分钟，直接返回上次结果（若有）
+            if (_lastGithubProxyUrl != null && (DateTime.Now - _lastGetGithubProxyRunTime).TotalMinutes < 1)
             {
                 Log($"GitHub Proxy：{_lastGithubProxyUrl}", GetRichTextBoxAllLog());
                 return _lastGithubProxyUrl;

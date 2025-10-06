@@ -132,6 +132,20 @@ recipient-url:
   # 钉钉格式：dingtalk://&lt;secret&gt;@&lt;dd_token&gt;/&lt;chat_id&gt;
   # - dingtalk://xxxxxx@xxxxxxx/123123
 # 自定义通知标题
-notify-title: "🔔 节点状态更新"</value>
+notify-title: "🔔 节点状态更新"
+
+# 符合条件节点数量的占比，低于此值会将订阅链接打印出来，用于排查质量差的订阅
+success-rate: 0
+
+# platforms:
+#   - iprisk
+#   - openai
+#   - gemini
+#   - tiktok
+#   - youtube
+#   - netflix
+#   - disney
+#   - x
+</value>
   </data>
 </root>

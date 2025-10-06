@@ -103,6 +103,7 @@ namespace subs_check.win.gui
             if (mainForm != null)
             {
                 githubProxyURL = await mainForm.GetGithubProxyUrlAsync();
+                await mainForm.AutoCheckSysProxy();
             }
 
             if (最新GUI版本号 != 当前GUI版本号)
@@ -111,7 +112,7 @@ namespace subs_check.win.gui
                 string upgradeExePath = System.IO.Path.Combine(Application.StartupPath, "Upgrade.exe");
                 if (System.IO.File.Exists(upgradeExePath))
                 {
-                    buttonUpdateGUI.Text = "立即更新";
+                    buttonUpdateGUI.Text = "更新原版";
                     buttonUpdateGUI.Enabled = true;
                 }
                 else
@@ -308,7 +309,7 @@ namespace subs_check.win.gui
             return detectedProxyURL;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonUpdateKernel_Click(object sender, EventArgs e)
         {
             // 设置对话框结果为OK，表示用户点击了"立即更新"按钮
             this.DialogResult = DialogResult.OK;
@@ -317,7 +318,7 @@ namespace subs_check.win.gui
             this.Close();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void buttonUpdateGUI_Click(object sender, EventArgs e)
         {
             if (buttonUpdateGUI.Text == "立即更新 GUI")
             {

@@ -78,7 +78,7 @@ namespace subs_check.win.gui
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/beck-8/subs-check/blob/master/config/config.example.yaml");
+            Process.Start("https://github.com/sinspired/subs-check/blob/master/config/config.example.yaml");
         }
 
         private void button1_Click(object sender, EventArgs e)

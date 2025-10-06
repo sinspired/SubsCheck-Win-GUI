@@ -74,7 +74,7 @@ namespace subs_check.win.gui
 
                 using (var client = new HttpClient(handler))
                 {
-                    client.Timeout = TimeSpan.FromSeconds(10);
+                    client.Timeout = TimeSpan.FromSeconds(5);
 
                     var testUrls = new List<Tuple<string, HttpStatusCode>>
                     {

@@ -93,7 +93,7 @@
             this.buttonUpdateGUI.TabIndex = 2;
             this.buttonUpdateGUI.Text = "正在获取版本";
             this.buttonUpdateGUI.UseVisualStyleBackColor = true;
-            this.buttonUpdateGUI.Click += new System.EventHandler(this.button1_Click);
+            this.buttonUpdateGUI.Click += new System.EventHandler(this.buttonUpdateGUI_Click);
             // 
             // label2
             // 
@@ -161,7 +161,7 @@
             this.buttonUpdateCore.TabIndex = 2;
             this.buttonUpdateCore.Text = "正在获取版本";
             this.buttonUpdateCore.UseVisualStyleBackColor = true;
-            this.buttonUpdateCore.Click += new System.EventHandler(this.button2_Click);
+            this.buttonUpdateCore.Click += new System.EventHandler(this.buttonUpdateKernel_Click);
             // 
             // label7
             // 
