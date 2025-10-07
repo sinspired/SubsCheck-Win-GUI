@@ -2358,7 +2358,7 @@ namespace subs_check.win.gui
             return richTextBoxAllLog;
         }
 
-        private void Log(string message, RichTextBox richTextBoxAllLog, bool isError = false)
+        public void Log(string message, RichTextBox richTextBoxAllLog, bool isError = false)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string logType = isError ? "ERR" : "INF";
@@ -2697,6 +2697,7 @@ namespace subs_check.win.gui
                 editURLsForm.UrlContent = textBoxSubsUrls.Text + "\n";
                 editURLsForm.githubProxys = comboBoxGithubProxyUrl.Items;
                 editURLsForm.githubProxy = comboBoxGithubProxyUrl.Text;
+                editURLsForm.LogAction = (msg) => Log(msg, richTextBoxAllLog); // 传递主窗体的 Log 方法
                 // 显示对话框并等待结果
                 DialogResult result = editURLsForm.ShowDialog();
 
