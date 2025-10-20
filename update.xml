@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
-    <version>2.4.0.0</version>
-    <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/v2.4.0.0/subs-check-win.zip</url>
+    <version>2.4.0.1</version>
+    <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/v2.4.0.1/subs-check-win.zip</url>
     <changelog>https://gh.39.al/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
     <mandatory>false</mandatory>
     <executable>subs-check.win.gui.exe</executable>
