@@ -399,7 +399,7 @@ namespace subs_check.win.gui
                     return; // 静默返回，不显示错误
                 }
 
-                var result = await 获取版本号("https://api.github.com/repos/cmliu/SubsCheck-Win-GUI/releases/latest");
+                var result = await 获取版本号("https://api.github.com/repos/sinspired/SubsCheck-Win-GUI/releases/latest");
                 if (result.Item1 != "未知版本")
                 {
                     string latestVersion = result.Item1;
@@ -2443,7 +2443,7 @@ namespace subs_check.win.gui
             // 遍历随机排序后的代理列表
             foreach (string proxyItem in proxyItems)
             {
-                string checkUrl = $"https://{proxyItem}/https://raw.githubusercontent.com/cmliu/SubsCheck-Win-GUI/master/packages.config";
+                string checkUrl = $"https://{proxyItem}/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/packages.config";
                 Log($"正在测试 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                 richTextBoxAllLog.Refresh();
 

@@ -334,7 +334,7 @@ namespace subs_check.win.gui
                 return;
             }
             //下载链接
-            string downloadURL = $"{githubProxyURL}https://github.com/cmliu/SubsCheck-Win-GUI/releases/download/{最新GUI版本号}/SubsCheck_Win_GUI.zip";
+            string downloadURL = $"{githubProxyURL}https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/{最新GUI版本号}/SubsCheck_Win_GUI.zip";
             //目标文件
             string downloadEXE = "subs-check.win.gui.exe";
 

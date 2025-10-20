@@ -10,7 +10,7 @@ namespace subs_check.win.gui
     static class Program
     {
         // 定义一个全局唯一的标识符，使用项目名称作为互斥体的名称
-        private static string appMutexName = "cmliu/SubsCheck-Win-GUI";
+        private static string appMutexName = "sinspired/SubsCheck-Win-GUI";
         private static Mutex mutex;
 
         /// <summary>
