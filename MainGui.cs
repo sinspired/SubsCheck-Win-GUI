@@ -1649,6 +1649,9 @@ namespace subs_check.win.gui
                 // 获取当前应用程序目录
                 string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                 string subsCheckPath = Path.Combine(executablePath, "subs-check.exe");
+                // 设置一个环境变量以表明是有GUI启动的
+
+                Environment.SetEnvironmentVariable("START_FROM_GUI", "true");
 
                 // 检查是否有其他subs-check.exe进程正在运行，并强制结束它们
                 try
