@@ -137,6 +137,30 @@ notify-title: "🔔 节点状态更新"
 # 符合条件节点数量的占比，低于此值会将订阅链接打印出来，用于排查质量差的订阅
 success-rate: 0
 
+# 是否显示检测进度
+print-progress: false
+# 进度条显示模式:
+# "auto": 根据测活-测速-媒体检测的阶段权重自动显示
+# "stage": 每个阶段完成,显示下一阶段剩余任务
+progress-mode: auto
+
+# 是否开启新版本更新
+# 支持启动时检查更新及定时更新任务,无缝升级新版本
+# 支持apprise API通知渠道
+# true: 自动更新; false: 不更新
+update: true
+# 启动时检查更新版本
+update-on-startup: true
+# 定时检查更新
+# "0 0,9,21 * * *" 默认每天0点,9点,21点检查更新
+cron-check-update: "0 0,9,21 * * *"
+# 使用预发布版本
+prerelease: false
+# 下载新版本超时时间(分钟)(默认2分钟)
+# 如系统代理和github代理不稳定,可适当调大即可
+# 请输入整数
+update-timeout: 2
+
 # platforms:
 #   - iprisk
 #   - openai
@@ -146,6 +170,40 @@ success-rate: 0
 #   - netflix
 #   - disney
 #   - x
+
+# 只测试指定协议的节点
+node-type:
+  # - ss
+  # - vmess
+  # - vless
+
+# singbox规则配置
+# json文件为分流规则
+# js脚本用来根据规则对节点进行处理
+# singbox每个版本规则不兼容，须根据客户端版本选择合适的规则
+# singbox latest 版本配置
+singbox-latest:
+  version: 1.12
+  json:
+    - https://raw.githubusercontent.com/sinspired/sub-store-template/main/1.12.x/sing-box.json
+  js:
+    - https://raw.githubusercontent.com/sinspired/sub-store-template/main/1.12.x/sing-box.js
+
+# singbox 1.11 版本配置（iOS 兼容）
+singbox-old:
+  version: 1.11
+  json:
+    - https://raw.githubusercontent.com/sinspired/sub-store-template/main/1.11.x/sing-box.json
+  js:
+    - https://raw.githubusercontent.com/sinspired/sub-store-template/main/1.11.x/sing-box.js
+
+ghproxy-group:
+  - https://ghp.yeye.f5.si/
+  - https://git.llvho.com/
+  - https://hub.885666.xyz/
+  - https://p.jackyu.cn/
+  - https://github.cnxiaobai.com/
+
 </value>
   </data>
 </root>

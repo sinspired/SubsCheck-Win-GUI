@@ -522,6 +522,11 @@ namespace subs_check.win.gui
 
                     checkBoxHighConcurrent.Checked = needHighConcurrent;
 
+                    if (checkBoxHighConcurrent.Checked)
+                    {
+                        comboBoxSubscriptionType.Items.AddRange(new object[] { "", "tag", "enclosure", "license", "nofollow" });
+                    }
+
                     // 根据是否启用高并发，调整界面布局
                     string sysproxy;
                     if (!checkBoxHighConcurrent.Checked)
@@ -2130,7 +2135,23 @@ namespace subs_check.win.gui
             try
             {
                 // 构造URL
-                string url = comboBoxSubscriptionType.Text == "Clash" ? $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/mihomo" : $"http://{本地IP}:{numericUpDownSubStorePort.Value}/download/sub";
+                string url;
+                if (comboBoxSubscriptionType.Text == "Clash")
+                {
+                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/mihomo";
+                }
+                else if (comboBoxSubscriptionType.Text == "Singbox-1.11" && checkBoxHighConcurrent.Checked)
+                {
+                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/singbox-1.11";
+                }
+                else if (comboBoxSubscriptionType.Text == "Singbox-1.12" && checkBoxHighConcurrent.Checked)
+                {
+                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/singbox-1.11";
+                }
+                else
+                {
+                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/download/sub";
+                }
 
                 // 将URL复制到剪贴板
                 Clipboard.SetText(url);
