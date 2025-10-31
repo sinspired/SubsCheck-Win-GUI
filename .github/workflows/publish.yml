@@ -103,7 +103,7 @@ jobs:
             <version>${VERSION}</version>
             <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/${CURRENT_TAG}/subs-check-win.zip</url>
             <changelog>https://gh.39.al/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
-            <mandatory>false</mandatory>
+            <mandatory>true</mandatory>
             <executable>subs-check.win.gui.exe</executable>
         </item>
         EOF
@@ -137,7 +137,7 @@ jobs:
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }} # Bot Token
         format: markdown
         message: |
-          💻 *subs-check_GUI 更新*
+          💻 *subs-check_GUI 更新(推荐)*
 
           版本: `${{ github.ref_name }}`
           项目: `${{ github.repository }}`

@@ -68,13 +68,15 @@
             this.labelLogNodeInfo = new System.Windows.Forms.Label();
             this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
+            this.comboBoxOverwriteUrls = new System.Windows.Forms.ComboBox();
+            this.textBoxSubStorePath = new System.Windows.Forms.TextBox();
+            this.labelSubstoreParh = new System.Windows.Forms.Label();
             this.numericUpDownTotalBandwidthLimit = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownSuccessLimit = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownDownloadMb = new System.Windows.Forms.NumericUpDown();
             this.comboBoxSysProxy = new System.Windows.Forms.ComboBox();
             this.comboBoxSpeedtestUrl = new System.Windows.Forms.ComboBox();
             this.comboBoxGithubProxyUrl = new System.Windows.Forms.ComboBox();
-            this.comboBoxOverwriteUrls = new System.Windows.Forms.ComboBox();
             this.labelOverwriteUrls = new System.Windows.Forms.Label();
             this.labelDownloadMb = new System.Windows.Forms.Label();
             this.textBoxWebUiAPIKey = new System.Windows.Forms.TextBox();
@@ -197,7 +199,7 @@
             // 
             // numericUpDownMinSpeed
             // 
-            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(192, 180);
+            this.numericUpDownMinSpeed.Location = new System.Drawing.Point(197, 180);
             this.numericUpDownMinSpeed.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownMinSpeed.Maximum = new decimal(new int[] {
             20480,
@@ -221,7 +223,7 @@
             // 
             // numericUpDownTimeout
             // 
-            this.numericUpDownTimeout.Location = new System.Drawing.Point(192, 131);
+            this.numericUpDownTimeout.Location = new System.Drawing.Point(197, 131);
             this.numericUpDownTimeout.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownTimeout.Maximum = new decimal(new int[] {
             10000,
@@ -245,7 +247,7 @@
             // 
             // numericUpDownInterval
             // 
-            this.numericUpDownInterval.Location = new System.Drawing.Point(192, 82);
+            this.numericUpDownInterval.Location = new System.Drawing.Point(197, 82);
             this.numericUpDownInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownInterval.Maximum = new decimal(new int[] {
             1440,
@@ -269,7 +271,7 @@
             // 
             // numericUpDownConcurrent
             // 
-            this.numericUpDownConcurrent.Location = new System.Drawing.Point(192, 33);
+            this.numericUpDownConcurrent.Location = new System.Drawing.Point(197, 33);
             this.numericUpDownConcurrent.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.numericUpDownConcurrent.Maximum = new decimal(new int[] {
             1024,
@@ -300,7 +302,7 @@
             "gist",
             "r2",
             "webdav"});
-            this.comboBoxSaveMethod.Location = new System.Drawing.Point(192, 230);
+            this.comboBoxSaveMethod.Location = new System.Drawing.Point(197, 230);
             this.comboBoxSaveMethod.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBoxSaveMethod.Name = "comboBoxSaveMethod";
             this.comboBoxSaveMethod.Size = new System.Drawing.Size(106, 29);
@@ -310,7 +312,7 @@
             // checkBoxSwitchArch64
             // 
             this.checkBoxSwitchArch64.AutoSize = true;
-            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(167, 539);
+            this.checkBoxSwitchArch64.Location = new System.Drawing.Point(170, 539);
             this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
             this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
             this.checkBoxSwitchArch64.TabIndex = 38;
@@ -324,7 +326,7 @@
             this.textBoxCron.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.textBoxCron.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.textBoxCron.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCron.Location = new System.Drawing.Point(85, 496);
+            this.textBoxCron.Location = new System.Drawing.Point(89, 496);
             this.textBoxCron.Margin = new System.Windows.Forms.Padding(5);
             this.textBoxCron.Name = "textBoxCron";
             this.textBoxCron.Size = new System.Drawing.Size(214, 31);
@@ -406,13 +408,13 @@
             this.comboBoxSubscriptionType.Location = new System.Drawing.Point(15, 578);
             this.comboBoxSubscriptionType.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBoxSubscriptionType.Name = "comboBoxSubscriptionType";
-            this.comboBoxSubscriptionType.Size = new System.Drawing.Size(132, 29);
+            this.comboBoxSubscriptionType.Size = new System.Drawing.Size(144, 29);
             this.comboBoxSubscriptionType.TabIndex = 19;
             // 
             // buttonCopySubscriptionUrl
             // 
             this.buttonCopySubscriptionUrl.Enabled = false;
-            this.buttonCopySubscriptionUrl.Location = new System.Drawing.Point(161, 575);
+            this.buttonCopySubscriptionUrl.Location = new System.Drawing.Point(165, 575);
             this.buttonCopySubscriptionUrl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonCopySubscriptionUrl.Name = "buttonCopySubscriptionUrl";
             this.buttonCopySubscriptionUrl.Size = new System.Drawing.Size(138, 40);
@@ -427,7 +429,7 @@
             this.buttonTriggerCheck.Location = new System.Drawing.Point(13, 625);
             this.buttonTriggerCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonTriggerCheck.Name = "buttonTriggerCheck";
-            this.buttonTriggerCheck.Size = new System.Drawing.Size(138, 40);
+            this.buttonTriggerCheck.Size = new System.Drawing.Size(146, 40);
             this.buttonTriggerCheck.TabIndex = 30;
             this.buttonTriggerCheck.Text = "🔀未启动";
             this.buttonTriggerCheck.UseVisualStyleBackColor = true;
@@ -436,7 +438,7 @@
             // buttonWebUi
             // 
             this.buttonWebUi.Enabled = false;
-            this.buttonWebUi.Location = new System.Drawing.Point(161, 625);
+            this.buttonWebUi.Location = new System.Drawing.Point(165, 625);
             this.buttonWebUi.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonWebUi.Name = "buttonWebUi";
             this.buttonWebUi.Size = new System.Drawing.Size(138, 40);
@@ -448,7 +450,7 @@
             // checkBoxStartup
             // 
             this.checkBoxStartup.AutoSize = true;
-            this.checkBoxStartup.Location = new System.Drawing.Point(167, 676);
+            this.checkBoxStartup.Location = new System.Drawing.Point(170, 676);
             this.checkBoxStartup.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.checkBoxStartup.Name = "checkBoxStartup";
             this.checkBoxStartup.Size = new System.Drawing.Size(120, 25);
@@ -488,7 +490,7 @@
             this.textBoxSubsUrls.Multiline = true;
             this.textBoxSubsUrls.Name = "textBoxSubsUrls";
             this.textBoxSubsUrls.ReadOnly = true;
-            this.textBoxSubsUrls.Size = new System.Drawing.Size(281, 223);
+            this.textBoxSubsUrls.Size = new System.Drawing.Size(286, 223);
             this.textBoxSubsUrls.TabIndex = 17;
             this.textBoxSubsUrls.Text = resources.GetString("textBoxSubsUrls.Text");
             this.textBoxSubsUrls.WordWrap = false;
@@ -501,7 +503,7 @@
             this.buttonStartCheck.Location = new System.Drawing.Point(13, 676);
             this.buttonStartCheck.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonStartCheck.Name = "buttonStartCheck";
-            this.buttonStartCheck.Size = new System.Drawing.Size(138, 79);
+            this.buttonStartCheck.Size = new System.Drawing.Size(146, 79);
             this.buttonStartCheck.TabIndex = 0;
             this.buttonStartCheck.Text = "▶️ 启动";
             this.buttonStartCheck.UseVisualStyleBackColor = true;
@@ -509,7 +511,7 @@
             // 
             // buttonAdvanceSettings
             // 
-            this.buttonAdvanceSettings.Location = new System.Drawing.Point(161, 715);
+            this.buttonAdvanceSettings.Location = new System.Drawing.Point(165, 715);
             this.buttonAdvanceSettings.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonAdvanceSettings.Name = "buttonAdvanceSettings";
             this.buttonAdvanceSettings.Size = new System.Drawing.Size(138, 40);
@@ -684,6 +686,9 @@
             // 
             // groupBoxAdvanceSettings
             // 
+            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxOverwriteUrls);
+            this.groupBoxAdvanceSettings.Controls.Add(this.textBoxSubStorePath);
+            this.groupBoxAdvanceSettings.Controls.Add(this.labelSubstoreParh);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownTotalBandwidthLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSuccessLimit);
             this.groupBoxAdvanceSettings.Controls.Add(this.numericUpDownSubStorePort);
@@ -694,7 +699,6 @@
             this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxSpeedtestUrl);
             this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxGithubProxyUrl);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelSubstorePort);
-            this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxOverwriteUrls);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelOverwriteUrls);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelWebUIPort);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelDownloadMb);
@@ -720,6 +724,58 @@
             this.groupBoxAdvanceSettings.TabStop = false;
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
+            // 
+            // comboBoxOverwriteUrls
+            // 
+            this.comboBoxOverwriteUrls.FormattingEnabled = true;
+            this.comboBoxOverwriteUrls.Items.AddRange(new object[] {
+            "[内置]布丁狗的订阅转换",
+            "[内置]ACL4SSR_Online_Full",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/布丁狗的订阅转" +
+                "换.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
+                "_Online_Full.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
+                "_Online_Full_WithIcon.yaml",
+            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/添加直连规则." +
+                "yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/布丁狗的订阅转换.y" +
+                "aml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
+                "line_Full.yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
+                "line_Full_WithIcon.yaml",
+            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/添加直连规则.yam" +
+                "l"});
+            this.comboBoxOverwriteUrls.Location = new System.Drawing.Point(914, 128);
+            this.comboBoxOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.comboBoxOverwriteUrls.Name = "comboBoxOverwriteUrls";
+            this.comboBoxOverwriteUrls.Size = new System.Drawing.Size(504, 29);
+            this.comboBoxOverwriteUrls.TabIndex = 24;
+            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBoxOverwriteUrls_SelectedIndexChanged);
+            // 
+            // textBoxSubStorePath
+            // 
+            this.textBoxSubStorePath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxSubStorePath.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.textBoxSubStorePath.Location = new System.Drawing.Point(914, 175);
+            this.textBoxSubStorePath.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.textBoxSubStorePath.Name = "textBoxSubStorePath";
+            this.textBoxSubStorePath.Size = new System.Drawing.Size(144, 31);
+            this.textBoxSubStorePath.TabIndex = 41;
+            this.textBoxSubStorePath.Text = "请输入路径";
+            this.textBoxSubStorePath.Enter += new System.EventHandler(this.textBoxSubStorePath_Enter);
+            this.textBoxSubStorePath.Leave += new System.EventHandler(this.textBoxSubStorePath_Leave);
+            // 
+            // labelSubstoreParh
+            // 
+            this.labelSubstoreParh.AutoSize = true;
+            this.labelSubstoreParh.Location = new System.Drawing.Point(735, 180);
+            this.labelSubstoreParh.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelSubstoreParh.Name = "labelSubstoreParh";
+            this.labelSubstoreParh.Size = new System.Drawing.Size(183, 21);
+            this.labelSubstoreParh.TabIndex = 42;
+            this.labelSubstoreParh.Text = "Sub-Store 路径：";
             // 
             // numericUpDownTotalBandwidthLimit
             // 
@@ -1267,44 +1323,15 @@
             this.comboBoxGithubProxyUrl.TabIndex = 21;
             this.comboBoxGithubProxyUrl.Leave += new System.EventHandler(this.comboBoxGithubProxyUrl_Leave);
             // 
-            // comboBoxOverwriteUrls
-            // 
-            this.comboBoxOverwriteUrls.FormattingEnabled = true;
-            this.comboBoxOverwriteUrls.Items.AddRange(new object[] {
-            "[内置]布丁狗的订阅转换",
-            "[内置]ACL4SSR_Online_Full",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/布丁狗的订阅转" +
-                "换.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
-                "_Online_Full.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/ACL4SSR" +
-                "_Online_Full_WithIcon.yaml",
-            "https://raw.githubusercontent.com/mihomo-party-org/override-hub/main/yaml/添加直连规则." +
-                "yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/布丁狗的订阅转换.y" +
-                "aml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
-                "line_Full.yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/ACL4SSR_On" +
-                "line_Full_WithIcon.yaml",
-            "https://fastly.jsdelivr.net/gh/mihomo-party-org/override-hub@main/yaml/添加直连规则.yam" +
-                "l"});
-            this.comboBoxOverwriteUrls.Location = new System.Drawing.Point(901, 128);
-            this.comboBoxOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.comboBoxOverwriteUrls.Name = "comboBoxOverwriteUrls";
-            this.comboBoxOverwriteUrls.Size = new System.Drawing.Size(517, 29);
-            this.comboBoxOverwriteUrls.TabIndex = 24;
-            this.comboBoxOverwriteUrls.SelectedIndexChanged += new System.EventHandler(this.comboBoxOverwriteUrls_SelectedIndexChanged);
-            // 
             // labelOverwriteUrls
             // 
             this.labelOverwriteUrls.AutoSize = true;
             this.labelOverwriteUrls.Location = new System.Drawing.Point(735, 132);
             this.labelOverwriteUrls.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelOverwriteUrls.Name = "labelOverwriteUrls";
-            this.labelOverwriteUrls.Size = new System.Drawing.Size(170, 21);
+            this.labelOverwriteUrls.Size = new System.Drawing.Size(181, 21);
             this.labelOverwriteUrls.TabIndex = 23;
-            this.labelOverwriteUrls.Text = "Clash覆写配置：";
+            this.labelOverwriteUrls.Text = "Clash 覆写配置：";
             // 
             // labelDownloadMb
             // 
@@ -1989,6 +2016,8 @@
         private System.Windows.Forms.ComboBox comboBoxSysProxy;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBoxEnableSuccessLimit;
+        private System.Windows.Forms.Label labelSubstoreParh;
+        private System.Windows.Forms.TextBox textBoxSubStorePath;
     }
 }
 

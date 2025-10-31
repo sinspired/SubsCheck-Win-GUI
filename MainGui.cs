@@ -92,7 +92,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBoxDropBadCFNodes, "丢弃无法访问CF CDN网站的节点。\r\n- 这类节点可以正常访问YouTube、Google等网站。\r\n- 无法访问cloudflare及使用了CDN服务的网站，比如Twitter、claude等。\r\n- 开启会导致节点数量大幅减少。");
 
 
-            toolTip1.SetToolTip(comboBoxSubscriptionType, "通用订阅：内置了Sub-Store程序，自适应订阅格式。\nClash订阅：带规则的 Mihomo、Clash 订阅格式。");
+            toolTip1.SetToolTip(comboBoxSubscriptionType, "通用订阅：内置了Sub-Store程序，自适应订阅格式。\nClash订阅：带规则的 Mihomo、Clash 订阅格式。\nSingbox：带规则的singbox订阅，需匹配版本");
             toolTip1.SetToolTip(comboBoxOverwriteUrls, "生成带规则的 Clash 订阅所需的覆写规则文件");
 
             toolTip1.SetToolTip(checkBoxStartup, "开机启动：勾选后，程序将在Windows启动时自动运行");
@@ -104,6 +104,8 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(numericUpDownDLTimehot, "下载测试时间(s)：与下载链接大小相关，默认最大测试10s。");
             toolTip1.SetToolTip(numericUpDownWebUIPort, "本地监听端口：用于直接返回测速结果的节点信息，方便 Sub-Store 实现订阅转换。");
             toolTip1.SetToolTip(numericUpDownSubStorePort, "Sub-Store监听端口：用于订阅订阅转换。\n注意：除非你知道你在干什么，否则不要将你的 Sub-Store 暴露到公网，否则可能会被滥用");
+            toolTip1.SetToolTip(textBoxSubStorePath, "Sub-Store自定义路径\n设置path之后，可以安全暴露到公网，开启订阅分享功能。\r\n# 订阅示例：http://127.0.0.1:8299/{sub-store-path}/api/file/mihomo\r\n# WebUI 支持分享订阅，直接复制订阅链接");
+
             toolTip1.SetToolTip(numericUpDownDownloadMb, "下载测试限制(MB)：当达到下载数据大小时，停止下载，可节省测速流量，减少测速测死的概率");
             toolTip1.SetToolTip(textBoxSubsUrls, "节点池订阅地址：支持 Link、Base64、Clash 格式的订阅链接。");
             toolTip1.SetToolTip(checkBoxEnableRenameNode, "以节点IP查询位置重命名节点。\n质量差的节点可能造成IP查询失败，造成整体检查速度稍微变慢。");
@@ -128,6 +130,8 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
+            toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
+            toolTip1.SetToolTip(textBoxWebUiAPIKey, "Web控制面板的api-key");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
         }
@@ -524,7 +528,7 @@ namespace subs_check.win.gui
 
                     if (checkBoxHighConcurrent.Checked)
                     {
-                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox-1.11", "Singbox-1.12" });
+                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11", "Singbox1.12" });
                     }
 
                     // 根据是否启用高并发，调整界面布局
@@ -790,6 +794,14 @@ namespace subs_check.win.gui
                         }
                     }
 
+                    string substorePath = 读取config字符串(config, "sub-store-path");
+                    if (!string.IsNullOrEmpty(substorePath))
+                    {
+                        if (substorePath.StartsWith("/")) substorePath = substorePath.Substring(1);
+
+                        textBoxSubStorePath.Text = substorePath;
+                    }
+
                     string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
                     {
@@ -929,6 +941,14 @@ namespace subs_check.win.gui
                     if (textBoxWebUiAPIKey.Text != "请输入密钥") config["old-api-key"] = textBoxWebUiAPIKey.Text;
                 }
                 config["api-key"] = WebUIapiKey;
+
+                string substorePath = textBoxSubStorePath.Text.Trim();
+                // 如果不是以 "/" 开头，则补上
+                if (!substorePath.StartsWith("/")) substorePath = "/" + substorePath;
+                // 如果是默认提示文字或仅有 "/"，则清空
+                if (substorePath == "/请输入路径" || substorePath == "/") substorePath = "";
+
+                config["sub-store-path"] = substorePath;
 
                 // 保存sub-store-port
                 config["sub-store-port"] = $@":{numericUpDownSubStorePort.Value}";
@@ -2134,23 +2154,29 @@ namespace subs_check.win.gui
             string 本地IP = GetLocalLANIP();
             try
             {
-                // 构造URL
+                string subPath = textBoxSubStorePath.Text.Trim();
+                subPath = !string.IsNullOrEmpty(subPath) && subPath != "请输入路径"
+                          ? (subPath.StartsWith("/") ? subPath : "/" + subPath)
+                          : string.Empty;
+
+                string baseSubStoreUrl = $"http://{本地IP}:{numericUpDownSubStorePort.Value}{subPath}";
                 string url;
+
                 if (comboBoxSubscriptionType.Text == "Clash")
                 {
-                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/mihomo";
+                    url = $"{baseSubStoreUrl}/api/file/mihomo";
                 }
-                else if (comboBoxSubscriptionType.Text == "Singbox-1.11" && checkBoxHighConcurrent.Checked)
+                else if (comboBoxSubscriptionType.Text == "Singbox1.11" && checkBoxHighConcurrent.Checked)
                 {
-                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/singbox-1.11";
+                    url = $"{baseSubStoreUrl}/api/file/singbox-1.11";
                 }
-                else if (comboBoxSubscriptionType.Text == "Singbox-1.12" && checkBoxHighConcurrent.Checked)
+                else if (comboBoxSubscriptionType.Text == "Singbox1.12" && checkBoxHighConcurrent.Checked)
                 {
-                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/api/file/singbox-1.11";
+                    url = $"{baseSubStoreUrl}/api/file/singbox-1.12";
                 }
                 else
                 {
-                    url = $"http://{本地IP}:{numericUpDownSubStorePort.Value}/download/sub";
+                    url = $"{baseSubStoreUrl}/download/sub";
                 }
 
                 // 将URL复制到剪贴板
@@ -2341,6 +2367,31 @@ namespace subs_check.win.gui
             }
         }
 
+        private void textBoxSubStorePath_Enter(object sender, EventArgs e)
+        {
+            textBoxSubStorePath.PasswordChar = '\0';
+            if (textBoxSubStorePath.Text == "请输入路径")
+            {
+                textBoxSubStorePath.Text = "";
+                textBoxSubStorePath.ForeColor = Color.Black;
+            }
+        }
+
+        private void textBoxSubStorePath_Leave(object sender, EventArgs e)
+        {
+
+            if (textBoxSubStorePath.Text == "")
+            {
+                textBoxSubStorePath.PasswordChar = '\0';
+                textBoxSubStorePath.Text = "请输入路径";
+                textBoxSubStorePath.ForeColor = Color.Gray;
+            }
+            else
+            {
+                textBoxSubStorePath.ForeColor = Color.Black;
+                textBoxSubStorePath.PasswordChar = '*';
+            }
+        }
         private void textBox7_Leave(object sender, EventArgs e)
         {
             // 检查是否有内容
@@ -3999,7 +4050,7 @@ namespace subs_check.win.gui
                     }
                     if (checkBoxHighConcurrent.Checked)
                     {
-                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox-1.11", "Singbox-1.12" });
+                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11", "Singbox1.12" });
                     }
                 }
 
