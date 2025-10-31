@@ -524,7 +524,7 @@ namespace subs_check.win.gui
 
                     if (checkBoxHighConcurrent.Checked)
                     {
-                        comboBoxSubscriptionType.Items.AddRange(new object[] { "", "tag", "enclosure", "license", "nofollow" });
+                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox-1.11", "Singbox-1.12" });
                     }
 
                     // 根据是否启用高并发，调整界面布局
@@ -3989,6 +3989,10 @@ namespace subs_check.win.gui
                         checkBoxSwitchArch64.Checked = false;
                         // 恢复事件
                         checkBoxSwitchArch64.CheckedChanged += checkBoxSwitchArch64_CheckedChanged;
+                    }
+                    if (checkBoxHighConcurrent.Checked)
+                    {
+                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox-1.11", "Singbox-1.12" });
                     }
                 }
 
