@@ -129,3 +129,17 @@ jobs:
         files: release/subs-check-win.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Send Telegram message on push
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }} # 频道 ID
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }} # Bot Token
+        format: markdown
+        message: |
+          💻 *subs-check_GUI 更新*
+
+          版本: `${{ github.ref_name }}`
+          项目: `${{ github.repository }}`
+
+          🔗 [查看详情](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }})
