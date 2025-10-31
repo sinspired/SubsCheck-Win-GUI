@@ -72,7 +72,10 @@
     <Delete Files="@(FilesToDelete)" />
     <!-- 删除除 zh 和 runtimes 之外的文件夹 -->
     <ItemGroup>
-      <DirsToDelete Include="$([System.IO.Directory]::GetDirectories('$(OutDir)'))" Exclude="$([System.IO.Path]::Combine('$(OutDir)','zh'));&#xD;&#xA;                            $([System.IO.Path]::Combine('$(OutDir)','runtimes'))" />
+      <DirsToDelete Include="$([System.IO.Directory]::GetDirectories('$(OutDir)'))" 
+					Exclude="$([System.IO.Path]::Combine('$(OutDir)','zh'));
+					$([System.IO.Path]::Combine('$(OutDir)','runtimes'));
+					" />
     </ItemGroup>
     <!-- <Message Text="删除目录: %(DirsToDelete.Identity)" Importance="high" /> -->
     <RemoveDir Directories="@(DirsToDelete)" />

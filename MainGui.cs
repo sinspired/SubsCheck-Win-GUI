@@ -2627,7 +2627,11 @@ namespace subs_check.win.gui
 
                 // 获取当前应用程序的执行目录
                 string executablePath = Path.GetDirectoryName(Application.ExecutablePath);
-                string nodeExePath = Path.Combine(executablePath, "output", "node.exe");
+                string nodeExePath_old = Path.Combine(executablePath, "output", "node.exe");
+                string nodeExePath_new = Path.Combine(executablePath, "output", "sub-store", "node.exe");
+
+                // 初始化要检查的路径数组
+                string[] nodeExePaths = new string[] { nodeExePath_old, nodeExePath_new };
 
                 // 获取所有 node.exe 进程
                 Process[] nodeProcesses = Process.GetProcessesByName("node");
@@ -2650,19 +2654,22 @@ namespace subs_check.win.gui
                         string processPath = await Task.Run(() => GetProcessPathByWmi(process.Id));
 
                         // 检查是否匹配我们要查找的 node.exe 路径
-                        if (!string.IsNullOrEmpty(processPath) &&
-                            processPath.Equals(nodeExePath, StringComparison.OrdinalIgnoreCase))
+                        foreach (var nodeExePath in nodeExePaths)
                         {
-                            Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...", GetRichTextBoxAllLog());
-
-                            await Task.Run(() =>
+                            if (!string.IsNullOrEmpty(processPath) &&
+                                processPath.Equals(nodeExePath, StringComparison.OrdinalIgnoreCase))
                             {
-                                process.Kill();
-                                process.WaitForExit();
-                            });
+                                Log($"发现匹配路径的 node.exe 进程(ID: {process.Id})，正在强制结束...", GetRichTextBoxAllLog());
 
-                            Log($"成功结束 node.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
-                            terminatedCount++;
+                                await Task.Run(() =>
+                                {
+                                    process.Kill();
+                                    process.WaitForExit();
+                                });
+
+                                Log($"成功结束 node.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
+                                terminatedCount++;
+                            }
                         }
                     }
                     catch (Exception ex)
