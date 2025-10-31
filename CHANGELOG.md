@@ -1,13 +1,20 @@
 # 📝 Changelog
 
-[2.4.0.1] - 2025-10-20
+[2.5.0.0] - 2025-10-31
+
+🚀 Features
+
+- 添加singbox订阅复制选项
+- 添加sub-store路径选项，支持公网分享订阅
+
+🐛 Bug Fixes
+
+- 兼容新的node文件路径
 
 ⚡ Performance
 
-- 支持恢复默认节点池链接
-- 启动内核时设置一个环境变量，以表示是由GUI启动的进程
+- 更新 更多参数
 
 ⚙️ Miscellaneous Tasks
 
-- *(release)* Update CHANGELOG.md and update.xml for v2.4.0.0
-- 修改更新检查地址
+- *(CI)* 更新构建
