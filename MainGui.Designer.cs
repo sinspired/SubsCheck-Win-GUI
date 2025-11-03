@@ -855,13 +855,19 @@
             this.comboBoxSysProxy.ImeMode = System.Windows.Forms.ImeMode.Close;
             this.comboBoxSysProxy.Items.AddRange(new object[] {
             "自动检测",
+            "127.0.0.1:443",
             "127.0.0.1:7890",
-            "127.0.0.1:10808",
-            "127.0.0.1:10809",
             "127.0.0.1:7891",
             "127.0.0.1:1080",
             "127.0.0.1:8080",
-            "127.0.0.1:443"});
+            "127.0.0.1:10808",
+            "127.0.0.1:10809",
+            "127.0.0.1:3067",
+            "127.0.0.1:2080",
+            "127.0.0.1:1194",
+            "127.0.0.1:1082",
+            "127.0.0.1:12334",
+            "127.0.0.1:12335"});
             this.comboBoxSysProxy.Location = new System.Drawing.Point(848, 32);
             this.comboBoxSysProxy.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.comboBoxSysProxy.Name = "comboBoxSysProxy";

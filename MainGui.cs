@@ -202,6 +202,15 @@ namespace subs_check.win.gui
 
             // 自动检测系统代理
             string configProxy = comboBoxSysProxy.Text;
+            if (configProxy == "自动检测" || string.IsNullOrEmpty(configProxy)||configProxy == "http://" || configProxy == "https://")
+            {
+                configProxy = "";
+            }
+
+            if ((!configProxy.StartsWith("http://") || !configProxy.StartsWith("https://")) && configProxy != "")
+            {
+                configProxy = "http://" + configProxy;
+            }
 
             SysProxySetting = await Proxy.GetSysProxyAsync(configProxy);
 
@@ -230,14 +239,14 @@ namespace subs_check.win.gui
                     }
 
                     comboBoxSysProxy.Text = input;
-                    Log("检测到系统代理: " + SysProxySetting.Address, GetRichTextBoxAllLog());
+                    Log("检测到可用系统代理并设置: " + SysProxySetting.Address, GetRichTextBoxAllLog());
 
                     //await SaveConfig(false);
                 }
             }
             else
             {
-                Log("未发现系统代理", GetRichTextBoxAllLog());
+                Log("未发现系统代理或系统代理不可用", GetRichTextBoxAllLog());
             }
         }
 
@@ -536,10 +545,18 @@ namespace subs_check.win.gui
                     if (!checkBoxHighConcurrent.Checked)
                     {
                         sysproxy = 读取config字符串(config, "proxy");
+                        if (sysproxy == null || sysproxy == "")
+                        {
+                            sysproxy = 读取config字符串(config, "system-proxy");
+                        }
                     }
                     else
                     {
                         sysproxy = 读取config字符串(config, "system-proxy");
+                        if (sysproxy == null || sysproxy == "")
+                        {
+                            sysproxy = 读取config字符串(config, "proxy");
+                        }
                     }
                     if (sysproxy != null)
                     {
@@ -968,10 +985,12 @@ namespace subs_check.win.gui
                 if (checkBoxHighConcurrent.Checked)
                 {
                     config["system-proxy"] = sysProxyURL;
+                    config["proxy"] = sysProxyURL;
                 }
                 else
                 {
                     config["proxy"] = sysProxyURL;
+                    config["system-proxy"] = sysProxyURL;
                 }
 
                 // 保存订阅列表

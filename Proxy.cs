@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -17,7 +18,13 @@ namespace subs_check.win.gui
             "http://127.0.0.1:1080",
             "http://127.0.0.1:8080",
             "http://127.0.0.1:10808",
-            "http://127.0.0.1:10809"
+            "http://127.0.0.1:10809",
+            "http://127.0.0.1:3067",
+            "http://127.0.0.1:2080",
+            "http://127.0.0.1:1194",
+            "http://127.0.0.1:1082",
+            "http://127.0.0.1:12334",
+            "http://127.0.0.1:12335"
         };
 
         public class SysProxyResult
@@ -61,7 +68,7 @@ namespace subs_check.win.gui
         /// <summary>
         /// 检测代理是否可用（要求 Google 204 和 GitHub Raw 都成功）
         /// </summary>
-        private static async Task<bool> IsSysProxyAvailableAsync(string proxy)
+        private static async Task<bool> IsSysProxyAvailableAsync(string proxy, CancellationToken token = default)
         {
             try
             {
@@ -74,38 +81,21 @@ namespace subs_check.win.gui
 
                 using (var client = new HttpClient(handler))
                 {
-                    client.Timeout = TimeSpan.FromSeconds(5);
+                    client.Timeout = TimeSpan.FromSeconds(10);
 
-                    var testUrls = new List<Tuple<string, HttpStatusCode>>
+                    var testTasks = new[]
                     {
-                        Tuple.Create("https://www.google.com/generate_204", HttpStatusCode.NoContent),
-                        Tuple.Create("https://raw.githubusercontent.com/github/gitignore/main/Go.gitignore", HttpStatusCode.OK)
+                        client.GetAsync("https://www.google.com/generate_204", token),
+                        client.GetAsync("https://raw.githubusercontent.com/github/gitignore/main/Go.gitignore", token)
                     };
 
-                    var tasks = new List<Task<bool>>();
-                    foreach (var t in testUrls)
-                    {
-                        tasks.Add(Task.Run(async () =>
-                        {
-                            try
-                            {
-                                var resp = await client.GetAsync(t.Item1);
-                                return resp.StatusCode == t.Item2;
-                            }
-                            catch
-                            {
-                                return false;
-                            }
-                        }));
-                    }
-
-                    var results = await Task.WhenAll(tasks);
-                    foreach (var ok in results)
-                    {
-                        if (!ok) return false;
-                    }
-                    return true;
+                    var responses = await Task.WhenAll(testTasks);
+                    return responses[0].StatusCode == HttpStatusCode.NoContent && responses[1].StatusCode == HttpStatusCode.OK;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                return false; // Expected cancellation
             }
             catch
             {
@@ -126,30 +116,38 @@ namespace subs_check.win.gui
 
             // Step 2: 并发检测候选代理
             var cts = new CancellationTokenSource();
-            var tasks = new List<Task<string>>();
-
+            var runningTasks = new List<Task<string>>();
             foreach (var p in candidates)
             {
-                tasks.Add(Task.Run(async () =>
+                runningTasks.Add(Task.Run(async () =>
                 {
-                    if (await IsSysProxyAvailableAsync(p))
+                    if (await IsSysProxyAvailableAsync(p, cts.Token))
                     {
-                        cts.Cancel(); // 找到一个就取消其他任务
                         return p;
                     }
                     return null;
                 }, cts.Token));
             }
 
-            var allTasks = Task.WhenAll(tasks);
-            var completed = await Task.WhenAny(allTasks, Task.Delay(5000));
-            if (completed == allTasks)
+            while (runningTasks.Any())
             {
-                foreach (var t in tasks)
+                var completedTask = await Task.WhenAny(runningTasks);
+                runningTasks.Remove(completedTask);
+
+                try
                 {
-                    if (!string.IsNullOrEmpty(t.Result))
-                        return t.Result;
+                    string result = await completedTask;
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        cts.Cancel(); // 找到一个就取消其他任务
+                        return result; // 立即返回结果
+                    }
                 }
+                catch (OperationCanceledException)
+                {
+                    // This task was canceled because another one finished first. Ignore.
+                }
+                // Other exceptions can be logged if needed.
             }
 
             return string.Empty;
