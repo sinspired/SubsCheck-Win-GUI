@@ -202,7 +202,7 @@ namespace subs_check.win.gui
 
             // 自动检测系统代理
             string configProxy = comboBoxSysProxy.Text;
-            if (configProxy == "自动检测" || string.IsNullOrEmpty(configProxy)||configProxy == "http://" || configProxy == "https://")
+            if (configProxy == "自动检测" || string.IsNullOrEmpty(configProxy) || configProxy == "http://" || configProxy == "https://")
             {
                 configProxy = "";
             }
@@ -415,12 +415,32 @@ namespace subs_check.win.gui
                 var result = await 获取版本号("https://api.github.com/repos/sinspired/SubsCheck-Win-GUI/releases/latest");
                 if (result.Item1 != "未知版本")
                 {
-                    string latestVersion = result.Item1;
-                    if (latestVersion != 当前GUI版本号)
+                    string latestVersionStr = result.Item1;
+                    try
                     {
-                        最新GUI版本号 = latestVersion;
-                        标题 = "SubsCheck Win GUI " + 当前GUI版本号 + $"  发现新版本: {最新GUI版本号} 请及时更新！";
-                        this.Text = 标题;
+                        // 移除版本号前的 'v' 前缀以便正确解析
+                        string latestVersionToParse = latestVersionStr.StartsWith("v") ? latestVersionStr.Substring(1) : latestVersionStr;
+                        string currentVersionToParse = 当前GUI版本号.StartsWith("v") ? 当前GUI版本号.Substring(1) : 当前GUI版本号;
+
+                        Version latestVersion = new Version(latestVersionToParse);
+                        Version currentVersion = new Version(currentVersionToParse);
+
+                        if (latestVersion > currentVersion)
+                        {
+                            最新GUI版本号 = latestVersionStr;
+                            标题 = "SubsCheck Win GUI " + 当前GUI版本号 + $"  发现新版本: {最新GUI版本号} 请及时更新！";
+                            this.Text = 标题;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // 版本号格式解析失败，回退到原始的字符串比较
+                        if (latestVersionStr != 当前GUI版本号)
+                        {
+                            最新GUI版本号 = latestVersionStr;
+                            标题 = "SubsCheck Win GUI " + 当前GUI版本号 + $"  发现新版本: {最新GUI版本号} 请及时更新！";
+                            this.Text = 标题;
+                        }
                     }
                 }
             }
