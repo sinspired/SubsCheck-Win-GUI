@@ -1,7 +1,5 @@
 # 🚀 SubsCheck-Win-GUI
 
-首先声明，这款软件并非我原创开发。Subs-Check是由 [bestruirui](https://github.com/bestruirui/BestSub) 原创、由 [beck-8](https://github.com/beck-8/subs-check) 进行二次开发，而我所编写的 GUI 仅是在这两位开发者的原始版本基础上进行的 **二次开发**。
-
 > ✨ 修复界面模糊，支持高DPI缩放，增加自适应高并发内核切换，增加`i386/64`位内核切换，优化自动更新，增加了新的参数设置项。
 > 新增：“系统代理”设置，支持系统代理自动检测并设置。
 
