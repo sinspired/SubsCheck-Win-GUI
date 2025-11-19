@@ -112,7 +112,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBoxEnableMediaCheck, "是否开启流媒体检测，其中IP欺诈依赖'节点地址查询'，内核版本需要 v2.0.8 以上\n\n示例：美国1 | ⬇️ 5.6MB/s |0%|Netflix|Disney|Openai\n风控值：0% (使用ping0.cc标准)\n流媒体解锁：Netflix、Disney、Openai");
             toolTip1.SetToolTip(comboBoxSysProxy, "系统代理设置: 适用于拉取代理、消息推送、文件上传等等。");
             toolTip1.SetToolTip(comboBoxGithubProxyUrl, "GitHub 代理：代理订阅 GitHub raw 节点池。");
-            toolTip1.SetToolTip(comboBoxSpeedtestUrl, "测速地址：注意 并发数*节点速度<最大网速 否则测速结果不准确\n尽量不要使用Speedtest，Cloudflare提供的下载链接，因为很多节点屏蔽测速网站。");
+            toolTip1.SetToolTip(comboBoxSpeedtestUrl, "测速地址：注意 并发数*节点速度<最大网速 否则测速结果不准确\n尽量不要使用Speedtest，Cloudflare提供的下载链接，因为很多节点屏蔽测速网站。\n可选择 random 使用随机测速地址\n大部分机场屏蔽测速，建议不测速或设置较低的速度上限，实际使用可能更好");
             toolTip1.SetToolTip(textBox7, "将测速结果推送到Worker的地址。");
             toolTip1.SetToolTip(textBox6, "Worker令牌。");
             toolTip1.SetToolTip(comboBoxSaveMethod, "测速结果的保存方法。");
@@ -130,6 +130,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
+            toolTip1.SetToolTip(checkBoxSubsStats, "勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
             toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
             toolTip1.SetToolTip(textBoxWebUiAPIKey, "Web控制面板的api-key");
             // 设置通知图标的上下文菜单
@@ -1149,6 +1150,7 @@ namespace subs_check.win.gui
                 config["rename-node"] = checkBoxEnableRenameNode.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBoxEnableMediaCheck.Checked;//是否开启流媒体检测
                 config["keep-success-proxies"] = checkBoxKeepSucced.Checked;//是否保留成功的节点
+                config["sub-urls-stats"] = checkBoxSubsStats.Checked;//是否统计节点信息
                 config["print-progress"] = false;//是否显示进度
                 config["sub-urls-retry"] = 3;//重试次数(获取订阅失败后重试次数)
                 config["subscheck-version"] = 当前subsCheck版本号;//当前subsCheck版本号
