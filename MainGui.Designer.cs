@@ -68,6 +68,7 @@
             this.labelLogNodeInfo = new System.Windows.Forms.Label();
             this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
+            this.checkBoxSubsStats = new System.Windows.Forms.CheckBox();
             this.comboBoxOverwriteUrls = new System.Windows.Forms.ComboBox();
             this.textBoxSubStorePath = new System.Windows.Forms.TextBox();
             this.labelSubstoreParh = new System.Windows.Forms.Label();
@@ -126,7 +127,6 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
-            this.checkBoxSubsStats = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
@@ -727,6 +727,16 @@
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
             // 
+            // checkBoxSubsStats
+            // 
+            this.checkBoxSubsStats.AutoSize = true;
+            this.checkBoxSubsStats.Location = new System.Drawing.Point(192, 130);
+            this.checkBoxSubsStats.Name = "checkBoxSubsStats";
+            this.checkBoxSubsStats.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxSubsStats.TabIndex = 43;
+            this.checkBoxSubsStats.Text = "统计订阅信息";
+            this.checkBoxSubsStats.UseVisualStyleBackColor = true;
+            // 
             // comboBoxOverwriteUrls
             // 
             this.comboBoxOverwriteUrls.FormattingEnabled = true;
@@ -758,6 +768,7 @@
             // 
             // textBoxSubStorePath
             // 
+            this.textBoxSubStorePath.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxSubStorePath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxSubStorePath.ForeColor = System.Drawing.SystemColors.WindowFrame;
             this.textBoxSubStorePath.Location = new System.Drawing.Point(914, 175);
@@ -1874,16 +1885,6 @@
             this.checkBoxEhanceTag.TabIndex = 38;
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxSubsStats
-            // 
-            this.checkBoxSubsStats.AutoSize = true;
-            this.checkBoxSubsStats.Location = new System.Drawing.Point(192, 130);
-            this.checkBoxSubsStats.Name = "checkBoxSubsStats";
-            this.checkBoxSubsStats.Size = new System.Drawing.Size(162, 25);
-            this.checkBoxSubsStats.TabIndex = 43;
-            this.checkBoxSubsStats.Text = "统计订阅信息";
-            this.checkBoxSubsStats.UseVisualStyleBackColor = true;
             // 
             // MainGui
             // 

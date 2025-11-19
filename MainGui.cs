@@ -76,7 +76,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(numericUpDownTimeout, "超时时间(毫秒)：节点的最大延迟。");
             toolTip1.SetToolTip(numericUpDownMinSpeed, "最低测速结果舍弃(KB/s)。");
 
-            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用流水线分段高并发版本内核。\n将同时开启以下功能:\n1. 测活、测速、媒体检测独立并发设置；\n2. 持久化保存并加载历次成功节点；\n3. 统计订阅信息，包括可用节点数量，成功率；\n4. 增强位置标签；\n5. 全新设计的WebUI，一键进入sub-store");
+            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用高并发内核。\n将同时开启以下功能:\n1. 测活、测速、媒体检测独立并发设置；\n2. 持久化保存并加载历次成功节点；\n3. 统计订阅信息，包括可用节点数量，成功率；\n4. 增强位置标签；\n5. 全新设计的WebUI，一键进入sub-store");
             toolTip1.SetToolTip(checkBoxSwitchArch64, "启用64位版本内核。");
 
             toolTip1.SetToolTip(buttonTriggerCheck, "⏯️开始检测：发送开始检测信号，开始检测；\n⏸️结束检测：发送停止信号，内核保持后台运行。");
@@ -881,8 +881,12 @@ namespace subs_check.win.gui
 
                         textBoxSubStorePath.Text = substorePath;
                     }
+                    else
+                    {
+                            textBoxSubStorePath.Text = GetComputerNameMD5();
+                    }
 
-                    string cronexpression = 读取config字符串(config, "cron-expression");
+                        string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
                     {
                         textBoxCron.Text = cronexpression;
@@ -1031,6 +1035,11 @@ namespace subs_check.win.gui
                 if (!substorePath.StartsWith("/")) substorePath = "/" + substorePath;
                 // 如果是默认提示文字或仅有 "/"，则清空
                 if (substorePath == "/请输入路径" || substorePath == "/") substorePath = "";
+
+                if (checkBoxHighConcurrent.Checked && substorePath == "")
+                {
+                    substorePath = GetComputerNameMD5();
+                }
 
                 config["sub-store-path"] = substorePath;
 
@@ -1305,6 +1314,11 @@ namespace subs_check.win.gui
                 if (checkBoxEnableWebUI.Checked && textBoxWebUiAPIKey.Text == "请输入密钥")
                 {
                     MessageBox.Show("您已启用WebUI，请设置WebUI API密钥！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (checkBoxHighConcurrent.Checked && textBoxSubStorePath.Text == "请输入路径")
+                {
+                    MessageBox.Show("请设置Sub-Store路径！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 run = 1;
