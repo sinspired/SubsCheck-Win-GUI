@@ -1,88 +1,86 @@
 # 🚀 SubsCheck-Win-GUI
 
-> 内核新增功能详见：[sinspired/subs-check](https://github.com/sinspired/subs-check)
+[![GUI 版本](https://img.shields.io/github/v/release/sinspired/SubsCheck-Win-GUI?logo=github)](https://github.com/sinspired/SubsCheck-Win-GUI/releases)
+[![内核](https://img.shields.io/github/v/release/sinspired/subs-check?display_name=release&style=social&logo=github&label=subs-check性能版)](https://github.com/sinspired/subs-check/releases/latest)
 
-> ✨ 修复界面模糊，支持高DPI缩放，增加自适应高并发内核切换，增加`i386/64`位内核切换，优化自动更新，增加了新的参数设置项。
-> 新增：“系统代理”设置，支持系统代理自动检测并设置。
+本项目基于CM的大量工作，已提PR。支持高并发内核切换，支持64位；支持高dpi显示器，解决界面字体模糊等问题；添加下载大小限制，降低节点被测死的概率；新内核支持一键管理 `sub-store`
 
-- **视频教程：[永久免费0门槛！小白也有无限高速代理节点！](https://youtu.be/sS9Tuf1PCyc)**
-- **数字签名：[关于项目报毒说明](https://www.youtube.com/watch?v=4906t5zygAE&t=123s)**
-- **Telegram交流群：[@CMLiussss](https://t.me/CMLiussss)**
+## ✨ 新增功能
 
-# ⚠️ 免责声明
+- [x] 🖥️ 修复界面模糊，支持 **高 DPI 缩放**  
+- [x] ⚡ 自动检测并设置系统代理  
+- [x] 🔄 增加 **自适应高并发内核切换**，减少无谓的生命浪费
+- [x] 🧩 增加 **i386/64 位内核切换**  
+- [x] 🔧 新增 **性能版内核参数**  
+- [x] 🚀 优化 **自动更新机制**
+- [x] 🌐 现代化 WebUI，优化移动端访问体验  
+- [x] 🛠️ 一键管理 `**sub-store**`
+- [x] 📊 统计订阅链接总数、可用节点数量、成功率  
+- [ ] 🌙 支持深色模式
 
-本项目仅供学习、研究与安全测试使用，请勿用于任何非法活动。使用前请确保您已了解并遵守所在地的法律法规。
+> [!TIP]
+> 功能更新频繁，请务必查看最新的 [配置文件示例](https://github.com/sinspired/subs-check/blob/main/config/config.example.yaml) 以获取最新功能支持。
+
+- **内核地址**：[subs-check 性能版，支持 Docker 部署](https://github.com/sinspired/subs-check)  
+- **Telegram 交流群**：[@Sinspired](https://t.me/subs_check_pro)
+
+## ⚠️ 免责声明
+
+本项目仅供 **学习、研究与安全测试** 使用，请勿用于任何非法活动。使用前请确保您已了解并遵守所在地的法律法规。
 
 ### 📋 使用条款
 
-- **教育与研究用途**：本软件仅可用于网络技术和编程领域的学习、研究和安全测试。
-- **禁止非法使用**：严禁将 **SubsCheck-Win-GUI** 用于任何非法活动或违反使用者所在地区法律法规的行为。
-- **使用时限**：基于学习和研究目的，建议用户在完成研究或学习后，或在安装后的**24小时内，删除本软件及所有相关文件。**
-- **免责声明**：**SubsCheck-Win-GUI** 的创建者和贡献者不对因使用或滥用本软件而导致的任何损害或法律问题负责。
-- **用户责任**：**用户对使用本软件的方式以及由此产生的任何后果完全负责。**
-- **无技术支持**：本软件的创建者不提供任何技术支持或使用协助。
-- **知情同意**：使用 **SubsCheck-Win-GUI** 即表示您已阅读并理解本免责声明，并同意受其条款的约束。
+- **教育与研究用途**：仅限学习、研究和安全测试  
+- **禁止非法使用**：严禁用于违法行为  
+- **使用时限**：建议安装后 **24 小时内删除**  
+- **免责声明**：作者不对任何损害或法律问题负责  
+- **用户责任**：用户需自行承担使用后果  
+- **无技术支持**：作者不提供技术支持  
+- **知情同意**：使用即表示同意上述条款  
 
-> [!WARNING]
-> **请记住**：本软件的主要目的是促进学习、研究和安全测试。作者不支持或认可任何其他用途。使用者应当在合法和负责任的前提下使用本工具。
-
----
-
-![GUI](./gui.png)
+> [!WARNING]  
+> 本软件的主要目的是促进学习、研究和安全测试。请在合法和负责任的前提下使用。
 
 ## 🖥️ 系统要求
 
-- **操作系统**: Windows 10/11 (32位/64位)
-- **.NET 框架**: .NET Framework 4.7.2 或更高版本
+- **操作系统**: Windows 10/11 (32位/64位)  
+- **.NET 框架**: .NET Framework 4.7.2 或更高版本  
 
-> [!CAUTION]
-> **系统兼容性说明**: 本软件不支持Windows 7及更早版本。因为核心组件subs-check使用Go语言编译，而Go 1.19及以后版本已正式放弃对Windows 7的支持。
+> [!CAUTION]  
+> 不支持 Windows 7 及更早版本（Go 1.19+ 已放弃支持）。
 
-## 💾 测速结果 保存方法
+## 💾 测速结果保存方式
 
-- **本地**：将结果保存到本地,默认保存到可执行文件目录下的 output 文件夹
-- **r2**：将结果保存到 cloudflare r2 存储桶 [配置方法](https://github.com/beck-8/subs-check/blob/master/doc/r2.md)
-- **gist**：将结果保存到 github gist [配置方法](https://github.com/beck-8/subs-check/blob/master/doc/gist.md)
-- **webdav**：将结果保存到 webdav 服务器 [配置方法](https://github.com/beck-8/subs-check/blob/master/doc/webdav.md)
+- **本地**：保存到 `output` 文件夹  
+- **r2**：保存到 Cloudflare R2 存储桶 → [配置方法](https://github.com/sinspired/subs-check/blob/master/doc/r2.md)  
+- **gist**：保存到 GitHub Gist → [配置方法](https://github.com/sinspired/subs-check/blob/master/doc/gist.md)  
+- **webdav**：保存到 WebDAV 服务器 → [配置方法](https://github.com/sinspired/subs-check/blob/master/doc/webdav.md)  
 
-## 📦 关于 Github Proxy
+## 📦 Github Proxy
 
-- **Github Proxy**：本项目使用了 `Github Proxy` 来加速 GUI 必要内容的加载。
+本项目使用 `Github Proxy` 加速 GUI 必要内容加载。  
+你也可以通过 [CF-Workers-GitHub](https://github.com/cmliu/CF-Workers-GitHub) 搭建自己的代理。
 
-> [!Tip]
-> 你也可以通过 <https://github.com/cmliu/CF-Workers-GitHub> 项目来搭建自己专属的 **Github Proxy**。
-
-## 📁 GUI 文件结构
+## 📁 文件结构
 
 ```shell
-subs-check.win.gui.exe       # GUI本体
-subs-check.exe               # subs-check x86_32位 内核本体  
-subs-check_Windows_i386.zip  # subs-check x86_32位 内核压缩包  
-# Upgrade.exe           # 升级程序（已使用AutoUpdater替换）
-# Upgrade.ini           # 升级配置文件（已使用AutoUpdater替换）
-config
- ├─ config.yaml              # subs-check 配置文件  
- └─ more.yaml                # 补充YAML参数配置文件  
-output
- ├─ ACL4SSR_Online_Full.yaml # ACL4SSR_Online_Full.yaml 覆写配置文件
- ├─ all.yaml                 # yaml格式 上次成功测试结果
- ├─ history.yaml             # yaml格式 历次成功测试结果
- ├─ base64.txt               # base64格式 测试结果
- ├─ bdg.yaml                 # 布丁狗的订阅转换.yaml 覆写配置文件
- ├─ mihomo.yaml              # clash订阅文件 带分流规则
- ├─ node.exe                 # sub-store 服务
- ├─ root.json                # sub-store 配置文件
- ├─ sub-store.bundle.js      # sub-store js文件
- ├─ sub-store.json           # sub-store json文件
+subs-check.win.gui.exe       # GUI 主程序
+subs-check.exe               # subs-check x86_32 内核
+subs-check_Windows_i386.zip  # subs-check 内核压缩包
+config/
+ ├─ config.yaml              # 主配置文件
+ └─ more.yaml                # 补充参数配置文件
+output/
+ ├─ all.yaml                 # 上次成功测试结果
+ ├─ history.yaml             # 历次成功测试结果
+ ├─ base64.txt               # Base64 格式结果
+ ├─ mihomo.yaml              # Clash 订阅文件
+ ├─ sub-store.*              # sub-store 相关文件
  └─ sub-store.log            # sub-store 日志
-Newtonsoft.Json.dll          # 验证版本信息组件
-YamlDotNet.dll               # yaml读写组件
-# AutoUpdater 依赖和语言支持
-AutoUpdater.NET.dll
-Microsoft.Web.WebView2.Core.dll
-Microsoft.Web.WebView2.WinForms.dll   
-runtimes\
-zh\                          # 中文语言包
+AutoUpdater.NET.dll          # 自动更新依赖
+Microsoft.Web.WebView2.*     # WebView2 组件
+Newtonsoft.Json.dll          # JSON 组件
+YamlDotNet.dll               # YAML 组件
 ```
 
 ## ⭐ Star 星星走起
@@ -92,8 +90,9 @@ zh\                          # 中文语言包
 ## 💻 已适配客户端
 
 - [v2rayN](https://github.com/2dust/v2rayN)
+- [singbox](https://github.com/SagerNet/sing-box)
 - [mihomo-party](https://github.com/mihomo-party-org/mihomo-party)，[FlClash](https://github.com/chen08209/FlClash)，[clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)，[Clash Nyanpasu](https://github.com/keiko233/clash-nyanpasu)
 
-# 🙏 致谢
+## 🙏 致谢
 
 [beck-8](https://github.com/beck-8/subs-check)、[bestruirui](https://github.com/bestruirui/BestSub)、[Sub-Store](https://github.com/sub-store-org/Sub-Store)、GPT
