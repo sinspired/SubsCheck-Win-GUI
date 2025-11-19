@@ -796,6 +796,9 @@ namespace subs_check.win.gui
                     if (keepSucced != null && keepSucced == "true") checkBoxKeepSucced.Checked = true;
                     else checkBoxKeepSucced.Checked = false;
 
+                    string SubsStats = 读取config字符串(config, "sub-urls-stats");
+                    if (SubsStats != null && SubsStats == "true") checkBoxSubsStats.Checked = true;
+                    else checkBoxSubsStats.Checked = false;
 
                     int? successlimit = 读取config整数(config, "success-limit");
                     if (successlimit.HasValue)

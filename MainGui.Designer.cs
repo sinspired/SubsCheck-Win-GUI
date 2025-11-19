@@ -126,6 +126,7 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
+            this.checkBoxSubsStats = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
@@ -686,6 +687,7 @@
             // 
             // groupBoxAdvanceSettings
             // 
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxSubsStats);
             this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxOverwriteUrls);
             this.groupBoxAdvanceSettings.Controls.Add(this.textBoxSubStorePath);
             this.groupBoxAdvanceSettings.Controls.Add(this.labelSubstoreParh);
@@ -1873,6 +1875,16 @@
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
             // 
+            // checkBoxSubsStats
+            // 
+            this.checkBoxSubsStats.AutoSize = true;
+            this.checkBoxSubsStats.Location = new System.Drawing.Point(192, 130);
+            this.checkBoxSubsStats.Name = "checkBoxSubsStats";
+            this.checkBoxSubsStats.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxSubsStats.TabIndex = 43;
+            this.checkBoxSubsStats.Text = "统计订阅信息";
+            this.checkBoxSubsStats.UseVisualStyleBackColor = true;
+            // 
             // MainGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
@@ -2026,6 +2038,7 @@
         private System.Windows.Forms.CheckBox checkBoxEnableSuccessLimit;
         private System.Windows.Forms.Label labelSubstoreParh;
         private System.Windows.Forms.TextBox textBoxSubStorePath;
+        private System.Windows.Forms.CheckBox checkBoxSubsStats;
     }
 }
 
