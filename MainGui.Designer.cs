@@ -216,7 +216,7 @@
             this.numericUpDownMinSpeed.Size = new System.Drawing.Size(106, 31);
             this.numericUpDownMinSpeed.TabIndex = 13;
             this.numericUpDownMinSpeed.Value = new decimal(new int[] {
-            1024,
+            128,
             0,
             0,
             0});
@@ -240,7 +240,7 @@
             this.numericUpDownTimeout.Size = new System.Drawing.Size(106, 31);
             this.numericUpDownTimeout.TabIndex = 12;
             this.numericUpDownTimeout.Value = new decimal(new int[] {
-            5000,
+            6000,
             0,
             0,
             0});
@@ -264,7 +264,7 @@
             this.numericUpDownInterval.Size = new System.Drawing.Size(106, 31);
             this.numericUpDownInterval.TabIndex = 11;
             this.numericUpDownInterval.Value = new decimal(new int[] {
-            120,
+            720,
             0,
             0,
             0});
@@ -332,7 +332,7 @@
             this.textBoxCron.Name = "textBoxCron";
             this.textBoxCron.Size = new System.Drawing.Size(214, 31);
             this.textBoxCron.TabIndex = 21;
-            this.textBoxCron.Text = "0 */2 * * *";
+            this.textBoxCron.Text = "0 4,16 * * *";
             this.textBoxCron.Visible = false;
             this.textBoxCron.DoubleClick += new System.EventHandler(this.切换cron表达式);
             this.textBoxCron.Leave += new System.EventHandler(this.textBoxCron_Leave);
