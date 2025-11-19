@@ -76,7 +76,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(numericUpDownTimeout, "超时时间(毫秒)：节点的最大延迟。");
             toolTip1.SetToolTip(numericUpDownMinSpeed, "最低测速结果舍弃(KB/s)。");
 
-            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用流水线分段高并发版本内核。");
+            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用流水线分段高并发版本内核。\n将同时开启以下功能:\n1. 测活、测速、媒体检测独立并发设置；\n2. 持久化保存并加载历次成功节点；\n3. 统计订阅信息，包括可用节点数量，成功率；\n4. 增强位置标签；\n5. 全新设计的WebUI，一键进入sub-store");
             toolTip1.SetToolTip(checkBoxSwitchArch64, "启用64位版本内核。");
 
             toolTip1.SetToolTip(buttonTriggerCheck, "⏯️开始检测：发送开始检测信号，开始检测；\n⏸️结束检测：发送停止信号，内核保持后台运行。");
@@ -130,8 +130,9 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
-            toolTip1.SetToolTip(checkBoxSubsStats, "勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
-            toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
+            toolTip1.SetToolTip(checkBoxSubsStats, "仅在 “高并发模式“可用”。\n勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
+            toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n开启后可一键管理sub-store\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
+            toolTip1.SetToolTip(buttonWebUi, "更方便的subs-check管理面板\n可一键分享订阅\n支持一键进入sub-store\n支持远程管理");
             toolTip1.SetToolTip(textBoxWebUiAPIKey, "Web控制面板的api-key");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
