@@ -631,10 +631,36 @@ namespace subs_check.win.gui
                     if (downloadLimitSpeedValue.HasValue) numericUpDownTotalBandwidthLimit.Value = downloadLimitSpeedValue.Value;
 
                     string speedTestUrl = 读取config字符串(config, "speed-test-url");
+                    if (checkBoxHighConcurrent.Checked && !comboBoxSpeedtestUrl.Items.Contains("random"))
+                    {
+                        // 只有当列表里至少有1个元素时，才能插在第2个位置（索引1）  
+                        // 否则只能插在第1个位置（索引0）  
+                        int insertIndex = comboBoxSpeedtestUrl.Items.Count > 0 ? 1 : 0;
+
+                        comboBoxSpeedtestUrl.Items.Insert(insertIndex, "random");
+                    }
+                    else
+                    {
+                        comboBoxSpeedtestUrl.Items.Remove("random");
+                        if (comboBoxSpeedtestUrl.Text == "random") comboBoxSpeedtestUrl.Text = "不测速";
+                    }
+
                     if (speedTestUrl != null)
                     {
-                        comboBoxSpeedtestUrl.Items.Add(speedTestUrl);
-                        comboBoxSpeedtestUrl.Text = speedTestUrl;
+                        if (speedTestUrl == "")
+                        {
+                            comboBoxSpeedtestUrl.Text = "不测速";
+
+                        }
+                        else
+                        {
+                            comboBoxSpeedtestUrl.Items.Add(speedTestUrl);
+                            comboBoxSpeedtestUrl.Text = speedTestUrl;
+                        }
+                    }
+                    else
+                    {
+                        comboBoxSpeedtestUrl.Text = "不测速";
                     }
 
                     string listenport = 读取config字符串(config, "listen-port");
@@ -942,8 +968,12 @@ namespace subs_check.win.gui
                 config["total-speed-limit"] = (int)numericUpDownTotalBandwidthLimit.Value;
 
 
-                if (!string.IsNullOrEmpty(comboBoxSpeedtestUrl.Text)) config["speed-test-url"] = comboBoxSpeedtestUrl.Text;
-
+                if (!string.IsNullOrEmpty(comboBoxSpeedtestUrl.Text))
+                {
+                    string testURL = comboBoxSpeedtestUrl.Text;
+                    if (comboBoxSpeedtestUrl.Text == "不测速") testURL = "";
+                    config["speed-test-url"] = testURL;
+                }
                 // 保存save-method，将"本地"转换为"local"
                 config["save-method"] = comboBoxSaveMethod.Text == "本地" ? "local" : comboBoxSaveMethod.Text;
 
@@ -2242,6 +2272,7 @@ namespace subs_check.win.gui
             // 检查是否有内容
             if (string.IsNullOrWhiteSpace(comboBoxSpeedtestUrl.Text))
             {
+                comboBoxSpeedtestUrl.Text = "不测速";
                 return;
             }
 
@@ -2572,7 +2603,7 @@ namespace subs_check.win.gui
                         {
                             // 找到可用代理
                             detectedProxyURL = $"https://{proxyItem}/";
-                            richTextBoxAllLog.Clear();
+                            //richTextBoxAllLog.Clear(); 暂时禁用
                             Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
                             proxyFound = true;
                             break;
@@ -4102,8 +4133,19 @@ namespace subs_check.win.gui
                 currentKernel = want;
                 if (!EnableHighConcurrent)
                 {
+                    if (comboBoxSpeedtestUrl.Text == "random") comboBoxSpeedtestUrl.Text = "不测速";
+                    comboBoxSpeedtestUrl.Items.Remove("random");
                     numericUpDownPipeAlive.Value = 0; numericUpDownPipeSpeed.Value = 0; numericUpDownPipeMedia.Value = 0;
                 }
+                else if (!comboBoxSpeedtestUrl.Items.Contains("random"))
+                {
+                    // 只有当列表里至少有1个元素时，才能插在第2个位置（索引1）  
+                    // 否则只能插在第1个位置（索引0）  
+                    int insertIndex = comboBoxSpeedtestUrl.Items.Count > 0 ? 1 : 0;
+
+                    comboBoxSpeedtestUrl.Items.Insert(insertIndex, "random");
+                }
+
                 checkBoxSwitchArch64.Enabled = true;
                 checkBoxHighConcurrent.Enabled = true;
                 buttonCheckUpdate.Enabled = true;

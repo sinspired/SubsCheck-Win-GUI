@@ -878,6 +878,9 @@
             // 
             this.comboBoxSpeedtestUrl.FormattingEnabled = true;
             this.comboBoxSpeedtestUrl.Items.AddRange(new object[] {
+            "不测速",
+            "https://github.com/2dust/v2rayN/releases/download/7.15.7/v2rayN-windows-64-SelfCo" +
+                "ntained.zip",
             "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
                 "Waifu2x-Extension-GUI-v2.21.12-Portable.7z",
             "https://github.com/2dust/v2rayN/releases/download/7.10.4/v2rayN-windows-64-deskto" +
@@ -889,8 +892,7 @@
             this.comboBoxSpeedtestUrl.Name = "comboBoxSpeedtestUrl";
             this.comboBoxSpeedtestUrl.Size = new System.Drawing.Size(570, 29);
             this.comboBoxSpeedtestUrl.TabIndex = 19;
-            this.comboBoxSpeedtestUrl.Text = "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
-    "Waifu2x-Extension-GUI-v2.21.12-Portable.7z";
+            this.comboBoxSpeedtestUrl.Text = "不测速";
             // 
             // comboBoxGithubProxyUrl
             // 
