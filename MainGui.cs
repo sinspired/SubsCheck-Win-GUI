@@ -749,6 +749,18 @@ namespace subs_check.win.gui
                                 }
                             }
                         }
+                        string extraURL01 = "https://raw.githubusercontent.com/officialputuid/KangProxy/KangProxy/xResults/old-data/RAW.txt";
+                        string extraURL02 = "https://raw.githubusercontent.com/officialputuid/KangProxy/KangProxy/xResults/Proxies.txt";
+                        if (checkBoxHighConcurrent.Checked)
+                        {
+                            if (filteredUrls.Contains(extraURL01) == false) filteredUrls.Add(extraURL01);
+                            if (filteredUrls.Contains(extraURL02) == false) filteredUrls.Add(extraURL02);
+                        }
+                        else
+                        {
+                            if (filteredUrls.Contains(extraURL01) == true) filteredUrls.Remove(extraURL01);
+                            if (filteredUrls.Contains(extraURL02) == true) filteredUrls.Remove(extraURL02);
+                        }
 
                         // 将过滤后的列表中的每个URL放在单独的行上
                         textBoxSubsUrls.Text = string.Join(Environment.NewLine, filteredUrls);
@@ -4138,12 +4150,14 @@ namespace subs_check.win.gui
                 currentKernel = want;
                 if (!EnableHighConcurrent)
                 {
+                    ReadConfig();
                     if (comboBoxSpeedtestUrl.Text == "random") comboBoxSpeedtestUrl.Text = "不测速";
                     comboBoxSpeedtestUrl.Items.Remove("random");
                     numericUpDownPipeAlive.Value = 0; numericUpDownPipeSpeed.Value = 0; numericUpDownPipeMedia.Value = 0;
                 }
                 else if (!comboBoxSpeedtestUrl.Items.Contains("random"))
                 {
+                    ReadConfig();
                     // 只有当列表里至少有1个元素时，才能插在第2个位置（索引1）  
                     // 否则只能插在第1个位置（索引0）  
                     int insertIndex = comboBoxSpeedtestUrl.Items.Count > 0 ? 1 : 0;
