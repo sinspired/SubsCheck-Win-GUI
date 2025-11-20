@@ -35,11 +35,13 @@ namespace subs_check.win.gui
         string githubProxyURL = "";
         string sysProxyURL = "";
         int run = 0;
-        string 当前subsCheck版本号 = "未知版本";
+
         string currentKernel = "原版内核";
         string currentArch = "i386";
         string 当前GUI版本号 = "未知版本";
         string 最新GUI版本号 = "未知版本";
+        string 当前subsCheck版本号 = "未知版本";
+        string 最新内核版本号 = "未知版本";
         private string nextCheckTime = null;// 用于存储下次检查时间
         string WebUIapiKey = "CMLiussss";
         int downloading = 0;
@@ -414,49 +416,105 @@ namespace subs_check.win.gui
         {
             try
             {
-                // 首先检查是否有网络连接
+                // 首先检查网络（你已有 IsNetworkAvailable() 方法）
                 if (!IsNetworkAvailable())
+                    return;
+
+                // 并行获取 GUI 和 Kernel 的最新版本（更快）
+                var taskGui = 获取版本号("https://api.github.com/repos/sinspired/SubsCheck-Win-GUI/releases/latest");
+
+                // 动态决定使用哪个仓库（checkBoxHighConcurrent 为 true 时使用 sinspired，否则使用 beck-8）
+                string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
+                var taskKernel = 获取版本号(apiUrl);
+
+                await Task.WhenAll(taskGui, taskKernel);
+
+                string latestGui = taskGui.Result.Item1;
+                string latestKernel = taskKernel.Result.Item1;
+
+                bool hasNewGui = false;
+                bool hasNewKernel = false;
+                string newTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+
+                // ========= 检查 GUI 更新 =========
+                if (latestGui != "未知版本" && !string.Equals(latestGui, 当前GUI版本号, StringComparison.OrdinalIgnoreCase))
                 {
-                    return; // 静默返回，不显示错误
+                    // 尝试用 Version 类精确比较
+                    if (TryParseVersion(latestGui, out Version vLatest) &&
+                        TryParseVersion(当前GUI版本号, out Version vCurrent) &&
+                        vLatest > vCurrent)
+                    {
+                        hasNewGui = true;
+                        最新GUI版本号 = latestGui;
+                    }
+                    else if (string.Compare(latestGui.TrimStart('v'), 当前GUI版本号.TrimStart('v'), StringComparison.OrdinalIgnoreCase) > 0)
+                    {
+                        // 回退到字符串比较（带 v 或不带 v 都支持）
+                        hasNewGui = true;
+                        最新GUI版本号 = latestGui;
+                    }
                 }
 
-                var result = await 获取版本号("https://api.github.com/repos/sinspired/SubsCheck-Win-GUI/releases/latest");
-                if (result.Item1 != "未知版本")
+                // ========= 检查 Kernel 更新 =========
+                if (latestKernel != "未知版本" && !string.Equals(latestKernel, 当前subsCheck版本号, StringComparison.OrdinalIgnoreCase))
                 {
-                    string latestVersionStr = result.Item1;
-                    try
+                    if (TryParseVersion(latestKernel, out Version vLatestK) &&
+                        TryParseVersion(当前subsCheck版本号, out Version vCurrentK) &&
+                        vLatestK > vCurrentK)
                     {
-                        // 移除版本号前的 'v' 前缀以便正确解析
-                        string latestVersionToParse = latestVersionStr.StartsWith("v") ? latestVersionStr.Substring(1) : latestVersionStr;
-                        string currentVersionToParse = 当前GUI版本号.StartsWith("v") ? 当前GUI版本号.Substring(1) : 当前GUI版本号;
-
-                        Version latestVersion = new Version(latestVersionToParse);
-                        Version currentVersion = new Version(currentVersionToParse);
-
-                        if (latestVersion > currentVersion)
-                        {
-                            最新GUI版本号 = latestVersionStr;
-                            标题 = "SubsCheck Win GUI " + 当前GUI版本号 + $"  发现新版本: {最新GUI版本号} 请及时更新！";
-                            this.Text = 标题;
-                        }
+                        hasNewKernel = true;
+                        最新内核版本号 = latestKernel; // 假设你有这个字段，没有就新建一个 string 最新内核版本号;
                     }
-                    catch (Exception)
+                    else if (string.Compare(latestKernel.TrimStart('v'), 当前subsCheck版本号.TrimStart('v'), StringComparison.OrdinalIgnoreCase) > 0)
                     {
-                        // 版本号格式解析失败，回退到原始的字符串比较
-                        if (latestVersionStr != 当前GUI版本号)
-                        {
-                            最新GUI版本号 = latestVersionStr;
-                            标题 = "SubsCheck Win GUI " + 当前GUI版本号 + $"  发现新版本: {最新GUI版本号} 请及时更新！";
-                            this.Text = 标题;
-                        }
+                        hasNewKernel = true;
+                        最新内核版本号 = latestKernel;
                     }
+                }
+
+                // ========= 生成标题提示 =========
+                if (hasNewGui && hasNewKernel)
+                {
+                    newTitle += $"  有新版本！GUI → {最新GUI版本号}   内核 → {最新内核版本号}";
+                }
+                else if (hasNewGui)
+                {
+                    newTitle += $"  发现新GUI版本: {最新GUI版本号} 请及时更新！";
+                }
+                else if (hasNewKernel)
+                {
+                    newTitle += $"  发现新内核版本: {最新内核版本号} 请更新内核！";
+                }
+
+                if (hasNewGui || hasNewKernel)
+                {
+                    // 检查更新按钮颜色
+                    buttonCheckUpdate.ForeColor = Color.LimeGreen;
+
+                    标题 = newTitle;
+                    this.Text = 标题; // 更新窗口标题
+                                    // 可选：这里再弹个小气泡提示更友好
+                    notifyIcon1.ShowBalloonTip(8000, "SubsCheck 更新提醒",
+                        hasNewGui && hasNewKernel ? $"GUI 和内核均有新版本！\nGUI: {最新GUI版本号}\n内核: {最新内核版本号}"
+                        : hasNewGui ? $"GUI 有新版本：{最新GUI版本号}"
+                        : $"内核有新版本：{最新内核版本号}", ToolTipIcon.Info);
                 }
             }
             catch
             {
-                // 静默处理任何其他异常
-                return;
+                // 所有异常静默处理，不打扰用户
             }
+        }
+
+        // 辅助方法：安全解析版本号（自动去掉 v 前缀）
+        private bool TryParseVersion(string input, out Version version)
+        {
+            version = null;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            string clean = input.TrimStart('v', 'V');
+            return Version.TryParse(clean, out version);
         }
 
         // 添加检查网络连接的辅助方法
@@ -3433,6 +3491,39 @@ namespace subs_check.win.gui
             }
 
             return resultArray;
+        }
+
+        /// <summary>
+        /// 获取内核当前版本和最新版本
+        /// </summary>
+        private async Task<string[]> GetKernelVersionAsync()
+        {
+            if (numericUpDownWebUIPort.Value <= 0 || numericUpDownWebUIPort.Value > 65535)
+                return new string[] { null, null };
+
+            var url = $"http://127.0.0.1:{numericUpDownWebUIPort.Value:D}/admin/version";
+
+            try
+            {
+                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(8) })
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "MyApp/1.0");
+
+                    string json = await client.GetStringAsync(url).ConfigureAwait(false);
+
+                    var data = JObject.Parse(json);
+
+                    return new string[]   // ← 这里显式指定 string[]
+                    {
+                data["version"]?.Value<string>()?.Trim(),
+                data["latest_version"]?.Value<string>()?.Trim()
+                    };
+                }
+            }
+            catch
+            {
+                return new string[] { null, null };
+            }
         }
 
         private async void timerRefresh_Tick(object sender, EventArgs e)
