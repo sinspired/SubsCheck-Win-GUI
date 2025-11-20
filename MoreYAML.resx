@@ -170,16 +170,17 @@ prerelease: false
 # 请输入整数
 update-timeout: 2
 
-# platforms:
-#   - iprisk
-#   - openai
-#   - gemini
-#   - tiktok
-#   - youtube
-#   - netflix
-#   - disney
-#   - x
-
+# 媒体解锁检测平台
+platforms:
+  - iprisk
+  - openai
+  - gemini
+  - youtube
+  # - tiktok
+  # - netflix
+  # - disney
+  # - x
+  
 # 只测试指定协议的节点
 node-type:
   # - ss
