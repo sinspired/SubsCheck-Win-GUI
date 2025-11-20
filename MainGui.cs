@@ -4476,5 +4476,23 @@ namespace subs_check.win.gui
             }
             return colour;
         }
+
+        private void checkBoxSubsStats_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxHighConcurrent.Checked)
+            {
+                Log("开启订阅链接统计，将在 ./output/stats 下生成订阅数量、可用节点数量、成功率等文件", GetRichTextBoxAllLog());
+            }
+            else
+            {
+                Log("当前内核不支持订阅链接统计，请切换 Subs-Check性能版！", GetRichTextBoxAllLog());
+                MessageBox.Show(
+                    this,  // 如果你在 Form 类里可以直接传 this，让弹窗属于当前窗口
+                    "当前内核不支持订阅链接统计功能！\r\n\r\n请勾选 “高并发模式”\n切换到 【Subs-Check 性能版】",
+                    "温馨提示",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
     }
 }

@@ -736,6 +736,7 @@
             this.checkBoxSubsStats.TabIndex = 43;
             this.checkBoxSubsStats.Text = "统计订阅信息";
             this.checkBoxSubsStats.UseVisualStyleBackColor = true;
+            this.checkBoxSubsStats.CheckedChanged += new System.EventHandler(this.checkBoxSubsStats_CheckedChanged);
             // 
             // comboBoxOverwriteUrls
             // 
