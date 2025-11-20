@@ -59,6 +59,12 @@ namespace subs_check.win.gui
         private Point _enhanceOriginalLocation;
         private bool _originalLocationSaved = false;
 
+        // 存储媒体解锁平台数组
+        private List<string> selectedPlatforms = new List<string>();
+
+        // 是否需要选择媒体解锁平台
+        private bool NeedSelectPlatforms = true;
+
         public MainGui()
         {
             InitializeComponent();
@@ -778,6 +784,17 @@ namespace subs_check.win.gui
                     if (renamenode != null && renamenode == "true") checkBoxEnableRenameNode.Checked = true;
                     else checkBoxEnableRenameNode.Checked = false;
 
+                    List<string> platforms = 读取config列表(config, "platforms");
+                    if (platforms != null && platforms.Count > 0)
+                    {
+                        selectedPlatforms = platforms;
+                        NeedSelectPlatforms = false;
+                    }
+                    else
+                    {
+                        selectedPlatforms = new List<string>();
+                    }
+
                     string mediacheck = 读取config字符串(config, "media-check");
                     if (mediacheck != null && mediacheck == "true") checkBoxEnableMediaCheck.Checked = true;
                     else checkBoxEnableMediaCheck.Checked = false;
@@ -1178,6 +1195,12 @@ namespace subs_check.win.gui
                 config["switch-x64"] = checkBoxSwitchArch64.Checked;//是否使用x64内核
                 config["rename-node"] = checkBoxEnableRenameNode.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBoxEnableMediaCheck.Checked;//是否开启流媒体检测
+
+                if (selectedPlatforms != null && selectedPlatforms.Count > 0)
+                {
+                    config["platforms"] = selectedPlatforms;// 保存平台数组
+                }
+
                 config["keep-success-proxies"] = checkBoxKeepSucced.Checked;//是否保留成功的节点
                 config["sub-urls-stats"] = checkBoxSubsStats.Checked;//是否统计节点信息
                 config["print-progress"] = false;//是否显示进度
@@ -2923,10 +2946,37 @@ namespace subs_check.win.gui
             if (checkBoxEnableRenameNode.Checked == false) checkBoxEnableMediaCheck.Checked = false;
         }
 
+
         private void checkBoxEnableMediaCheck_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBoxEnableMediaCheck.Checked == true) checkBoxEnableRenameNode.Checked = true;
+            if (checkBoxEnableMediaCheck.Checked)
+            {
+                // 启用流媒体检测时，自动启用重命名节点
+                checkBoxEnableRenameNode.Checked = true;
+
+                if (NeedSelectPlatforms)
+                {
+                    using (var selector = new PlatformSelectorForm(selectedPlatforms))
+                    {
+                        if (selector.ShowDialog() == DialogResult.OK)
+                        {
+                            // 只更新变量，不直接写文件
+                            selectedPlatforms = selector.SelectedPlatforms;
+                            if (selectedPlatforms.Count == 0)
+                            {
+                                checkBoxEnableMediaCheck.Checked = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    NeedSelectPlatforms = true;
+                }
+            }
         }
+
+
 
         private async void timerRestartSchedule_Tick(object sender, EventArgs e)
         {
@@ -3342,7 +3392,7 @@ namespace subs_check.win.gui
                 resultArray[5] = "N/A";
 
                 // 可选：记录错误到日志
-                Log($"获取API状态失败: {ex.Message}", GetRichTextBoxAllLog(), true);
+                // Log($"获取API状态失败: {ex.Message}", GetRichTextBoxAllLog(), true);
             }
 
             return resultArray;
