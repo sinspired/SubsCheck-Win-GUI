@@ -559,7 +559,14 @@ namespace subs_check.win.gui
 
                     if (checkBoxHighConcurrent.Checked)
                     {
-                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11", "Singbox1.12" });
+                        if (!comboBoxSubscriptionType.Items.Contains("Singbox1.11"))
+                        {
+                            comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11" });
+                        }
+                        if (!comboBoxSubscriptionType.Items.Contains("Singbox1.12"))
+                        {
+                            comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.12" });
+                        }
                     }
 
                     // 根据是否启用高并发，调整界面布局
@@ -883,10 +890,10 @@ namespace subs_check.win.gui
                     }
                     else
                     {
-                            textBoxSubStorePath.Text = GetComputerNameMD5();
+                        textBoxSubStorePath.Text = GetComputerNameMD5();
                     }
 
-                        string cronexpression = 读取config字符串(config, "cron-expression");
+                    string cronexpression = 读取config字符串(config, "cron-expression");
                     if (cronexpression != null)
                     {
                         textBoxCron.Text = cronexpression;
@@ -4152,7 +4159,14 @@ namespace subs_check.win.gui
                     }
                     if (checkBoxHighConcurrent.Checked)
                     {
-                        comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11", "Singbox1.12" });
+                        if (!comboBoxSubscriptionType.Items.Contains("Singbox1.11"))
+                        {
+                            comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.11" });
+                        }
+                        if (!comboBoxSubscriptionType.Items.Contains("Singbox1.12"))
+                        {
+                            comboBoxSubscriptionType.Items.AddRange(new object[] { "Singbox1.12" });
+                        }
                     }
                 }
 
