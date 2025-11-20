@@ -2177,101 +2177,127 @@ namespace subs_check.win.gui
                 else
                 {
                     // 创建选择窗口
-                    Form selectForm = new Form();
-                    selectForm.Text = "选择局域网IP地址";
-                    selectForm.StartPosition = FormStartPosition.CenterParent;
-                    /*
-                    selectForm.Width = 520;  // 保持宽度
-                    selectForm.Height = 320; // 增加高度以容纳额外的警告标签
-                    selectForm.FormBorderStyle = FormBorderStyle.FixedDialog;
-                    */
-                    selectForm.AutoSize = true;  // 启用自动大小调整
-                    selectForm.AutoSizeMode = AutoSizeMode.GrowAndShrink;  // 根据内容调整大小
-                    selectForm.FormBorderStyle = FormBorderStyle.FixedSingle;  // 使用固定但可调整的边框
-                    selectForm.ShowIcon = false;
-                    selectForm.MaximizeBox = false;
-                    selectForm.MinimizeBox = false;
-
-                    // 添加说明标签
-                    Label label = new Label();
-                    label.Text = "发现多个局域网IP地址：\n\n" +
-                                 "· 仅在本机访问：直接点击【取消】，将使用127.0.0.1\n\n" +
-                                 "· 局域网内其他设备访问：请在下面列表中选择一个正确的局域网IP";
-                    label.Location = new Point(15, 10);
-                    label.AutoSize = true;
-                    label.MaximumSize = new Size(380, 0); // 设置最大宽度，允许自动换行
-                    selectForm.Controls.Add(label);
-
-                    // 计算标签高度以正确放置列表框
-                    int labelHeight = label.Height + 20;
-
-                    // 添加IP地址列表框
-                    ListBox listBox = new ListBox();
-                    listBox.Location = new Point(15, labelHeight);
-                    listBox.Width = 380;
-                    listBox.Height = 130; // 保持列表框高度
-                    foreach (string ip in lanIPs)
+                    using (Form selectForm = new Form()) // 使用 using 确保资源释放
                     {
-                        listBox.Items.Add(ip);
-                    }
-                    // 查找非".1"结尾的IP地址，如果所有IP都以".1"结尾，则使用第一个IP
-                    int selectedIndex = 0;
-                    for (int i = 0; i < lanIPs.Count; i++)
-                    {
-                        if (!lanIPs[i].EndsWith(".1"))
+                        selectForm.Text = "选择局域网IP地址";
+                        selectForm.Font = new Font("宋体", 9F); // 统一字体
+                        selectForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                        selectForm.StartPosition = FormStartPosition.CenterParent;
+                        selectForm.MaximizeBox = false;
+                        selectForm.MinimizeBox = false;
+                        selectForm.AutoSize = true;
+                        selectForm.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                        selectForm.Padding = new Padding(15); // 窗体边缘留白
+
+                        // 主布局容器：垂直排列所有元素
+                        var mainLayout = new TableLayoutPanel
                         {
-                            selectedIndex = i;
-                            break;
+                            Dock = DockStyle.Fill,
+                            AutoSize = true,
+                            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                            ColumnCount = 1,
+                            RowCount = 4, // 说明文本、列表、警告、按钮组
+                            Padding = new Padding(0)
+                        };
+
+                        // 1. 说明标签
+                        Label label = new Label();
+                        label.Text = "发现多个局域网IP地址：\n\n" +
+                                     "- 仅在本机访问：直接点击【取消】，将使用127.0.0.1\n" +
+                                     "- 局域网内其他设备访问：请在下面列表中选择一个正确的局域网IP";
+                        label.AutoSize = true;
+                        label.MaximumSize = new Size(550, 0); // 限制最大宽度，自动换行
+                        label.Margin = new Padding(0, 0, 0, 20); // 下边距
+
+                        // 2. IP列表框
+                        ListBox listBox = new ListBox();
+                        listBox.Width = 550; // 稍微加宽
+                        listBox.Height = 160;
+                        listBox.Font = new Font("Verdana", 10F); // IP地址用英文字体显示更清晰
+                        foreach (string ip in lanIPs)
+                        {
+                            listBox.Items.Add(ip);
+                        }
+
+                        // 智能选择逻辑：优先选非 .1 结尾的
+                        int selectedIndex = 0;
+                        for (int i = 0; i < lanIPs.Count; i++)
+                        {
+                            if (!lanIPs[i].EndsWith(".1"))
+                            {
+                                selectedIndex = i;
+                                break;
+                            }
+                        }
+                        if (listBox.Items.Count > 0)
+                            listBox.SelectedIndex = selectedIndex;
+
+                        // 3. 警告标签
+                        Label warningLabel = new Label();
+                        warningLabel.Text = "注意：\n\n选择错误的IP会导致局域网内其他设备无法访问。\n推荐您可以先尝试使用非“.1”结尾的IP！";
+                        warningLabel.AutoSize = true;
+                        warningLabel.ForeColor = Color.Red;
+                        warningLabel.MaximumSize = new Size(550, 0);
+                        warningLabel.Margin = new Padding(0, 20, 0, 25); // 上下边距
+
+                        // 4. 按钮区域 (使用 FlowLayoutPanel 居中对齐)
+                        FlowLayoutPanel buttonPanel = new FlowLayoutPanel
+                        {
+                            AutoSize = true,
+                            FlowDirection = FlowDirection.LeftToRight,
+                            Anchor = AnchorStyles.Top | AnchorStyles.Bottom, // 在单元格内居中需要配合父级设置
+                            Dock = DockStyle.Fill,
+                            Padding = new Padding(0),
+                            Margin = new Padding(0)
+                        };
+                        // 让 FlowLayoutPanel 内容居中比较特殊，这里用 Margin 手动推 或者将 Panel 居中
+                        // 简单做法：直接让 mainLayout 的这一行居中
+
+                        Button okButton = new Button();
+                        okButton.Text = "确定";
+                        okButton.DialogResult = DialogResult.OK;
+                        okButton.Size = new Size(100, 32); // 【关键修改】增加宽度和高度
+                        okButton.Cursor = Cursors.Hand;
+
+                        Button cancelButton = new Button();
+                        cancelButton.Text = "取消";
+                        cancelButton.DialogResult = DialogResult.Cancel;
+                        cancelButton.Size = new Size(100, 32); // 增加宽度和高度
+                        cancelButton.Margin = new Padding(20, 0, 0, 0); // 按钮间距
+                        cancelButton.Cursor = Cursors.Hand;
+
+                        buttonPanel.Controls.Add(okButton);
+                        buttonPanel.Controls.Add(cancelButton);
+
+                        // 将按钮面板放入主布局，并设置居中
+                        mainLayout.Controls.Add(label, 0, 0);
+                        mainLayout.Controls.Add(listBox, 0, 1);
+                        mainLayout.Controls.Add(warningLabel, 0, 2);
+                        mainLayout.Controls.Add(buttonPanel, 0, 3);
+
+                        // 设置按钮面板在单元格内居中
+                        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                        // 这种写法是为了让 buttonPanel 在 TableLayout 的单元格里居中
+                        buttonPanel.Anchor = AnchorStyles.None;
+
+                        selectForm.Controls.Add(mainLayout);
+                        selectForm.AcceptButton = okButton;
+                        selectForm.CancelButton = cancelButton;
+
+                        // 显示逻辑
+                        if (selectForm.ShowDialog() == DialogResult.OK && listBox.SelectedItem != null)
+                        {
+                            return listBox.SelectedItem.ToString();
+                        }
+                        else
+                        {
+                            return "127.0.0.1";
                         }
                     }
-
-                    // 设置选中的索引
-                    listBox.SelectedIndex = selectedIndex;
-                    selectForm.Controls.Add(listBox);
-
-                    // 添加警告标签（放在列表框下方）
-                    Label warningLabel = new Label();
-                    warningLabel.Text = "注意：选择错误的IP会导致局域网内其他设备无法访问。\n\n　　　推荐您可以先尝试使用非“.1”结尾的IP！";
-                    warningLabel.Location = new Point(15, labelHeight + listBox.Height + 10);
-                    warningLabel.AutoSize = true;
-                    warningLabel.ForeColor = Color.Red; // 警告文本使用红色
-                    selectForm.Controls.Add(warningLabel);
-
-                    // 计算按钮位置（居中排布）
-                    int buttonY = labelHeight + listBox.Height + warningLabel.Height + 20;
-                    int buttonTotalWidth = 75 * 2 + 15; // 两个按钮的宽度加间距
-                    int buttonStartX = (selectForm.ClientSize.Width - buttonTotalWidth) / 2;
-
-                    // 添加确定按钮
-                    Button okButton = new Button();
-                    okButton.Text = "确定";
-                    okButton.DialogResult = DialogResult.OK;
-                    okButton.Location = new Point(buttonStartX, buttonY);
-                    okButton.Width = 75;
-                    selectForm.Controls.Add(okButton);
-                    selectForm.AcceptButton = okButton;
-
-                    // 添加取消按钮
-                    Button cancelButton = new Button();
-                    cancelButton.Text = "取消";
-                    cancelButton.DialogResult = DialogResult.Cancel;
-                    cancelButton.Location = new Point(buttonStartX + 90, buttonY);
-                    cancelButton.Width = 75;
-                    selectForm.Controls.Add(cancelButton);
-                    selectForm.CancelButton = cancelButton;
-
-                    // 显示选择窗口
-                    if (selectForm.ShowDialog() == DialogResult.OK)
-                    {
-                        return listBox.SelectedItem.ToString();
-                    }
-                    else
-                    {
-                        return "127.0.0.1"; // 如果用户取消，返回本地回环地址
-                    }
                 }
-
-
             }
             catch (Exception ex)
             {
