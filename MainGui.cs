@@ -491,6 +491,7 @@ namespace subs_check.win.gui
                 {
                     // 检查更新按钮颜色
                     buttonCheckUpdate.ForeColor = Color.LimeGreen;
+                    buttonCheckUpdate.Text = "有新版本";
 
                     标题 = newTitle;
                     this.Text = 标题; // 更新窗口标题
@@ -1672,6 +1673,12 @@ namespace subs_check.win.gui
                                 当前subsCheck版本号 = $"{latestVersion}";
 
                                 Log($"{currentKernel}({currentArch}): subs-check.exe {当前subsCheck版本号} 已就绪！", GetRichTextBoxAllLog());
+
+                                buttonCheckUpdate.ForeColor = Color.Black;
+                                buttonCheckUpdate.Text = "检查更新";
+                                string defaultTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+                                标题 = defaultTitle;
+                                this.Text = 标题;
 
                                 await SaveConfig(false);
 
@@ -3498,10 +3505,13 @@ namespace subs_check.win.gui
         /// </summary>
         private async Task<string[]> GetKernelVersionAsync()
         {
+            // 1. 类型转换检查
             if (numericUpDownWebUIPort.Value <= 0 || numericUpDownWebUIPort.Value > 65535)
                 return new string[] { null, null };
 
-            var url = $"http://127.0.0.1:{numericUpDownWebUIPort.Value:D}/admin/version";
+            // 2. 【关键修改】将 decimal 强转为 int
+            int port = (int)numericUpDownWebUIPort.Value;
+            var url = $"http://127.0.0.1:{port}/admin/version";
 
             try
             {
@@ -3509,14 +3519,16 @@ namespace subs_check.win.gui
                 {
                     client.DefaultRequestHeaders.Add("User-Agent", "MyApp/1.0");
 
+                    // 3. 异步请求
                     string json = await client.GetStringAsync(url).ConfigureAwait(false);
 
+                    // 4. 解析 JSON (确保已引用 Newtonsoft.Json)
                     var data = JObject.Parse(json);
 
-                    return new string[]   // ← 这里显式指定 string[]
+                    return new string[]
                     {
-                data["version"]?.Value<string>()?.Trim(),
-                data["latest_version"]?.Value<string>()?.Trim()
+                        data["version"]?.Value<string>()?.Trim(),
+                        data["latest_version"]?.Value<string>()?.Trim()
                     };
                 }
             }
@@ -3530,14 +3542,57 @@ namespace subs_check.win.gui
         {
             //if (!button7.Enabled) button7.Enabled = true;
             string[] subscheck状态 = await GetApiStatusAsync();
+
             string 状态类型 = subscheck状态[0];
             string 状态图标类别 = subscheck状态[1];
             string 状态文本 = subscheck状态[2];
             string 节点总数 = subscheck状态[3];
             string 进度百分比 = subscheck状态[4];
             string 可用节点数量 = subscheck状态[5];
-            // 更新状态文本
 
+            string[] kernelVersion = await GetKernelVersionAsync();
+            string currentKernelVersion = kernelVersion[0];
+            string latestKernelVersion = kernelVersion[1];
+
+            string defaultTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+            if (currentKernelVersion != null && latestKernelVersion != null)
+            {
+                if (TryParseVersion(latestKernelVersion, out Version vLatestK) &&
+    TryParseVersion(currentKernelVersion, out Version vCurrentK) &&
+    vLatestK > vCurrentK)
+                {
+                    // 内核有新版
+                    string newTitle = defaultTitle;
+                    newTitle += $"  发现新内核版本: {vLatestK} 请更新内核！";
+
+                    // 检查更新按钮颜色
+                    buttonCheckUpdate.Enabled = true;
+                    buttonCheckUpdate.ForeColor = Color.LimeGreen;
+                    buttonCheckUpdate.Text = "有新版本";
+
+                    标题 = newTitle;
+                    this.Text = 标题; // 更新窗口标题
+                }
+                else
+                {
+                    // 检查更新按钮颜色
+                    buttonCheckUpdate.ForeColor = Color.Black;
+                    buttonCheckUpdate.Text = "检查更新";
+                    标题 = defaultTitle;
+                    this.Text = 标题; // 更新窗口标题
+                }
+            }
+            else
+            {
+                // 检查更新按钮颜色
+                buttonCheckUpdate.ForeColor = Color.Black;
+                buttonCheckUpdate.Text = "检查更新";
+                标题 = defaultTitle;
+                this.Text = 标题; // 更新窗口标题
+            }
+
+
+            // 更新状态文本
             if (状态类型 == "checking")
             {
                 buttonTriggerCheck.Text = buttonTriggerCheck.Text == "⌛获取订阅" ? buttonTriggerCheck.Text : "⌛获取订阅";
