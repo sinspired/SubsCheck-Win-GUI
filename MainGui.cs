@@ -1880,6 +1880,15 @@ namespace subs_check.win.gui
 
                 Log($"subs-check.exe {当前subsCheck版本号} 已启动...", GetRichTextBoxAllLog());
                 timerRefresh.Enabled = true;
+
+                // 启动进程后就可以使用WebUI
+                buttonWebUi.Enabled = true;
+
+                // 如果使用cron表达式，启用手动检测按钮
+                if (textBoxCron.Visible == true)
+                {
+                    buttonTriggerCheck.Enabled = true;
+                }
             }
             catch (Exception ex)
             {
@@ -1913,6 +1922,8 @@ namespace subs_check.win.gui
                 {
                     subsCheckProcess.Dispose();
                     subsCheckProcess = null;
+                    // 结束进程后禁用WebUI
+                    buttonWebUi.Enabled = false;
                 }
             }
         }
