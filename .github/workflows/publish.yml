@@ -141,11 +141,5 @@ jobs:
 
           版本: `${{ github.ref_name }}`
           项目: `${{ github.repository }}`
-          更新说明:
-            - 支持高并发内核新特性
-            - 支持统计订阅链接总数、可用节点数量、成功率
-            - 优化默认参数，提高检测成功率
-            - 新内核集成 sub-store 前后端，可通过WebUI一键管理
-            - 添加媒体解锁平台 多选窗口
 
           🔗 [查看详情](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }})
