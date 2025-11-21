@@ -110,8 +110,8 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(buttonCheckUpdate, "检查GUI和内核版本更新");
 
             toolTip1.SetToolTip(numericUpDownDLTimehot, "下载测试时间(s)：与下载链接大小相关，默认最大测试10s。");
-            toolTip1.SetToolTip(numericUpDownWebUIPort, "本地监听端口：用于直接返回测速结果的节点信息，方便 Sub-Store 实现订阅转换。");
-            toolTip1.SetToolTip(numericUpDownSubStorePort, "Sub-Store监听端口：用于订阅订阅转换。\n注意：除非你知道你在干什么，否则不要将你的 Sub-Store 暴露到公网，否则可能会被滥用");
+            toolTip1.SetToolTip(numericUpDownWebUIPort, "本地监听端口：用于WebUi，返回软件运行信息等。");
+            toolTip1.SetToolTip(numericUpDownSubStorePort, "Sub-Store监听端口：用于订阅转换。\n注意：\n请设置sub-store-path以防止被扫描主机");
             toolTip1.SetToolTip(textBoxSubStorePath, "Sub-Store自定义路径\n设置path之后，可以安全暴露到公网，开启订阅分享功能。\r\n# 订阅示例：http://127.0.0.1:8299/{sub-store-path}/api/file/mihomo\r\n# WebUI 支持分享订阅，直接复制订阅链接");
 
             toolTip1.SetToolTip(numericUpDownDownloadMb, "下载测试限制(MB)：当达到下载数据大小时，停止下载，可节省测速流量，减少测速测死的概率");
@@ -137,7 +137,7 @@ namespace subs_check.win.gui
 
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
-            toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会在内存中保留成功节点以便下次使用（重启后丢失）\n可在订阅链接中添加以下地址作为替代：\n- http://127.0.0.1:8199/all.yaml#KeepSucced\n");
+            toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会保留成功节点以便下次使用（持久化存储）\n1. 将加载上次成功节点；\n2. 将加载历次检测成功节点。");
             toolTip1.SetToolTip(checkBoxSubsStats, "仅在 “高并发模式“可用”。\n勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
             toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n开启后可一键管理sub-store\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
             toolTip1.SetToolTip(buttonWebUi, "更方便的subs-check管理面板\n可一键分享订阅\n支持一键进入sub-store\n支持远程管理");
