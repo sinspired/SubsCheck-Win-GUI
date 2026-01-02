@@ -396,7 +396,7 @@
             this.checkBoxHighConcurrent.Name = "checkBoxHighConcurrent";
             this.checkBoxHighConcurrent.Size = new System.Drawing.Size(141, 25);
             this.checkBoxHighConcurrent.TabIndex = 39;
-            this.checkBoxHighConcurrent.Text = "高并发模式";
+            this.checkBoxHighConcurrent.Text = "高性能模式";
             this.checkBoxHighConcurrent.UseVisualStyleBackColor = true;
             this.checkBoxHighConcurrent.CheckedChanged += new System.EventHandler(this.checkBoxHighConcurrent_CheckedChanged);
             // 

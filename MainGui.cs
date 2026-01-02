@@ -76,7 +76,7 @@ namespace subs_check.win.gui
             originalNotifyIcon = notifyIcon1.Icon;
 
             // 设置提示信息
-            toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高并发而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高并发后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
+            toolTip1.SetToolTip(numericUpDownConcurrent, "并发线程数：推荐 宽带峰值/50M。\n\n如启用高性能模式而未单独设置分段并发数,将使用该值计算自适应并发数.\n启用高性能模式后,此值可安全设置,下载速度会被限制在一个较小的值,同时加快检测速度");
             toolTip1.SetToolTip(numericUpDownInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
             toolTip1.SetToolTip(labelInterval, "检查间隔时间(分钟)：放置后台的时候，下次自动测速的间隔时间。\n\n 双击切换 使用「cron表达式」");
             toolTip1.SetToolTip(labelCron, "双击切换 使用「分钟倒计时」");
@@ -84,7 +84,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(numericUpDownTimeout, "超时时间(毫秒)：节点的最大延迟。");
             toolTip1.SetToolTip(numericUpDownMinSpeed, "最低测速结果舍弃(KB/s)。");
 
-            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用高并发内核。\n将同时开启以下功能:\n1. 测活、测速、媒体检测独立并发设置；\n2. 持久化保存并加载历次成功节点；\n3. 统计订阅信息，包括可用节点数量，成功率；\n4. 增强位置标签；\n5. 全新设计的WebUI，一键进入sub-store");
+            toolTip1.SetToolTip(checkBoxHighConcurrent, "启用高性能内核。\n将同时开启以下功能:\n1. 测活、测速、媒体检测独立并发设置；\n2. 持久化保存并加载历次成功节点；\n3. 统计订阅信息，包括可用节点数量，成功率；\n4. 增强位置标签；\n5. 全新设计的WebUI，一键进入sub-store");
             toolTip1.SetToolTip(checkBoxSwitchArch64, "启用64位版本内核。");
 
             toolTip1.SetToolTip(buttonTriggerCheck, "⏯️开始检测：发送开始检测信号，开始检测；\n⏸️结束检测：发送停止信号，内核保持后台运行。");
@@ -138,7 +138,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(textBoxCron, "支持标准cron表达式，如：\n 0 */2 * * * 表示每2小时的整点执行\n 0 0 */2 * * 表示每2天的0点执行\n 0 0 1 * * 表示每月1日0点执行\n */30 * * * * 表示每30分钟执行一次\n\n 双击切换 使用「分钟倒计时」");
 
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会保留成功节点以便下次使用（持久化存储）\n1. 将加载上次成功节点；\n2. 将加载历次检测成功节点。");
-            toolTip1.SetToolTip(checkBoxSubsStats, "仅在 “高并发模式“可用”。\n勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
+            toolTip1.SetToolTip(checkBoxSubsStats, "仅在 “高性能模式“可用”。\n勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
             toolTip1.SetToolTip(checkBoxIspCheck, "是否执行 isp 类型检测\n检测是否 原生/广播IP，以及住宅、机房等类型\n将为节点添加类似 [原生|机房]的标签");
 
             toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n开启后可一键管理sub-store\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
@@ -582,7 +582,7 @@ namespace subs_check.win.gui
                     int? mediaConcurrentValue = 读取config整数(config, "media-concurrent");
                     if (mediaConcurrentValue.HasValue) numericUpDownPipeMedia.Value = mediaConcurrentValue.Value;
 
-                    // 根据各阶段并发数切换设置项, 如果任一为0, 则启用自适应高并发
+                    // 根据各阶段并发数切换设置项, 如果任一为0, 则启用自适应高性能
                     switchPipeAutoConcurrent(); // 现在控件已被赋值，函数可以安全读取 numericUpDown 的值
 
                     // 重新启用事件
@@ -616,7 +616,7 @@ namespace subs_check.win.gui
                         bool.TryParse(enableHighConcurrentRaw.Trim(), out enableHighConcurrentFlag);
                     }
 
-                    // 决定是否启用高并发：只要显式开启 或 drop/enhance 为 true 或 三阶段并发均 > 0
+                    // 决定是否启用高性能：只要显式开启 或 drop/enhance 为 true 或 三阶段并发均 > 0
                     bool needHighConcurrent = enableHighConcurrentFlag
                                             || dropBadCFFlag
                                             || enhanceTagFlag
@@ -636,7 +636,7 @@ namespace subs_check.win.gui
                         }
                     }
 
-                    // 根据是否启用高并发，调整界面布局
+                    // 根据是否启用高性能，调整界面布局
                     string sysproxy;
                     if (!checkBoxHighConcurrent.Checked)
                     {
@@ -1256,7 +1256,7 @@ namespace subs_check.win.gui
                 else if (comboBoxOverwriteUrls.Text.StartsWith(githubRawPrefix)) config["mihomo-overwrite-url"] = githubProxyURL + comboBoxOverwriteUrls.Text;
                 else config["mihomo-overwrite-url"] = comboBoxOverwriteUrls.Text != "" ? comboBoxOverwriteUrls.Text : $"http://127.0.0.1:{numericUpDownWebUIPort.Value}/ACL4SSR_Online_Full.yaml";
 
-                config["enable-high-concurrent"] = checkBoxHighConcurrent.Checked;//使用自适应高并发版本
+                config["enable-high-concurrent"] = checkBoxHighConcurrent.Checked;//使用自适应高性能版本
                 config["switch-x64"] = checkBoxSwitchArch64.Checked;//是否使用x64内核
                 config["rename-node"] = checkBoxEnableRenameNode.Checked;//以节点IP查询位置重命名节点
                 config["media-check"] = checkBoxEnableMediaCheck.Checked;//是否开启流媒体检测
@@ -1544,7 +1544,7 @@ namespace subs_check.win.gui
                 string releasesPageUrl = $"https://github.com/{repoOwner}/subs-check/releases";
                 // 决定目标资源名称：64位优先 (amd64)，否则 i386
                 string desiredArchToken = checkBoxSwitchArch64.Checked ? "x86_64" : "i386";
-                string desiredKernel = checkBoxHighConcurrent.Checked ? "高并发内核" : "原版内核";
+                string desiredKernel = checkBoxHighConcurrent.Checked ? "高性能内核" : "原版内核";
                 string desiredAssetName = $"subs-check_Windows_{desiredArchToken}.zip";
 
                 // 首先检查是否有网络连接
@@ -3363,7 +3363,7 @@ namespace subs_check.win.gui
         {
             if (checkBoxHighConcurrent.Checked)
             {
-                Log("已启用流水线高并发模式✨\n- 此值将作为计算测活-测速-流媒体检测各阶段并发数的基准.\n- 内核已启用衰减算法,可放心设置", GetRichTextBoxAllLog());
+                Log("已启用流水线高性能模式✨\n- 此值将作为计算测活-测速-流媒体检测各阶段并发数的基准.\n- 内核已启用衰减算法,可放心设置", GetRichTextBoxAllLog());
             }
             else
             {
@@ -4321,7 +4321,7 @@ namespace subs_check.win.gui
             return _lastGithubProxyUrl;
         }
 
-        // 切换高并发内核和原版内核设置项
+        // 切换高性能内核和原版内核设置项
         private void SwitchHighConcurrentLayout(bool EnableHighConcurrent)
         {
             bool collapsed = buttonAdvanceSettings.Text == "高级设置∨";
@@ -4368,7 +4368,7 @@ namespace subs_check.win.gui
             SwitchHighConcurrentLayout(EnableHighConcurrent);
 
             // 判断是否需要下载新内核
-            string want = EnableHighConcurrent ? "高并发内核" : "原版内核";
+            string want = EnableHighConcurrent ? "高性能内核" : "原版内核";
             if (currentKernel != want)
             {
                 if (EnableHighConcurrent && !checkBoxSwitchArch64.Checked)
@@ -4414,7 +4414,7 @@ namespace subs_check.win.gui
                 checkBoxHighConcurrent.Enabled = false;
                 buttonCheckUpdate.Enabled = false;
 
-                Log(EnableHighConcurrent ? "切换为 高并发 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核", GetRichTextBoxAllLog());
+                Log(EnableHighConcurrent ? "切换为 高性能 内核,可单独设置测活-测速-媒体检测各阶段并发数,大幅提高性能" : "切换为 原版 内核", GetRichTextBoxAllLog());
                 await DownloadSubsCheckEXE();// 若要后台并行改为 _ = DownloadSubsCheckEXE();
                 currentKernel = want;
                 if (!EnableHighConcurrent)
@@ -4438,7 +4438,7 @@ namespace subs_check.win.gui
                 checkBoxHighConcurrent.Enabled = true;
                 buttonCheckUpdate.Enabled = true;
             }
-            Log(EnableHighConcurrent ? "已切换高并发内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。", GetRichTextBoxAllLog());
+            Log(EnableHighConcurrent ? "已切换高性能内核，测活-测速-媒体检测 流水线式并发运行。" : "使用原版内核。", GetRichTextBoxAllLog());
         }
 
         // x64 按钮切换事件
@@ -4652,7 +4652,7 @@ namespace subs_check.win.gui
                 Log("当前内核不支持订阅链接统计，请切换 Subs-Check性能版！", GetRichTextBoxAllLog());
                 MessageBox.Show(
                     this,  // 如果你在 Form 类里可以直接传 this，让弹窗属于当前窗口
-                    "当前内核不支持订阅链接统计功能！\r\n\r\n请勾选 “高并发模式”\n切换到 【Subs-Check 性能版】",
+                    "当前内核不支持订阅链接统计功能！\r\n\r\n请勾选 “高性能模式”\n切换到 【Subs-Check 性能版】",
                     "温馨提示",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -4670,7 +4670,7 @@ namespace subs_check.win.gui
                 Log("当前内核不支持 isp 类型检测，请切换 Subs-Check性能版！", GetRichTextBoxAllLog());
                 MessageBox.Show(
                     this,  // 如果你在 Form 类里可以直接传 this，让弹窗属于当前窗口
-                    "当前内核不支持 isp 类型检测！\r\n\r\n请勾选 “高并发模式”\n切换到 【Subs-Check 性能版】",
+                    "当前内核不支持 isp 类型检测！\r\n\r\n请勾选 “高性能模式”\n切换到 【Subs-Check 性能版】",
                     "温馨提示",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);

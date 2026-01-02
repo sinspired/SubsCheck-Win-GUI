@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("SubsCheck Win GUI")]
-[assembly: AssemblyDescription("SubsCheck 为 Windows 用户设计的 GUI 程序界面。修复字体模糊，兼容新旧dpi设备，新增高并发、64位内核，新增历次检测可用节点，添加新内核特性。")]
+[assembly: AssemblyDescription("SubsCheck 为 Windows 用户设计的 GUI 程序界面。修复字体模糊，兼容新旧dpi设备，新增高性能、64位内核，新增历次检测可用节点，添加新内核特性。")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TG:sinspired")]
 [assembly: AssemblyProduct("SubsCheck Win GUI")]
