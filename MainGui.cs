@@ -139,6 +139,8 @@ namespace subs_check.win.gui
 
             toolTip1.SetToolTip(checkBoxKeepSucced, "勾选会保留成功节点以便下次使用（持久化存储）\n1. 将加载上次成功节点；\n2. 将加载历次检测成功节点。");
             toolTip1.SetToolTip(checkBoxSubsStats, "仅在 “高并发模式“可用”。\n勾选会在 /output/stats 文件夹生成每个订阅链接内的节点数量，可用节点数量以及成功率。");
+            toolTip1.SetToolTip(checkBoxIspCheck, "是否执行 isp 类型检测\n检测是否 原生/广播IP，以及住宅、机房等类型\n将为节点添加类似 [原生|机房]的标签");
+
             toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n开启后可一键管理sub-store\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
             toolTip1.SetToolTip(buttonWebUi, "更方便的subs-check管理面板\n可一键分享订阅\n支持一键进入sub-store\n支持远程管理");
             toolTip1.SetToolTip(textBoxWebUiAPIKey, "Web控制面板的api-key");
@@ -897,6 +899,10 @@ namespace subs_check.win.gui
                     if (SubsStats != null && SubsStats == "true") checkBoxSubsStats.Checked = true;
                     else checkBoxSubsStats.Checked = false;
 
+                    string ispCheck = 读取config字符串(config, "isp-check");
+                    if (ispCheck != null && ispCheck == "true") checkBoxIspCheck.Checked = true;
+                    else checkBoxIspCheck.Checked = false;
+
                     int? successlimit = 读取config整数(config, "success-limit");
                     if (successlimit.HasValue)
                     {
@@ -1262,6 +1268,7 @@ namespace subs_check.win.gui
 
                 config["keep-success-proxies"] = checkBoxKeepSucced.Checked;//是否保留成功的节点
                 config["sub-urls-stats"] = checkBoxSubsStats.Checked;//是否统计节点信息
+                config["isp-check"] = checkBoxIspCheck.Checked;//是否启用ISP检测
                 config["print-progress"] = false;//是否显示进度
                 config["sub-urls-retry"] = 3;//重试次数(获取订阅失败后重试次数)
                 config["subscheck-version"] = 当前subsCheck版本号;//当前subsCheck版本号
@@ -4646,6 +4653,24 @@ namespace subs_check.win.gui
                 MessageBox.Show(
                     this,  // 如果你在 Form 类里可以直接传 this，让弹窗属于当前窗口
                     "当前内核不支持订阅链接统计功能！\r\n\r\n请勾选 “高并发模式”\n切换到 【Subs-Check 性能版】",
+                    "温馨提示",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
+
+        private void checkBoxIspCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxHighConcurrent.Checked)
+            {
+                Log("开启 isp 类型检测，检测是否原生/广播IP，以及住宅、机房等类型；将为节点添加类似 [原生|机房] 的标签", GetRichTextBoxAllLog());
+            }
+            else
+            {
+                Log("当前内核不支持 isp 类型检测，请切换 Subs-Check性能版！", GetRichTextBoxAllLog());
+                MessageBox.Show(
+                    this,  // 如果你在 Form 类里可以直接传 this，让弹窗属于当前窗口
+                    "当前内核不支持 isp 类型检测！\r\n\r\n请勾选 “高并发模式”\n切换到 【Subs-Check 性能版】",
                     "温馨提示",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);

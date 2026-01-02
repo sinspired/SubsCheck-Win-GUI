@@ -127,6 +127,7 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
+            this.checkBoxIspCheck = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
@@ -687,6 +688,7 @@
             // 
             // groupBoxAdvanceSettings
             // 
+            this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxIspCheck);
             this.groupBoxAdvanceSettings.Controls.Add(this.checkBoxSubsStats);
             this.groupBoxAdvanceSettings.Controls.Add(this.comboBoxOverwriteUrls);
             this.groupBoxAdvanceSettings.Controls.Add(this.textBoxSubStorePath);
@@ -732,9 +734,9 @@
             this.checkBoxSubsStats.AutoSize = true;
             this.checkBoxSubsStats.Location = new System.Drawing.Point(192, 130);
             this.checkBoxSubsStats.Name = "checkBoxSubsStats";
-            this.checkBoxSubsStats.Size = new System.Drawing.Size(162, 25);
+            this.checkBoxSubsStats.Size = new System.Drawing.Size(120, 25);
             this.checkBoxSubsStats.TabIndex = 43;
-            this.checkBoxSubsStats.Text = "统计订阅信息";
+            this.checkBoxSubsStats.Text = "统计订阅";
             this.checkBoxSubsStats.UseVisualStyleBackColor = true;
             this.checkBoxSubsStats.CheckedChanged += new System.EventHandler(this.checkBoxSubsStats_CheckedChanged);
             // 
@@ -1887,6 +1889,17 @@
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
             // 
+            // checkBoxIspCheck
+            // 
+            this.checkBoxIspCheck.AutoSize = true;
+            this.checkBoxIspCheck.Location = new System.Drawing.Point(346, 130);
+            this.checkBoxIspCheck.Name = "checkBoxIspCheck";
+            this.checkBoxIspCheck.Size = new System.Drawing.Size(111, 25);
+            this.checkBoxIspCheck.TabIndex = 44;
+            this.checkBoxIspCheck.Text = "ISP类型";
+            this.checkBoxIspCheck.UseVisualStyleBackColor = true;
+            this.checkBoxIspCheck.CheckedChanged += new System.EventHandler(this.checkBoxIspCheck_CheckedChanged);
+            // 
             // MainGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
@@ -2041,6 +2054,7 @@
         private System.Windows.Forms.Label labelSubstoreParh;
         private System.Windows.Forms.TextBox textBoxSubStorePath;
         private System.Windows.Forms.CheckBox checkBoxSubsStats;
+        private System.Windows.Forms.CheckBox checkBoxIspCheck;
     }
 }
 
