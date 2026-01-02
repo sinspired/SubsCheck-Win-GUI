@@ -137,7 +137,7 @@ jobs:
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }} # Bot Token
         format: markdown
         message: |
-          💻 *subs-check_GUI 更新(推荐)*
+          💻 *subs-check_GUI for Windows 更新*
 
           版本: `${{ github.ref_name }}`
           项目: `${{ github.repository }}`
