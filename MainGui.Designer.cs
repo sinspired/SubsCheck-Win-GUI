@@ -68,6 +68,7 @@
             this.labelLogNodeInfo = new System.Windows.Forms.Label();
             this.richTextBoxAllLog = new System.Windows.Forms.RichTextBox();
             this.groupBoxAdvanceSettings = new System.Windows.Forms.GroupBox();
+            this.checkBoxIspCheck = new System.Windows.Forms.CheckBox();
             this.checkBoxSubsStats = new System.Windows.Forms.CheckBox();
             this.comboBoxOverwriteUrls = new System.Windows.Forms.ComboBox();
             this.textBoxSubStorePath = new System.Windows.Forms.TextBox();
@@ -127,7 +128,6 @@
             this.groupBoxEnhance = new System.Windows.Forms.GroupBox();
             this.checkBoxDropBadCFNodes = new System.Windows.Forms.CheckBox();
             this.checkBoxEhanceTag = new System.Windows.Forms.CheckBox();
-            this.checkBoxIspCheck = new System.Windows.Forms.CheckBox();
             this.groupBoxComonSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
@@ -392,6 +392,8 @@
             // checkBoxHighConcurrent
             // 
             this.checkBoxHighConcurrent.AutoSize = true;
+            this.checkBoxHighConcurrent.Checked = true;
+            this.checkBoxHighConcurrent.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxHighConcurrent.Location = new System.Drawing.Point(18, 539);
             this.checkBoxHighConcurrent.Name = "checkBoxHighConcurrent";
             this.checkBoxHighConcurrent.Size = new System.Drawing.Size(141, 25);
@@ -728,6 +730,17 @@
             this.groupBoxAdvanceSettings.TabStop = false;
             this.groupBoxAdvanceSettings.Text = "高级设置";
             this.groupBoxAdvanceSettings.Visible = false;
+            // 
+            // checkBoxIspCheck
+            // 
+            this.checkBoxIspCheck.AutoSize = true;
+            this.checkBoxIspCheck.Location = new System.Drawing.Point(346, 130);
+            this.checkBoxIspCheck.Name = "checkBoxIspCheck";
+            this.checkBoxIspCheck.Size = new System.Drawing.Size(111, 25);
+            this.checkBoxIspCheck.TabIndex = 44;
+            this.checkBoxIspCheck.Text = "ISP类型";
+            this.checkBoxIspCheck.UseVisualStyleBackColor = true;
+            this.checkBoxIspCheck.CheckedChanged += new System.EventHandler(this.checkBoxIspCheck_CheckedChanged);
             // 
             // checkBoxSubsStats
             // 
@@ -1888,17 +1901,6 @@
             this.checkBoxEhanceTag.TabIndex = 38;
             this.checkBoxEhanceTag.Text = "增强位置标签";
             this.checkBoxEhanceTag.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxIspCheck
-            // 
-            this.checkBoxIspCheck.AutoSize = true;
-            this.checkBoxIspCheck.Location = new System.Drawing.Point(346, 130);
-            this.checkBoxIspCheck.Name = "checkBoxIspCheck";
-            this.checkBoxIspCheck.Size = new System.Drawing.Size(111, 25);
-            this.checkBoxIspCheck.TabIndex = 44;
-            this.checkBoxIspCheck.Text = "ISP类型";
-            this.checkBoxIspCheck.UseVisualStyleBackColor = true;
-            this.checkBoxIspCheck.CheckedChanged += new System.EventHandler(this.checkBoxIspCheck_CheckedChanged);
             // 
             // MainGui
             // 

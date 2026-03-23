@@ -1414,8 +1414,8 @@ namespace subs_check.win.gui
                 }
                 if (checkBoxHighConcurrent.Checked && textBoxSubStorePath.Text == "请输入路径")
                 {
-                    MessageBox.Show("请设置Sub-Store路径！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    //MessageBox.Show("请设置Sub-Store路径！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxSubStorePath.Text = GetComputerNameMD5();
                 }
                 run = 1;
                 if (buttonCopySubscriptionUrl.Enabled == false)

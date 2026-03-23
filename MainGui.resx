@@ -3480,9 +3480,6 @@ https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/main/all_configs.txt<
   <metadata name="timerCopySubscriptionUrl.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>822, 19</value>
   </metadata>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>196, 21</value>
-  </metadata>
   <metadata name="timerRestartSchedule.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>533, 19</value>
   </metadata>
