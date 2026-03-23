@@ -18,7 +18,7 @@ namespace subs_check.win.gui
         {
             InitializeComponent();
 
-            
+
             // 移除文本框的等待光标
             textBox1.UseWaitCursor = false;
             初始化 = textBox1.Text;
@@ -36,7 +36,7 @@ namespace subs_check.win.gui
             button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             button2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            
+
             // 检查并加载配置文件
             LoadMoreYamlConfig();
         }
@@ -78,7 +78,7 @@ namespace subs_check.win.gui
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/sinspired/subs-check/blob/master/config/config.example.yaml");
+            Process.Start("https://github.com/sinspired/subs-check-pro/blob/master/config/config.example.yaml");
         }
 
         private void button1_Click(object sender, EventArgs e)

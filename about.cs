@@ -42,7 +42,7 @@ namespace subs_check.win.gui
 
         private void linkLabel5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/sinspired/subs-check");
+            Process.Start("https://github.com/sinspired/subs-check-pro");
         }
 
         private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

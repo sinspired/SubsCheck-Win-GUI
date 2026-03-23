@@ -131,6 +131,7 @@ namespace subs_check.win.gui
 
             // 根据并发参数选择仓库
             string repoOwner = EnableHighConcurrent ? "sinspired" : "beck-8";
+            string repoName = EnableHighConcurrent ? "subs-check-pro" : "subs-check";
 
             using (HttpClient client = new HttpClient())
             {
@@ -140,8 +141,8 @@ namespace subs_check.win.gui
                     client.Timeout = TimeSpan.FromSeconds(30); // 增加超时时间以适应下载需求
 
 
-                    string url = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
-                    string 备用url = $"https://api.github.cmliussss.net/repos/{repoOwner}/subs-check/releases/latest";
+                    string url = $"https://api.github.com/repos/{repoOwner}/{repoName}/releases/latest";
+                    string 备用url = $"https://api.github.cmliussss.net/repos/{repoOwner}/{repoName}/releases/latest";
 
                     HttpResponseMessage response = null;
                     string responseBody = null;
@@ -266,7 +267,7 @@ namespace subs_check.win.gui
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n请前往 https://github.com/{repoOwner}/subs-check/releases 自行下载！",
+                    MessageBox.Show($"下载 {repoName}.exe 时出错: {ex.Message}\n\n请前往 https://github.com/{repoOwner}/{repoName}/releases 自行下载！",
                         "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

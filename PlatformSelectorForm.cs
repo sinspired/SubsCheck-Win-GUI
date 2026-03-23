@@ -16,7 +16,7 @@ namespace subs_check.win.gui
 
         private readonly string[] _platforms =
         {
-            "iprisk", "openai", "gemini", "youtube",
+            "iprisk", "openai", "gemini",  "copilot", "youtube",
             "tiktok", "netflix", "disney", "x"
         };
 
@@ -30,14 +30,14 @@ namespace subs_check.win.gui
         {
             // 1. 窗体基础设置
             this.Text = "媒体解锁检测";
-            this.Font = new Font("宋体", 9F); 
+            this.Font = new Font("宋体", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterParent;
             this.MinimizeBox = false;
             this.MaximizeBox = false;
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            this.BackColor = Color.WhiteSmoke; 
+            this.BackColor = Color.WhiteSmoke;
 
             // 2. 主布局：两列 (左侧列表 | 右侧按钮)
             var mainLayout = new TableLayoutPanel
@@ -158,6 +158,7 @@ namespace subs_check.win.gui
                 case "iprisk": return "IPRisk(风控)";
                 case "openai": return "OpenAI/ChatGPT";
                 case "gemini": return "Gemini";
+                case "copilot": return "Copilot";
                 case "youtube": return "YouTube";
                 case "tiktok": return "TikTok";
                 case "netflix": return "Netflix";

@@ -142,7 +142,7 @@ namespace subs_check.win.gui
             toolTip1.SetToolTip(checkBoxIspCheck, "是否执行 isp 类型检测\n检测是否 原生/广播IP，以及住宅、机房等类型\n将为节点添加类似 [原生|机房]的标签");
 
             toolTip1.SetToolTip(checkBoxEnableWebUI, "勾选后启用WebUI管理界面\n建议启用\n开启后可一键管理sub-store\n建议使用 Cloudflare Tunel隧道 映射主机端口\r\n可使用域名编辑、管理配置,开始、结束检测任务\n本地管理地址: http://127.0.0.1:8199/admin\n");
-            toolTip1.SetToolTip(buttonWebUi, "更方便的subs-check管理面板\n可一键分享订阅\n支持一键进入sub-store\n支持远程管理");
+            toolTip1.SetToolTip(buttonWebUi, "更方便的 Subs-Check-PRO 管理面板\n可一键分享订阅\n支持一键进入sub-store\n支持远程管理");
             toolTip1.SetToolTip(textBoxWebUiAPIKey, "Web控制面板的api-key");
             // 设置通知图标的上下文菜单
             SetupNotifyIconContextMenu();
@@ -427,7 +427,9 @@ namespace subs_check.win.gui
 
                 // 动态决定使用哪个仓库（checkBoxHighConcurrent 为 true 时使用 sinspired，否则使用 beck-8）
                 string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
-                string apiUrl = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/releases/latest";
                 var taskKernel = 获取版本号(apiUrl);
 
                 await Task.WhenAll(taskGui, taskKernel);
@@ -1540,18 +1542,19 @@ namespace subs_check.win.gui
 
                 // 动态决定使用哪个仓库（checkBoxHighConcurrent 为 true 时使用 sinspired，否则使用 beck-8）
                 string repoOwner = checkBoxHighConcurrent.Checked ? "sinspired" : "beck-8";
-                string apiUrl = $"https://api.github.com/repos/{repoOwner}/subs-check/releases/latest";
-                string releasesPageUrl = $"https://github.com/{repoOwner}/subs-check/releases";
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/releases/latest";
+                string releasesPageUrl = $"https://github.com/{repoOwner}/{repoName}/releases";
                 // 决定目标资源名称：64位优先 (amd64)，否则 i386
                 string desiredArchToken = checkBoxSwitchArch64.Checked ? "x86_64" : "i386";
                 string desiredKernel = checkBoxHighConcurrent.Checked ? "高性能内核" : "原版内核";
-                string desiredAssetName = $"subs-check_Windows_{desiredArchToken}.zip";
+                string desiredAssetName = $"{repoName}_Windows_{desiredArchToken}.zip";
 
                 // 首先检查是否有网络连接
                 if (!IsNetworkAvailable())
                 {
                     Log("网络连接不可用，无法下载核心文件。", GetRichTextBoxAllLog(), true);
-                    MessageBox.Show($"缺少 subs-check.exe 核心文件。\n\n您可以前往 {releasesPageUrl} 自行下载！",
+                    MessageBox.Show($"缺少 {repoName}.exe 核心文件。\n\n您可以前往 {releasesPageUrl} 自行下载！",
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
@@ -1577,7 +1580,7 @@ namespace subs_check.win.gui
                     {
                         string latestVersion = result.Item1;
                         JArray assets = result.Item2;
-                        Log($"subs-check.exe 最新版本为: {latestVersion} ", GetRichTextBoxAllLog());
+                        Log($"{repoName}.exe 最新版本为: {latestVersion} ", GetRichTextBoxAllLog());
 
                         // 先尝试精确匹配期望文件名；找不到则回退为任意包含 "Windows" 且包含 arch token 的条目；
                         // 若仍找不到，再回退为任意包含 "Windows" 的资源。
@@ -1622,7 +1625,7 @@ namespace subs_check.win.gui
                         if (downloadUrl == null)
                         {
                             Log("无法找到适用于 Windows 的下载链接。", GetRichTextBoxAllLog(), true);
-                            MessageBox.Show($"未能找到适用的 subs-check.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
+                            MessageBox.Show($"未能找到适用的 {repoName}.exe 下载链接。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return;
                         }
@@ -1648,7 +1651,7 @@ namespace subs_check.win.gui
                         {
                             Log($"所有下载尝试均失败，最后错误: {failureReason}", GetRichTextBoxAllLog(), true);
                             MessageBox.Show(
-                                $"下载 subs-check.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
+                                $"下载 {repoName}.exe 失败，请检查网络连接后重试。\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                                 "下载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             progressBarAll.Value = 0;
@@ -1664,11 +1667,11 @@ namespace subs_check.win.gui
                         {
                             // 查找subs-check.exe
                             var exeEntry = archive.Entries.FirstOrDefault(
-                                entry => entry.Name.Equals("subs-check.exe", StringComparison.OrdinalIgnoreCase));
+                                entry => entry.Name.Equals($"{repoName}.exe", StringComparison.OrdinalIgnoreCase));
 
                             if (exeEntry != null)
                             {
-                                string exeFilePath = Path.Combine(executablePath, "subs-check.exe");
+                                string exeFilePath = Path.Combine(executablePath, $"{repoName}.exe");
                                 // 如果文件已存在，先删除
                                 if (File.Exists(exeFilePath)) File.Delete(exeFilePath);
 
@@ -1679,7 +1682,7 @@ namespace subs_check.win.gui
 
                                 当前subsCheck版本号 = $"{latestVersion}";
 
-                                Log($"{currentKernel}({currentArch}): subs-check.exe {当前subsCheck版本号} 已就绪！", GetRichTextBoxAllLog());
+                                Log($"{currentKernel}({currentArch}): {repoName}.exe {当前subsCheck版本号} 已就绪！", GetRichTextBoxAllLog());
 
                                 buttonCheckUpdate.ForeColor = Color.Black;
                                 buttonCheckUpdate.Text = "检查更新";
@@ -1694,14 +1697,14 @@ namespace subs_check.win.gui
                             }
                             else
                             {
-                                Log("无法在压缩包中找到 subs-check.exe 文件。", GetRichTextBoxAllLog(), true);
+                                Log($"无法在压缩包中找到 {repoName}.exe 文件。", GetRichTextBoxAllLog(), true);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         Log($"下载过程中出错: {ex.Message}", GetRichTextBoxAllLog(), true);
-                        MessageBox.Show($"下载 subs-check.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
+                        MessageBox.Show($"下载 {repoName}.exe 时出错: {ex.Message}\n\n可尝试更换 Github Proxy 后，点击「检查更新」>「更新内核」。\n或前往 {releasesPageUrl} 自行下载！",
                             "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -1730,6 +1733,8 @@ namespace subs_check.win.gui
             string latestVersion = "未知版本";
             JArray assets = null;
 
+            string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+
             // 创建不使用系统代理的 HttpClientHandler
             HttpClientHandler handler = new HttpClientHandler
             {
@@ -1743,7 +1748,7 @@ namespace subs_check.win.gui
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
                 client.Timeout = TimeSpan.FromSeconds(30); // 增加超时时间以适应下载需求
 
-                if (是否输出log) Log("正在获取最新版本 subs-check.exe 内核下载地址...", GetRichTextBoxAllLog());
+                if (是否输出log) Log($"正在获取最新版本 {repoName}.exe 内核下载地址...", GetRichTextBoxAllLog());
                 string url = 版本号URL;
                 string 备用url = 版本号URL.Replace("api.github.com", "api.github.cmliussss.net");
 
@@ -1876,7 +1881,8 @@ namespace subs_check.win.gui
 
                 // 获取当前应用程序目录
                 string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                string subsCheckPath = Path.Combine(executablePath, "subs-check.exe");
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+                string subsCheckPath = Path.Combine(executablePath, $"{repoName}.exe");
                 // 设置一个环境变量以表明是有GUI启动的
 
                 Environment.SetEnvironmentVariable("START_FROM_GUI", "true");
@@ -1884,10 +1890,10 @@ namespace subs_check.win.gui
                 // 检查是否有其他subs-check.exe进程正在运行，并强制结束它们
                 try
                 {
-                    Process[] processes = Process.GetProcessesByName("subs-check");
+                    Process[] processes = Process.GetProcessesByName($"{repoName}");
                     if (processes.Length > 0)
                     {
-                        Log("发现正在运行的subs-check.exe进程，正在强制结束...", GetRichTextBoxAllLog());
+                        Log($"发现正在运行的 {repoName}.exe 进程，正在强制结束...", GetRichTextBoxAllLog());
                         foreach (Process process in processes)
                         {
                             // 确保不是当前应用程序的进程
@@ -1897,11 +1903,11 @@ namespace subs_check.win.gui
                                 {
                                     process.Kill();
                                     process.WaitForExit();
-                                    Log($"成功结束subs-check.exe进程(ID: {process.Id})", GetRichTextBoxAllLog());
+                                    Log($"成功结束 {repoName}.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log($"结束subs-check.exe进程时出错(ID: {process.Id}): {ex.Message}", GetRichTextBoxAllLog(), true);
+                                    Log($"结束 {repoName}.exe 进程时出错(ID: {process.Id}): {ex.Message}", GetRichTextBoxAllLog(), true);
                                 }
                             }
                         }
@@ -1909,13 +1915,13 @@ namespace subs_check.win.gui
                 }
                 catch (Exception ex)
                 {
-                    Log($"检查运行中的subs-check.exe进程时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
+                    Log($"检查运行中的 {repoName}.exe 进程时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
 
                 // 检查文件是否存在
                 if (!File.Exists(subsCheckPath))
                 {
-                    Log("没有找到 subs-check.exe 文件。", GetRichTextBoxAllLog(), true);
+                    Log($"没有找到  {repoName}.exe 文件。", GetRichTextBoxAllLog(), true);
                     await DownloadSubsCheckEXE(); // 使用异步等待
                 }
 
@@ -1950,7 +1956,7 @@ namespace subs_check.win.gui
                 subsCheckProcess.EnableRaisingEvents = true;
                 subsCheckProcess.Exited += SubsCheckProcess_Exited;
 
-                Log($"subs-check.exe {当前subsCheck版本号} 已启动...", GetRichTextBoxAllLog());
+                Log($"{repoName}.exe {当前subsCheck版本号} 已启动...", GetRichTextBoxAllLog());
                 timerRefresh.Enabled = true;
 
                 // 启动进程后就可以使用WebUI
@@ -1964,7 +1970,8 @@ namespace subs_check.win.gui
             }
             catch (Exception ex)
             {
-                Log($"启动 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+                Log($"启动 {repoName}.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 buttonStartCheck.Text = "▶️ 启动";
                 buttonStartCheck.ForeColor = Color.Black;
             }
@@ -1976,19 +1983,20 @@ namespace subs_check.win.gui
             timerRefresh.Enabled = false;
             if (subsCheckProcess != null && !subsCheckProcess.HasExited)
             {
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
                 try
                 {
                     // 尝试正常关闭进程
                     subsCheckProcess.Kill();
                     subsCheckProcess.WaitForExit();
-                    Log("subs-check.exe 已停止", GetRichTextBoxAllLog());
+                    Log($"{repoName}.exe 已停止", GetRichTextBoxAllLog());
                     notifyIcon1.Icon = originalNotifyIcon;
                     buttonTriggerCheck.Enabled = false;
                     buttonTriggerCheck.Text = "🔀未启动";
                 }
                 catch (Exception ex)
                 {
-                    Log($"停止 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
+                    Log($"停止 {repoName}.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
                 }
                 finally
                 {
@@ -2188,7 +2196,8 @@ namespace subs_check.win.gui
             // 进程退出时，在 UI 线程上更新控件
             BeginInvoke(new Action(() =>
             {
-                Log("subs-check.exe 已退出", GetRichTextBoxAllLog());
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+                Log($"{repoName}.exe 已退出", GetRichTextBoxAllLog());
                 buttonStartCheck.Text = "▶️ 启动";
                 buttonStartCheck.ForeColor = Color.Black;
 
@@ -2810,31 +2819,33 @@ namespace subs_check.win.gui
                 buttonStartCheck.Enabled = false;
                 // 清空日志
                 richTextBoxAllLog.Clear();
-                Log("开始检查和下载最新版本的 subs-check.exe...", GetRichTextBoxAllLog());
+                string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
+
+                Log($"开始检查和下载最新版本的 {repoName}.exe...", GetRichTextBoxAllLog());
 
                 // 获取当前应用程序目录
                 string executablePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                string subsCheckPath = Path.Combine(executablePath, "subs-check.exe");
+                string subsCheckPath = Path.Combine(executablePath, $"{repoName}.exe");
 
                 // 检查文件是否存在
                 if (File.Exists(subsCheckPath))
                 {
-                    Log($"发现 subs-check.exe，正在删除...", GetRichTextBoxAllLog());
+                    Log($"发现 {repoName}.exe，正在删除...", GetRichTextBoxAllLog());
 
                     try
                     {
                         // 首先检查是否有进程正在运行
-                        Process[] processes = Process.GetProcessesByName("subs-check");
+                        Process[] processes = Process.GetProcessesByName($"{repoName}");
                         if (processes.Length > 0)
                         {
-                            Log("发现正在运行的 subs-check.exe 进程，正在强制结束...", GetRichTextBoxAllLog());
+                            Log($"发现正在运行的 {repoName}.exe 进程，正在强制结束...", GetRichTextBoxAllLog());
                             foreach (Process process in processes)
                             {
                                 try
                                 {
                                     process.Kill();
                                     process.WaitForExit();
-                                    Log($"成功结束 subs-check.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
+                                    Log($"成功结束 {repoName}.exe 进程(ID: {process.Id})", GetRichTextBoxAllLog());
                                 }
                                 catch (Exception ex)
                                 {
@@ -2845,19 +2856,19 @@ namespace subs_check.win.gui
 
                         // 删除文件
                         File.Delete(subsCheckPath);
-                        Log("成功删除旧版本 subs-check.exe", GetRichTextBoxAllLog());
+                        Log($"成功删除旧版本 {repoName}.exe", GetRichTextBoxAllLog());
                     }
                     catch (Exception ex)
                     {
-                        Log($"删除 subs-check.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
-                        MessageBox.Show($"无法删除现有的 subs-check.exe 文件: {ex.Message}\n\n请手动删除后重试，或者检查文件是否被其他程序占用。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Log($"删除 {repoName}.exe 时出错: {ex.Message}", GetRichTextBoxAllLog(), true);
+                        MessageBox.Show($"无法删除现有的 {repoName}.exe 文件: {ex.Message}\n\n请手动删除后重试，或者检查文件是否被其他程序占用。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         buttonUpdateKernel.Enabled = true;
                         return;
                     }
                 }
                 else
                 {
-                    Log("未找到现有的 subs-check.exe 文件，将直接下载最新版本", GetRichTextBoxAllLog());
+                    Log($"未找到现有的 {repoName}.exe 文件，将直接下载最新版本", GetRichTextBoxAllLog());
                 }
 
                 //// 检测可用的 GitHub 代理
@@ -3089,10 +3100,11 @@ namespace subs_check.win.gui
 
         private async void timerRestartSchedule_Tick(object sender, EventArgs e)
         {
+            string repoName = checkBoxHighConcurrent.Checked ? "subs-check-pro" : "subs-check";
             if (buttonStartCheck.Text == "⏹️ 停止")
             {
                 buttonStartCheck.ForeColor = Color.Red;
-                Log("subs-check.exe 运行时满24小时，自动重启清理内存占用。", GetRichTextBoxAllLog());
+                Log($"{repoName}.exe 运行时满24小时，自动重启清理内存占用。", GetRichTextBoxAllLog());
                 // 停止 subs-check.exe 程序
                 StopSubsCheckProcess();
                 // 结束 Sub-Store
@@ -3398,11 +3410,12 @@ namespace subs_check.win.gui
             {
                 // 构造URL
                 string url = $"http://{本地IP}:{numericUpDownWebUIPort.Value}/admin";
+                string repoName = checkBoxHighConcurrent.Checked ? "Subs-Check-PRO" : "subs-check";
 
                 // 使用系统默认浏览器打开URL
                 System.Diagnostics.Process.Start(url);
 
-                Log($"正在浏览器中打开 Subs-Check 配置管理: {url}", GetRichTextBoxAllLog());
+                Log($"正在浏览器中打开 {repoName} 配置管理: {url}", GetRichTextBoxAllLog());
             }
             catch (Exception ex)
             {
