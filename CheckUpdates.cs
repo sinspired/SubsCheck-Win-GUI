@@ -109,19 +109,19 @@ namespace subs_check.win.gui
             if (最新GUI版本号 != 当前GUI版本号)
             {
                 // 检查当前目录下是否存在 Upgrade.exe
-                string upgradeExePath = System.IO.Path.Combine(Application.StartupPath, "Upgrade.exe");
-                if (System.IO.File.Exists(upgradeExePath))
-                {
-                    buttonUpdateGUI.Text = "更新原版";
-                    buttonUpdateGUI.Enabled = true;
-                }
-                else
-                {
-                    buttonUpdateGUI.Text = "立即更新 GUI";
-                    buttonUpdateGUI.Enabled = true;
-                    buttonUpdateGUI.ForeColor = System.Drawing.Color.Green;
+                //string upgradeExePath = System.IO.Path.Combine(Application.StartupPath, "Upgrade.exe");
+                //if (System.IO.File.Exists(upgradeExePath))
+                //{
+                //    buttonUpdateGUI.Text = "更新原版";
+                //    buttonUpdateGUI.Enabled = true;
+                //}
+                //else
+                //{
+                buttonUpdateGUI.Text = "立即更新 GUI";
+                buttonUpdateGUI.Enabled = true;
+                buttonUpdateGUI.ForeColor = System.Drawing.Color.Green;
 
-                }
+                //}
             }
             else
             {
@@ -331,7 +331,7 @@ namespace subs_check.win.gui
                 AutoUpdater.ShowRemindLaterButton = false;
                 AutoUpdater.ReportErrors = true;
                 AutoUpdater.HttpUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-                AutoUpdater.Start("https://ghproxy.net/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
+                AutoUpdater.Start($"{githubProxyURL}/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
                 return;
             }
             //下载链接
