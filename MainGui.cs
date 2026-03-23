@@ -397,12 +397,12 @@ namespace subs_check.win.gui
 
             ReadConfig();
 
-            if (checkBoxHighConcurrent.Checked)
-            {
-                groupBoxGist.Location = new Point(groupBoxGist.Location.X, groupBoxGist.Location.Y + groupBoxPipeConcurrent.Height);
-                groupBoxR2.Location = groupBoxGist.Location;
-                groupBoxWebdav.Location = groupBoxGist.Location;
-            }
+            // if (checkBoxHighConcurrent.Checked)
+            // {
+            //     groupBoxGist.Location = new Point(groupBoxGist.Location.X, groupBoxGist.Location.Y + groupBoxPipeConcurrent.Height);
+            //     groupBoxR2.Location = groupBoxGist.Location;
+            //     groupBoxWebdav.Location = groupBoxGist.Location;
+            // }
 
             if (CheckCommandLineParameter("-auto"))
             {
