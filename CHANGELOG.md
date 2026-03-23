@@ -1,19 +1,19 @@
 # 📝 Changelog
 
-[2.7.0.1] - 2026-01-02
+[2.8.0.0] - 2026-03-23
 
 🚀 Features
 
-- 添加 isp 类型检测选项
+- 升级 v2 性能版内核
 
-📚 Documentation
+🐛 Bug Fixes
 
-- 更新软件运行截图
-- 更新 README
+- 修复未设置 sub-store 路径的逻辑
+
+⚡ Performance
+
+- 优化初始设置
 
 ⚙️ Miscellaneous Tasks
 
-- 更新软件信息
-- 更新控件提示
-- 修改部分文案
-- Bump version to 2.7.0.1
+- Bump version to v2.8.0.0
