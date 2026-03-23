@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
     <version>2.7.0.1</version>
-    <url>https://gh.39.al/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/v2.7.0.1/subs-check-win.zip</url>
-    <changelog>https://gh.39.al/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
+    <url>https://hk.gh-proxy.org/https://github.com/sinspired/SubsCheck-Win-GUI/releases/download/v2.7.0.1/subs-check-win.zip</url>
+    <changelog>https://hk.gh-proxy.org/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
     <mandatory>true</mandatory>
     <executable>subs-check.win.gui.exe</executable>
 </item>
