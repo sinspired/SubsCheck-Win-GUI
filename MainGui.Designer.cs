@@ -314,6 +314,8 @@
             // checkBoxSwitchArch64
             // 
             this.checkBoxSwitchArch64.AutoSize = true;
+            this.checkBoxSwitchArch64.Checked = true;
+            this.checkBoxSwitchArch64.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxSwitchArch64.Location = new System.Drawing.Point(170, 539);
             this.checkBoxSwitchArch64.Name = "checkBoxSwitchArch64";
             this.checkBoxSwitchArch64.Size = new System.Drawing.Size(111, 25);
@@ -441,14 +443,18 @@
             // 
             // buttonWebUi
             // 
+            this.buttonWebUi.BackColor = System.Drawing.SystemColors.Control;
             this.buttonWebUi.Enabled = false;
+            this.buttonWebUi.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonWebUi.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonWebUi.ForeColor = System.Drawing.Color.LightSeaGreen;
             this.buttonWebUi.Location = new System.Drawing.Point(165, 625);
             this.buttonWebUi.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.buttonWebUi.Name = "buttonWebUi";
             this.buttonWebUi.Size = new System.Drawing.Size(138, 40);
             this.buttonWebUi.TabIndex = 29;
             this.buttonWebUi.Text = "访问WebUI";
-            this.buttonWebUi.UseVisualStyleBackColor = true;
+            this.buttonWebUi.UseVisualStyleBackColor = false;
             this.buttonWebUi.Click += new System.EventHandler(this.buttonWebUi_Click);
             // 
             // checkBoxStartup
@@ -908,6 +914,7 @@
             this.comboBoxSpeedtestUrl.FormattingEnabled = true;
             this.comboBoxSpeedtestUrl.Items.AddRange(new object[] {
             "不测速",
+            "random",
             "https://github.com/2dust/v2rayN/releases/download/7.15.7/v2rayN-windows-64-SelfCo" +
                 "ntained.zip",
             "https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/" +
