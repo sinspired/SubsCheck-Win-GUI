@@ -2757,58 +2757,108 @@ namespace subs_check.win.gui
         // 创建专用方法用于异步检测GitHub代理
         private async Task<string> DetectGitHubProxyAsync(List<string> proxyItems)
         {
-            bool proxyFound = false;
-            string detectedProxyURL = "";
-
             Log("检测可用 GitHub 代理...", GetRichTextBoxAllLog());
 
-            // 遍历随机排序后的代理列表
-            foreach (string proxyItem in proxyItems)
+            // 固定 commit，确保内容不变
+            const string testTarget = "https://raw.githubusercontent.com/golang/go/080aa8e9647e5211650f34f3a93fb493afbe396d/src/net/http/transport.go";
+            const string expectedHash = "cbb44007f7cc4cd862acfdb70fbbf5bd89cd800de78a2905bfbc71900e7639e2";
+            const long minSizeBytes = 50 * 1024;
+
+            // 并发检测所有代理
+            var tasks = proxyItems.Select(async proxyItem =>
             {
-                string checkUrl = $"https://{proxyItem}/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/packages.config";
-                Log($"正在测试 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
+                string proxyBase = proxyItem.StartsWith("http://") || proxyItem.StartsWith("https://")
+                    ? proxyItem
+                    : $"https://{proxyItem}";
+                if (!proxyBase.EndsWith("/"))
+                    proxyBase += "/";
+
+                string checkUrl = proxyBase + testTarget;
+                // Log($"正在测试 GitHub 代理: {proxyBase}", GetRichTextBoxAllLog());
                 richTextBoxAllLog.Refresh();
 
                 try
                 {
-                    using (HttpClient client = new HttpClient())
+                    using (var handler = new HttpClientHandler { Proxy = null, UseProxy = false })
+                    using (var client = new HttpClient(handler))
                     {
-                        client.Timeout = TimeSpan.FromSeconds(5); // 设置5秒超时
-                                                                  // 添加User-Agent头，避免被拒绝访问
-                        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) cmliu/SubsCheck-Win-GUI");
+                        client.Timeout = TimeSpan.FromSeconds(15);
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                            "Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36");
 
-                        // 使用异步方式
-                        HttpResponseMessage response = await client.GetAsync(checkUrl);
-                        if (response.IsSuccessStatusCode)
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        var response = await client.GetAsync(checkUrl, HttpCompletionOption.ResponseContentRead);
+                        sw.Stop();
+
+                        if (!response.IsSuccessStatusCode)
+                            return null;
+
+                        byte[] content = await response.Content.ReadAsByteArrayAsync();
+
+                        // 校验文件大小
+                        if (content.Length < minSizeBytes)
                         {
-                            // 找到可用代理
-                            detectedProxyURL = $"https://{proxyItem}/";
-                            //richTextBoxAllLog.Clear(); 暂时禁用
-                            Log($"找到可用 GitHub 代理: {proxyItem}", GetRichTextBoxAllLog());
-                            proxyFound = true;
-                            break;
+                            // Log($"代理 {proxyBase} 返回内容过小({content.Length} bytes)，疑似无效响应", GetRichTextBoxAllLog(), true);
+                            return null;
                         }
+
+                        // 校验 SHA256
+                        string actualHash;
+                        using (var sha256 = System.Security.Cryptography.SHA256.Create())
+                        {
+                            var hashBytes = sha256.ComputeHash(content);
+                            actualHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                        }
+
+                        if (actualHash != expectedHash)
+                        {
+                            // Log($"代理 {proxyBase} 内容校验失败，疑似虚假代理", GetRichTextBoxAllLog(), true);
+                            return null;
+                        }
+
+                        double speedKBps = content.Length / 1024.0 / sw.Elapsed.TotalSeconds;
+                        // Log($"代理 {proxyBase} 可用，耗时 {sw.ElapsedMilliseconds}ms，速度 {speedKBps:F1}KB/s", GetRichTextBoxAllLog());
+
+                        return new
+                        {
+                            ProxyURL = proxyBase,
+                            Elapsed = sw.Elapsed,
+                            SpeedKBps = speedKBps
+                        };
                     }
                 }
                 catch (Exception ex)
                 {
-                    // 记录错误但继续尝试下一个
-                    Log($"代理 {proxyItem} 测试失败: {ex.Message}", GetRichTextBoxAllLog(), true);
+                    // Log($"代理 {proxyItem} 测试失败: {ex.Message}", GetRichTextBoxAllLog(), true);
                     richTextBoxAllLog.Refresh();
+                    return null;
                 }
-            }
+            }).ToList();
 
-            // 如果没有找到可用的代理
-            if (!proxyFound)
+            // 等待所有检测完成
+            var results = await Task.WhenAll(tasks);
+
+            // 综合评分：速度 70% + 延迟 30%
+            var best = results
+                .Where(r => r != null)
+                .OrderByDescending(r => r.SpeedKBps * 0.7 + (1.0 / r.Elapsed.TotalSeconds) * 0.3)
+                .FirstOrDefault();
+
+            if (best != null)
             {
-                Log("未找到可用的 GitHub 代理，请在高级设置中手动设置。", GetRichTextBoxAllLog(), true);
-                MessageBox.Show("未找到可用的 GitHub 代理。\n\n请打开高级设置手动填入一个可用的Github Proxy，或检查您的网络连接。",
-                    "代理检测失败",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                Log($"最佳 GitHub 代理: {best.ProxyURL}，速度 {best.SpeedKBps:F1}KB/s，耗时 {best.Elapsed.TotalMilliseconds:F0}ms",
+                    GetRichTextBoxAllLog());
+                return best.ProxyURL;
             }
 
-            return detectedProxyURL;
+            Log("未找到可用的 GitHub 代理，请手动设置。", GetRichTextBoxAllLog(), true);
+            MessageBox.Show(
+                "未找到可用的 GitHub 代理。\n\n请手动填入可用的 Github Proxy，或检查您的网络连接。",
+                "代理检测失败",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return "";
         }
 
         private async void buttonUpdateKernel_Click(object sender, EventArgs e)
