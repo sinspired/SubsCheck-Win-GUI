@@ -1682,6 +1682,8 @@ namespace subs_check.win.gui
 
                                 当前subsCheck版本号 = $"{latestVersion}";
 
+                                await SaveConfig(false);
+
                                 Log($"{currentKernel}({currentArch}): {repoName}.exe {当前subsCheck版本号} 已就绪！", GetRichTextBoxAllLog());
 
                                 buttonCheckUpdate.ForeColor = Color.Black;
@@ -1690,10 +1692,8 @@ namespace subs_check.win.gui
                                 标题 = defaultTitle;
                                 this.Text = 标题;
 
-                                await SaveConfig(false);
-
                                 // 可选：删除 zip 文件（注释状态保留原样）
-                                //File.Delete(zipFilePath);
+                                File.Delete(zipFilePath);
                             }
                             else
                             {
@@ -4425,7 +4425,6 @@ namespace subs_check.win.gui
         private async void checkBoxHighConcurrent_CheckedChanged(object sender, EventArgs e)
         {
             bool EnableHighConcurrent = checkBoxHighConcurrent.Checked;
-
 
             // 先进行控件切换
             SwitchHighConcurrentLayout(EnableHighConcurrent);

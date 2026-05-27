@@ -1,10 +1,11 @@
 # 📝 Changelog
 
-[2.8.0.1] - 2026-03-23
+[3.0.0.0] - 2026-03-23
 
-⚙️ Miscellaneous Tasks
+⚠️ 本次升级将是一次重大改变
 
-- *(release)* Update CHANGELOG.md and update.xml for v2.7.0.1
-- 更新GitHub代理
-- *(release)* Update CHANGELOG.md and update.xml for v2.8.0.0
-- 避免异常更新
+- 新架构
+- 新样式
+- 可能存在bug
+- 谨慎升级
+- 体验将大幅提升
