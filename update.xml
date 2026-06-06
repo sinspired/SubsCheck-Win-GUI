@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
     <version>3.0.0.0</version>
-    <url>https://proxy.linkpc.dpdns.org/https://github.com/sinspired/subs-check-pro-gui/releases/download/v1.0.0-beta.1/subs-check-pro-gui_x64.zip</url>
+    <url>https://proxy.linkpc.dpdns.org/https://github.com/sinspired/subs-check-pro-gui/releases/download/v1.0.0-beta.1/subs-check-pro-gui-windows-amd64.zip</url>
     <changelog>https://proxy.linkpc.dpdns.org/https://raw.githubusercontent.com/sinspired/SubsCheck-Win-GUI/master/CHANGELOG.md</changelog>
     <mandatory>false</mandatory>
     <executable>subs-check-pro-gui_x64.exe</executable>
