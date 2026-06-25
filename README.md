@@ -1,7 +1,7 @@
 # 🚀 SubsCheck-Win-GUI
 
 [![GUI 版本](https://img.shields.io/github/v/release/sinspired/SubsCheck-Win-GUI?logo=github)](https://github.com/sinspired/SubsCheck-Win-GUI/releases)
-[![内核](https://img.shields.io/github/v/release/sinspired/subs-check?display_name=release&style=social&logo=github&label=subs-check性能版)](https://github.com/sinspired/subs-check/releases/latest)
+[![内核](https://img.shields.io/github/v/release/sinspired/subs-check?display_name=release&style=social&logo=github&label=subs-check性能版)](https://github.com/sinspired/subs-check-pro/releases/latest)
 
 > [!CAUTION]
 >请访问 https://github.com/sinspired/subs-check-pro-gui 下载最新的跨平台现代桌面端程序；本仓库将停止维护！
