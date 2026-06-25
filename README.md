@@ -1,6 +1,6 @@
 # 🚀 SubsCheck-Win-GUI
 
-[![新的跨平台现代 GUI](https://img.shields.io/github/v/release/sinspired/subs-check-pro-gui?logo=wails&logoColor=E2434B&label=跨平台现代客户端)](https://github.com/sinspired/subs-check-pro-gui/releases)
+[![新的跨平台现代 GUI](https://img.shields.io/github/v/release/sinspired/subs-check-pro-gui?logo=wails&logoColor=E2434B&label=新的跨平台客户端)](https://github.com/sinspired/subs-check-pro-gui/releases)
 [![内核](https://img.shields.io/github/v/release/sinspired/subs-check-pro?display_name=release&style=social&logo=github&label=subs-check性能版)](https://github.com/sinspired/subs-check-pro/releases/latest)
 
 > [!CAUTION]
