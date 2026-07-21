@@ -165,6 +165,262 @@ namespace subs_check.win.gui
             AutoUpdater.Start("https://gh.39.al/raw.githubusercontent.com/sinspired/subsCheck-Win-GUI/master/update.xml");
         }
 
+        private void ShowDeprecationWarning()
+        {
+            using (Form prompt = new Form())
+            {
+                prompt.Text = "GUI 升级提示";
+                prompt.FormBorderStyle = FormBorderStyle.FixedDialog; // 恢复原生标题栏
+                prompt.StartPosition = FormStartPosition.CenterScreen;
+                prompt.MaximizeBox = false;
+                prompt.MinimizeBox = false;
+                prompt.BackColor = Color.White;
+                prompt.ShowIcon = false;
+
+                // ---------- 加宽，避免中文文案在原宽度下被裁切 ----------
+                const int FormWidth = 640;   // 580 -> 640
+                const int MarginX = 40;      // 36 -> 40，卡片内文字更从容
+                const int ContentWidth = FormWidth - MarginX * 2; // 560
+                const int SectionGap = 20;
+                const int LineGap = 12;
+
+                prompt.ClientSize = new Size(FormWidth, 640);
+
+                Panel topAccent = new Panel { Dock = DockStyle.Top, Height = 4, BackColor = Color.FromArgb(16, 185, 129) };
+                prompt.Controls.Add(topAccent);
+
+                int currentY = 36;
+
+                // 1. 标题
+                FlowLayoutPanel flpHeader = new FlowLayoutPanel
+                {
+                    Location = new Point(MarginX, currentY),
+                    AutoSize = true,
+                    WrapContents = false,
+                    Width = ContentWidth
+                };
+                Label lblTitle = new Label
+                {
+                    Text = "本项目已停止维护",
+                    Font = new Font("Microsoft YaHei UI", 15, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(17, 24, 39),
+                    AutoSize = true,
+                    Margin = new Padding(0, 0, 8, 0)
+                };
+                flpHeader.Controls.Add(lblTitle);
+
+                Panel proBadge = CreateCapsule("请尽快升级", Color.FromArgb(16, 185, 129), Color.White, Color.FromArgb(5, 150, 105));
+                proBadge.Margin = new Padding(0, 4, 0, 0);
+                flpHeader.Controls.Add(proBadge);
+
+                prompt.Controls.Add(flpHeader);
+                currentY = flpHeader.Bottom + 10;
+
+                // 2. 引言（关键：MaximumSize 用 ContentWidth，且 AutoSize 的 Label 要设 AutoEllipsis=false 防止意外截断）
+                Label lblIntro = new Label
+                {
+                    Text = "本项目框架已严重落后，不会再更新维护，请尽快切换至新项目！",
+                    Font = new Font("Microsoft YaHei UI", 9.5f, FontStyle.Regular),
+                    ForeColor = Color.FromArgb(75, 85, 99),
+                    AutoSize = true,
+                    MaximumSize = new Size(ContentWidth, 0),
+                    AutoEllipsis = false,
+                    Location = new Point(MarginX, currentY)
+                };
+                prompt.Controls.Add(lblIntro);
+                currentY = lblIntro.Bottom + SectionGap;
+
+                // 3. 功能卡片
+                Panel pnlFeature = new Panel
+                {
+                    BackColor = Color.FromArgb(249, 250, 251),
+                    Location = new Point(MarginX, currentY),
+                    Width = ContentWidth
+                };
+                Panel leftLine = new Panel { BackColor = Color.FromArgb(16, 185, 129), Width = 3, Dock = DockStyle.Left };
+                pnlFeature.Controls.Add(leftLine);
+
+                int innerX = 20;
+                int innerY = 18;
+                int innerWidth = ContentWidth - innerX - 20; // 卡片内可用宽度，供长文本换行计算用
+
+                FlowLayoutPanel flpOS = new FlowLayoutPanel { Location = new Point(innerX, innerY), AutoSize = true, WrapContents = false };
+                Label lblOsTitle = new Label
+                {
+                    Text = "支持平台：",
+                    Font = new Font("Microsoft YaHei UI", 9.5f, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(31, 41, 55),
+                    AutoSize = true,
+                    Margin = new Padding(0, 2, 2, 0)
+                };
+                flpOS.Controls.Add(lblOsTitle);
+                flpOS.Controls.Add(CreateCapsule("Windows"));
+                flpOS.Controls.Add(CreateCapsule("macOS"));
+                flpOS.Controls.Add(CreateCapsule("Linux"));
+                pnlFeature.Controls.Add(flpOS);
+                innerY = flpOS.Bottom + LineGap;
+
+                AddFeatureLine(pnlFeature, "全新管理界面，小白直接上手", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "采用全新 subs-check-pro 内核，自动更新", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "支持切换配置文件，端口冲突检测", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "一键获取订阅链接和检测结果分析报告", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "支持原生系统通知", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "支持钉钉，tg，email等通知渠道", innerX, innerWidth, ref innerY, LineGap);
+                AddFeatureLine(pnlFeature, "开机自启，后台定时运行任务", innerX, innerWidth, ref innerY, 0);
+
+                pnlFeature.Height = innerY + 18;
+                pnlFeature.Paint += (s, e) => e.Graphics.DrawRectangle(new Pen(Color.FromArgb(229, 231, 235)), 0, 0, pnlFeature.Width - 1, pnlFeature.Height - 1);
+                prompt.Controls.Add(pnlFeature);
+                currentY = pnlFeature.Bottom + 28;
+
+                // 4. 主行动按钮
+                Button btnGo = new Button
+                {
+                    Text = "前往获取全新跨平台客户端  →",
+                    Font = new Font("Microsoft YaHei UI", 11.5f, FontStyle.Bold),
+                    BackColor = Color.FromArgb(16, 185, 129),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Size = new Size(ContentWidth, 46),
+                    Location = new Point(MarginX, currentY),
+                    Cursor = Cursors.Hand
+                };
+                btnGo.FlatAppearance.BorderSize = 0;
+                btnGo.MouseEnter += (s, ev) => btnGo.BackColor = Color.FromArgb(5, 150, 105);
+                btnGo.MouseLeave += (s, ev) => btnGo.BackColor = Color.FromArgb(16, 185, 129);
+                btnGo.Click += (s, e) =>
+                {
+                    try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/sinspired/subs-check-pro-gui") { UseShellExecute = true }); }
+                    catch { }
+                };
+                prompt.Controls.Add(btnGo);
+                currentY = btnGo.Bottom + 12;
+
+                // 5. 弱化的"继续使用"入口
+                Label btnContinue = new Label
+                {
+                    Text = "继续使用当前版本",
+                    Font = new Font("Microsoft YaHei UI", 9f, FontStyle.Regular),
+                    ForeColor = Color.FromArgb(156, 163, 175),
+                    AutoSize = false,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Size = new Size(ContentWidth, 26),
+                    Location = new Point(MarginX, currentY),
+                    Cursor = Cursors.Hand
+                };
+                btnContinue.MouseEnter += (s, ev) =>
+                {
+                    btnContinue.ForeColor = Color.FromArgb(75, 85, 99);
+                    btnContinue.Font = new Font("Microsoft YaHei UI", 9f, FontStyle.Underline);
+                };
+                btnContinue.MouseLeave += (s, ev) =>
+                {
+                    btnContinue.ForeColor = Color.FromArgb(156, 163, 175);
+                    btnContinue.Font = new Font("Microsoft YaHei UI", 9f, FontStyle.Regular);
+                };
+                btnContinue.Click += (s, e) => prompt.Close();
+                prompt.Controls.Add(btnContinue);
+
+                currentY = btnContinue.Bottom + 32;
+                prompt.ClientSize = new Size(FormWidth, currentY);
+
+                prompt.ShowDialog(this);
+            }
+        }
+
+        /// <summary>
+        /// 添加一行带圆点图标的功能说明；maxWidth 用于长文案自动换行，避免右侧裁切
+        /// </summary>
+        private void AddFeatureLine(Panel container, string text, int x, int maxWidth, ref int y, int gapAfter)
+        {
+            Panel dot = new Panel
+            {
+                BackColor = Color.FromArgb(16, 185, 129),
+                Size = new Size(6, 6),
+                Location = new Point(x + 2, y + 6)
+            };
+            dot.Region = CreateRoundRegion(dot.Size, 3);
+            container.Controls.Add(dot);
+
+            Label lbl = new Label
+            {
+                Text = text,
+                Font = new Font("Microsoft YaHei UI", 9.5f),
+                ForeColor = Color.FromArgb(55, 65, 81),
+                AutoSize = true,
+                MaximumSize = new Size(maxWidth - 16, 0), // 超宽自动换行而不是被裁掉
+                Location = new Point(x + 16, y)
+            };
+            container.Controls.Add(lbl);
+
+            y = lbl.Bottom + gapAfter;
+        }
+
+        /// <summary>
+        /// 默认颜色胶囊（浅翠绿）
+        /// </summary>
+        private Panel CreateCapsule(string text)
+        {
+            return CreateCapsule(text, Color.FromArgb(209, 250, 229), Color.FromArgb(6, 95, 70), Color.FromArgb(167, 243, 208));
+        }
+
+        /// <summary>
+        /// 支持自定义颜色的圆角胶囊标签
+        /// </summary>
+        private Panel CreateCapsule(string text, Color bgColor, Color textColor, Color borderColor)
+        {
+            Panel pnl = new Panel();
+            Label lbl = new Label
+            {
+                Text = text,
+                Font = new Font("Microsoft YaHei UI", 7.5f, FontStyle.Bold),
+                ForeColor = textColor,
+                BackColor = Color.Transparent,
+                AutoSize = true,
+                Location = new Point(8, 2)
+            };
+            pnl.Controls.Add(lbl);
+
+            var dummy = lbl.Handle;
+            pnl.Size = new Size(lbl.Width + 16, lbl.Height + 4);
+            pnl.Margin = new Padding(0, 0, 6, 0);
+
+            pnl.Paint += (s, e) =>
+            {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                using (var brush = new SolidBrush(bgColor))
+                using (var pen = new Pen(borderColor, 1))
+                {
+                    var path = CreateRoundPath(new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1), pnl.Height / 2);
+                    e.Graphics.FillPath(brush, path);
+                    e.Graphics.DrawPath(pen, path);
+                }
+            };
+            return pnl;
+        }
+
+        /// <summary>
+        /// 生成圆角矩形路径
+        /// </summary>
+        private System.Drawing.Drawing2D.GraphicsPath CreateRoundPath(Rectangle rect, int radius)
+        {
+            var path = new System.Drawing.Drawing2D.GraphicsPath();
+            path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
+            path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
+            path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
+            path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
+        /// <summary>
+        /// 生成圆角矩形 Region（用于控件/窗体裁剪）
+        /// </summary>
+        private Region CreateRoundRegion(Size size, int radius)
+        {
+            return new Region(CreateRoundPath(new Rectangle(0, 0, size.Width, size.Height), radius));
+        }
+
         // 更新程序退出事件处理器
         private async void AutoUpdater_ApplicationExitEvent()
         {
@@ -366,6 +622,12 @@ namespace subs_check.win.gui
         private async void timerinitial_Tick(object sender, EventArgs e)//初始化
         {
             timerinitial.Enabled = false;
+
+            // ==========================================
+            // 最优先弹出：项目停更与迁移通知的现代化提示
+            ShowDeprecationWarning();
+            // ==========================================
+
             if (buttonAdvanceSettings.Text == "高级设置∧") buttonAdvanceSettings_Click(sender, e);
             // 检查并创建config文件夹
             string executablePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
@@ -390,7 +652,7 @@ namespace subs_check.win.gui
             FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
             当前GUI版本号 = "v" + myFileVersionInfo.FileVersion;
             最新GUI版本号 = 当前GUI版本号;
-            标题 = "SubsCheck Win GUI " + 当前GUI版本号;
+            标题 = "SubsCheck Win GUI [已停更，请用 subs-check-pro-gui 项目] " + 当前GUI版本号;
             this.Text = 标题;// + " TG:CMLiussss BY:CM喂饭 干货满满";
             comboBoxSaveMethod.Text = "本地";
             comboBoxSubscriptionType.Text = "通用订阅";
@@ -439,7 +701,7 @@ namespace subs_check.win.gui
 
                 bool hasNewGui = false;
                 bool hasNewKernel = false;
-                string newTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+                string newTitle = $"SubsCheck Win GUI [已停更，请用 subs-check-pro-gui] {当前GUI版本号}";
 
                 // ========= 检查 GUI 更新 =========
                 if (latestGui != "未知版本" && !string.Equals(latestGui, 当前GUI版本号, StringComparison.OrdinalIgnoreCase))
@@ -1688,7 +1950,7 @@ namespace subs_check.win.gui
 
                                 buttonCheckUpdate.ForeColor = Color.Black;
                                 buttonCheckUpdate.Text = "检查更新";
-                                string defaultTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+                                string defaultTitle = $"SubsCheck Win GUI [已停更，请用 subs-check-pro-gui] {当前GUI版本号}";
                                 标题 = defaultTitle;
                                 this.Text = 标题;
 
@@ -3624,7 +3886,7 @@ namespace subs_check.win.gui
             string currentKernelVersion = kernelVersion[0];
             string latestKernelVersion = kernelVersion[1];
 
-            string defaultTitle = $"SubsCheck Win GUI {当前GUI版本号}";
+            string defaultTitle = $"SubsCheck Win GUI [已停更，请用 subs-check-pro-gui] {当前GUI版本号}";
             if (currentKernelVersion != null && latestKernelVersion != null)
             {
                 if (TryParseVersion(latestKernelVersion, out Version vLatestK) &&

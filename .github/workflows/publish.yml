@@ -76,21 +76,21 @@ jobs:
         zip -r subs-check-win.zip .
       shell: bash
 
-    # 用 git-cliff 生成并更新 CHANGELOG.md（范围：PREV_TAG..CURRENT_TAG）
-    - name: Generate changelog with git-cliff
-      uses: orhun/git-cliff-action@v4
-      id: git-cliff
-      with:
-        config: cliff.toml
-        args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }} -o CHANGELOG.md
+    # # 用 git-cliff 生成并更新 CHANGELOG.md（范围：PREV_TAG..CURRENT_TAG）
+    # - name: Generate changelog with git-cliff
+    #   uses: orhun/git-cliff-action@v4
+    #   id: git-cliff
+    #   with:
+    #     config: cliff.toml
+    #     args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }} -o CHANGELOG.md
 
-    # 用 git-cliff 生成 Release body（范围：PREV_TAG..CURRENT_TAG）
-    - name: Generate changelog with git-cliff (release body)
-      uses: orhun/git-cliff-action@v4
-      id: git-cliff-release
-      with:
-        config: cliff-release.toml
-        args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }}
+    # # 用 git-cliff 生成 Release body（范围：PREV_TAG..CURRENT_TAG）
+    # - name: Generate changelog with git-cliff (release body)
+    #   uses: orhun/git-cliff-action@v4
+    #   id: git-cliff-release
+    #   with:
+    #     config: cliff-release.toml
+    #     args: ${{ steps.tags.outputs.prev_tag && format('{0}..{1}', steps.tags.outputs.prev_tag, steps.tags.outputs.current_tag) || steps.tags.outputs.current_tag }}
 
     - name: Generate update.xml
       run: |
